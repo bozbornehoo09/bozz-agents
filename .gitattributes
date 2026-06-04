@@ -1,0 +1,5 @@
+# Per-tool skill directories are generated from skills/ by CI — collapse them
+# in diffs and mark them as generated. Edit skills/ instead.
+.claude/skills/** linguist-generated=true
+.agents/skills/** linguist-generated=true
+.cursor/skills/** linguist-generated=true

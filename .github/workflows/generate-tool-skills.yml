@@ -1,0 +1,45 @@
+name: generate-tool-skills
+
+# Regenerate the per-tool skill directories (.claude/skills, .agents/skills)
+# from the canonical skills/ tree, and commit them back to the branch.
+#
+# Loop guard: this triggers ONLY on changes under skills/**. The generated
+# commit touches only .claude/skills/** and .agents/skills/**, so it never
+# re-triggers itself. The [skip ci] tag and concurrency group are belt-and-
+# suspenders.
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'skills/**'
+      - 'scripts/generate-tool-skills.sh'
+      - '.github/workflows/generate-tool-skills.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: generate-tool-skills-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate tool-specific skill directories
+        run: bash scripts/generate-tool-skills.sh
+
+      - name: Commit generated dirs if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .claude/skills .agents/skills
+          if git diff --cached --quiet; then
+            echo "Generated dirs already up to date — nothing to commit."
+          else
+            git commit -m "chore: regenerate per-tool skills from skills/ [skip ci]"
+            git push
+          fi

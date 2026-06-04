@@ -1,0 +1,19 @@
+name: validate-skills
+
+# On pull requests that touch skills, validate the canonical tree against the
+# Agent Skills spec (required name/description, kebab name matching the dir).
+# Generation + commit-back happens only on push to the default branch.
+
+on:
+  pull_request:
+    paths:
+      - 'skills/**'
+      - 'scripts/generate-tool-skills.sh'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate canonical skills against the Agent Skills spec
+        run: bash scripts/generate-tool-skills.sh --validate-only
