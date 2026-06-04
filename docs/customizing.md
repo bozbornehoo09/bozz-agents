@@ -21,38 +21,42 @@ Copy `config/context-manifest.example.yaml` to your project root as
 If you don't add a manifest, the skills fall back to the defaults in the example
 file.
 
-## 2. Replace the domain briefs
+## 2. Write your design-review briefs
 
 `docs-review` and `skill-review` are **project-agnostic** — their briefs check
 universal properties (internal consistency, decisional clarity, temporal decay,
 structural integrity, anti-hallucination quality, scope, cross-skill
 consistency). Leave them.
 
-`plan-review` and `code-review` are **architecture-specific**. The briefs under
-their `references/` directories —
+`plan-review` and `code-review` ship as **skeletons**. They contain the generic
+machinery (parallel fan-out, anti-hallucination contract, verdict aggregation)
+and a single template brief:
 
 ```
-skills/plan-review/references/{architecture,ml-contracts,iac-discipline,security,testing,performance-cost}.md
-skills/code-review/references/{...same...}.md
+skills/plan-review/references/_brief-template.md
+skills/code-review/references/_brief-template.md
 ```
 
-— encode the **Prism** project's hard rules (Model Router boundary, two-pass
-cognition, Vertex Pipelines vs Cloud Workflows, tenant/domain scoping, …). They
-are included as a **worked example**, not as defaults that fit you.
+They do **not** know your architecture — out of the box they have no real
+specialist briefs, so they have nothing to flag against. You supply that:
 
-To adapt:
-
-1. **Replace** each domain brief with one for *your* architecture. Keep the
-   brief shape (a single lens, a "do not flag" negative scope, and the
-   anti-hallucination contract). Use `docs/prism-case-study.md` and any existing
-   brief as a template.
-2. **Update both skills' `references/`.** plan-review and code-review carry
-   independent copies so each skill stays self-contained; if you change one
-   brief, change it in both (or let them diverge intentionally — plan-time and
-   diff-time checks can differ).
-3. **Update the SKILL.md specialist table** in each to list your briefs and
+1. **Copy `_brief-template.md`** to one real brief per architectural concern —
+   e.g. `architecture.md`, `security.md`, `performance.md`. One brief = one lens.
+   Each declares what it checks, a "do not flag" negative scope, and the
+   anti-hallucination contract (the template already has the shape).
+2. **Add them to both skills' `references/`.** plan-review and code-review keep
+   independent copies so each skill stays self-contained; share a brief by
+   copying it into both, or let them diverge (plan-time and diff-time checks can
+   differ).
+3. **Update the Specialists table** in each `SKILL.md` to list your briefs and
    their run-conditions.
 4. **Update `reviews:` in the manifest** to match.
+
+For a full, real instantiation to copy from, see
+[`prism-case-study.md`](prism-case-study.md) — the Prism project's six design
+briefs (Model Router boundary, two-pass cognition, Vertex Pipelines vs Cloud
+Workflows, tenant/domain scoping, …) live in the Prism repo's own
+`.claude/skills/`, not in this package.
 
 A new brief is small. The hard part — the parallel fan-out, the verdict
 aggregation, the anti-hallucination enforcement — is already in the SKILL.md and

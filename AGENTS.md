@@ -33,8 +33,9 @@ files under `skills/`.
 - Editing a skill or brief? Run `skill-review` afterward.
 - Editing these docs (`README.md`, `AGENTS.md`, `docs/**`)? Keep them consistent
   with the skills they describe.
-- The `plan-review` and `code-review` briefs under their `references/` are the
-  **Prism** worked example — project-specific by design. Don't genericize them;
-  they demonstrate how a consumer writes their own domain briefs.
+- `plan-review` and `code-review` are **skeletons**: generic machinery plus a
+  `_brief-template.md`. They carry no real specialist briefs — a consumer adds
+  briefs for their own architecture. The Prism project's real design briefs live
+  in the Prism repo, not here (see `docs/prism-case-study.md`).
 
 For Codex-specific install/usage, see `codex/README.md`.

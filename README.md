@@ -42,8 +42,8 @@ bozz-agents/
 │   ├── update-decisions/  …  update-work-tracker/   # 8 content-layer skills
 │   ├── docs-review/         #   review skills; specialist briefs live in
 │   ├── skill-review/        #   each skill's references/ subdirectory
-│   ├── plan-review/         #   (plan/code-review briefs are the Prism
-│   └── code-review/         #    worked example — replace for your project)
+│   ├── plan-review/         #   (skeletons — add briefs for your own
+│   └── code-review/         #    architecture; a template brief is included)
 ├── config/
 │   └── context-manifest.example.yaml   # the one file you customize
 ├── docs/                    # concepts.md, customizing.md, prism-case-study.md
@@ -82,9 +82,10 @@ The skills ship with sensible defaults (the conventional `docs/decisions/`,
 
 1. Copy `config/context-manifest.example.yaml` to your project as
    `context-manifest.yaml` and remap the layer paths.
-2. Replace the **domain briefs** under `skills/plan-review/references/` and
-   `skills/code-review/references/` — those encode the *Prism* project's
-   architecture and are included as a worked example.
+2. Give `plan-review` / `code-review` **briefs for your architecture**. They
+   ship as skeletons with a `_brief-template.md`; copy it into each skill's
+   `references/` (one brief per concern). The Prism project's real design briefs
+   live in the Prism repo as a worked example — see `docs/prism-case-study.md`.
 
 Full guide: [`docs/customizing.md`](docs/customizing.md). The pattern itself is
 explained in [`docs/concepts.md`](docs/concepts.md), and the original Prism

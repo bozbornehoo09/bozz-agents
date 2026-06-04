@@ -46,8 +46,10 @@ of the family. That *shape* is what you reuse; the *rules* are what you replace.
   skills; `docs-review` and `skill-review` and their briefs; the family pattern,
   severity vocabulary, verdict labels, and anti-hallucination contract. Hardcoded
   paths became the manifest; "Prism" became "the project".
-- **Kept as the example** (still Prism-specific): `plan-review`, `code-review`,
-  and their six domain briefs. Replacing these is step 2 of
+- **Shipped as skeletons** (Prism-specific content removed): `plan-review` and
+  `code-review` keep the generic machinery plus a `_brief-template.md`. Prism's
+  six real design briefs live in the **Prism repo's** own `.claude/skills/`, next
+  to the architecture they review. Writing your own is step 2 of
   [`customizing.md`](customizing.md).
 
 If you're adapting bozz-agents, read a couple of these briefs first — they're the

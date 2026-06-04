@@ -5,27 +5,29 @@ description: Review an implementation plan against the project's architectural A
 
 # Plan Review
 
-> **Worked example.** The specialist briefs under `references/` encode the **Prism** project's architecture and are included as a template. Replace them with briefs for your own architecture — see `docs/customizing.md`. The orchestration, fan-out, and anti-hallucination contract below are project-agnostic and stay as-is.
+> **Skeleton skill.** This ships the generic orchestration, anti-hallucination contract, and verdict logic, plus **one template brief** in `references/`. It does **not** know your architecture. Add one specialist brief per architectural concern (e.g. `architecture.md`, `security.md`, `performance.md`) to `references/`, then update the Specialists table below. For a full worked instantiation, see `docs/prism-case-study.md` — the Prism project's design briefs live in the Prism repo, not here.
 
-Stress-test an implementation plan against the architecture **before** code lands. In the Prism example, that means catching port violations, missed tenancy/domain scoping, two-pass cognition skips, and Cloud Workflows-vs-Vertex-Pipelines confusion at design time, not at PR time.
+Stress-test an implementation plan against the architecture **before** code lands — catching boundary/port violations, missed cross-cutting requirements, and decisions that need an ADR, at design time rather than at PR time. What counts as a violation is defined entirely by the briefs you add to `references/`.
 
 ## Inputs
 
 - A plan: file path (e.g. `docs/implementation_plan.md`), pasted markdown, or "the plan we just discussed in this session".
-- Optional: package scope hint (e.g. "this touches `src/inference_worker/` and `infrastructure/terraform/services/`"). If not given, infer from the plan's targets.
+- Optional: package scope hint (e.g. "this touches the API and the infra layer"). If not given, infer from the plan's targets.
 
 ## Specialists
 
-Each brief lives in `references/`. Spawn them in parallel via the Agent tool with `subagent_type: general-purpose` (or `agent-teams:team-reviewer` if running inside a `team-spawn`). Always run the first three; add the rest based on scope.
+Each brief is a self-contained reviewer instruction file in `references/`, covering exactly one lens. Spawn them in parallel via the Agent tool with `subagent_type: general-purpose` (or `agent-teams:team-reviewer` if running inside a `team-spawn`).
+
+Declare your briefs and their run-conditions here. Replace this table with your own:
 
 | Brief | When to run |
 |---|---|
-| `architecture.md` | Always |
-| `security.md` | Always |
-| `ml-contracts.md` | Always (Prism is an ML platform — Model Router/AdapterPack discipline is load-bearing even on UI work) |
-| `performance-cost.md` | Plan touches inference pipelines, Pub/Sub, Workflows, vector store, or any frontier model invocation |
-| `iac-discipline.md` | Plan touches `infrastructure/terraform/**`, IAM, schedules, or service accounts |
-| `testing.md` | Plan adds/changes tests, or skips testing entirely on a non-trivial change |
+| `_brief-template.md` | Template only — copy it to create real briefs; do not run as-is |
+| _(your `architecture.md`)_ | Always |
+| _(your `security.md`)_ | Always |
+| _(your domain brief)_ | When the plan touches that domain |
+
+Convention: keep 2–3 "always" briefs (the load-bearing lenses) and gate the rest on scope.
 
 ## Orchestration
 
@@ -69,18 +71,18 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
 # Plan Review: <plan title>
 
 Scope: <inferred packages>
-Specialists run: architecture, security, ml-contracts, ...
+Specialists run: <your brief names>
 
 ## BLOCK
-- [architecture] <finding> — <ADR/rule citation>
+- [<dimension>] <finding> — <ADR/rule citation>
 - ...
 
 ## FIX
-- [security] <finding> — <citation>
+- [<dimension>] <finding> — <citation>
 - ...
 
 ## SUGGEST
-- [performance-cost] <finding> — <citation>
+- [<dimension>] <finding> — <citation>
 - ...
 
 Verdict: REVISE
@@ -90,4 +92,4 @@ Verdict: REVISE
 
 - Not a code reviewer — the plan has no code yet. Use `code-review` after implementation.
 - Not a substitute for ADR creation. If the plan implies a *new* architectural decision (alternatives genuinely considered, binds future work), surface that as a BLOCK with "needs ADR" rather than rubber-stamping it.
-- Not a generic SOLID/DRY checker — those are inside `architecture.md`, scoped to Prism's actual port boundaries.
+- Not a generic SOLID/DRY checker — every check must trace to a brief in `references/` that you wrote for your architecture.

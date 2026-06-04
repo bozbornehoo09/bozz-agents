@@ -84,9 +84,9 @@ layers:
 
 # ---------------------------------------------------------------------------
 # Review-skill family. Each SKILL.md orchestrates the briefs bundled in its
-# own references/ directory. `domain` briefs are project-specific — the ones
-# shipped under plan-review/ and code-review/ are the Prism worked example;
-# replace them with briefs for YOUR architecture (see docs/customizing.md).
+# own references/ directory. docs-review and skill-review ship ready. plan-review
+# and code-review ship as SKELETONS — add briefs for YOUR architecture (copy
+# references/_brief-template.md). See docs/customizing.md.
 # ---------------------------------------------------------------------------
 reviews:
   docs-review:
@@ -97,10 +97,10 @@ reviews:
     briefs: [structural-integrity, anti-hallucination-quality, scope-focus, cross-skill-consistency]
   plan-review:
     reviews: "an implementation plan against the architecture, before code"
-    briefs: [architecture, ml-contracts, iac-discipline, security, testing, performance-cost]  # domain — replace
+    briefs: []   # skeleton — add your own (e.g. architecture, security, performance)
   code-review:
     reviews: "a diff/commit against the architecture"
-    briefs: [architecture, ml-contracts, iac-discipline, security, testing, performance-cost]  # domain — replace
+    briefs: []   # skeleton — add your own (e.g. architecture, security, performance)
 
 # Shared review conventions (kept consistent across the family by
 # cross-skill-consistency.md):

@@ -5,9 +5,9 @@ description: Review uncommitted changes or a specific commit/range against the p
 
 # Code Review
 
-> **Worked example.** The specialist briefs under `references/` encode the **Prism** project's architecture and are included as a template. Replace them with briefs for your own architecture — see `docs/customizing.md`. The orchestration, fan-out, and anti-hallucination contract below are project-agnostic and stay as-is.
+> **Skeleton skill.** This ships the generic orchestration, anti-hallucination contract, and verdict logic, plus **one template brief** in `references/`. It does **not** know your architecture. Add one specialist brief per architectural concern (e.g. `architecture.md`, `security.md`, `performance.md`) to `references/`, then update the Specialists table below. For a full worked instantiation, see `docs/prism-case-study.md` — the Prism project's design briefs live in the Prism repo, not here.
 
-Review actual code against the project's architecture. Specialist briefs live in `references/`.
+Review actual code against the project's architecture. What counts as a violation is defined entirely by the specialist briefs in `references/`, each citing your ADRs and rules.
 
 ## Inputs
 
@@ -20,16 +20,16 @@ If the diff is large (>500 lines), ask the user whether to chunk by file group o
 
 ## Specialists
 
-Each brief is a self-contained reviewer instruction file in `references/`. Run-conditions:
+Each brief is a self-contained reviewer instruction file in `references/`, covering exactly one lens. Declare your briefs and run-conditions here. Replace this table with your own:
 
 | Brief | When to run |
 |---|---|
-| `architecture.md` | Always |
-| `security.md` | Always |
-| `ml-contracts.md` | Always (Prism is an ML platform — Model Router/AdapterPack discipline applies even to UI work that surfaces model output) |
-| `performance-cost.md` | Diff touches `src/inference_worker/**`, `src/api_ingestion/**`, vector store, Pub/Sub, Workflows, or any frontier model invocation |
-| `iac-discipline.md` | Diff touches `infrastructure/terraform/**`, IAM, schedules, or service accounts |
-| `testing.md` | Diff adds/changes tests, OR non-trivial logic landed without test changes |
+| `_brief-template.md` | Template only — copy it to create real briefs; do not run as-is |
+| _(your `architecture.md`)_ | Always |
+| _(your `security.md`)_ | Always |
+| _(your domain brief)_ | When the diff touches that domain's paths |
+
+Convention: keep 2–3 "always" briefs and gate the rest on changed-file paths.
 
 ## Orchestration
 
@@ -68,8 +68,8 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
 
 ## Severity criteria
 
-- **BLOCK** — violates a CRITICAL OVERRIDE in a rule file, or contradicts an Accepted ADR. Do not merge.
-- **FIX** — violates a Hard Rule but is mechanically fixable, or introduces a clear regression risk.
+- **BLOCK** — violates a CRITICAL OVERRIDE / hard rule in a rule file, or contradicts an Accepted ADR. Do not merge.
+- **FIX** — violates a rule but is mechanically fixable, or introduces a clear regression risk.
 - **SUGGEST** — improvement that doesn't violate a rule (cleanup, naming, future-proofing). Optional.
 
 ## Output template
@@ -78,12 +78,13 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
 # Code Review: <commit message or "uncommitted changes">
 
 Files: <count> changed (<+adds>/<-dels>)
-Specialists run: architecture, security, ml-contracts, performance-cost
+Specialists run: <your brief names>
 
 ## BLOCK
-- src/inference_worker/recognizer.py:42 [security, ml-contracts]
-  Imports `anthropic` directly — violates Model Router rule.
-  → .claude/rules/inference_worker.md "Workers do not import provider SDKs"
+- <path>:<line> [<dimension>]
+  > "<verbatim offending line>"
+  <why it violates the rule>
+  → <rule/ADR file> "<verbatim rule clause>"
 
 ## FIX
 - ...
@@ -99,3 +100,4 @@ Verdict: REVISE | READY-WITH-FIXES | READY
 - Not a linter or formatter — assume those run separately.
 - Not a test runner — flag missing tests but do not execute the suite.
 - Not a substitute for human review on enterprise-bound code. In a personal project the fan-out is enough; on shared/critical code, a human still reads the diff.
+- Not a generic SOLID/DRY checker — every check must trace to a brief in `references/` that you wrote for your architecture.
