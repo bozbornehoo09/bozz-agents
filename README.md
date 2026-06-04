@@ -56,7 +56,7 @@ bozz-agents/
 ### Claude Code (plugin + marketplace)
 
 ```
-/plugin marketplace add bosborne09/bozz-agents
+/plugin marketplace add bozbornehoo09/bozz-agents
 /plugin install bozz-agents@bozz-agents
 ```
 
