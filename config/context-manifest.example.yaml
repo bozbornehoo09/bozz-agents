@@ -1,0 +1,109 @@
+# bozz-agents — context manifest (EXAMPLE)
+#
+# This file declares the authoritative "content layers" in YOUR project and
+# how the update-* and review skills operate on them. It is the single
+# customization point: the skills ship with the conventional defaults below,
+# and you remap paths here to match your repo.
+#
+# Usage: copy to your project root as `context-manifest.yaml` and edit. Every
+# path is relative to the project root. When no manifest is present, the
+# skills fall back to these same defaults.
+
+project:
+  name: "your-project"
+  # Always-on orientation file(s). Claude Code reads CLAUDE.md; Codex / Cursor
+  # / Gemini read AGENTS.md. List whichever your team uses (both is fine).
+  orientation: ["CLAUDE.md", "AGENTS.md"]
+
+# ---------------------------------------------------------------------------
+# Authoritative content layers, in dependency order (upstream truth first).
+#   - `skill`  : the update-* skill that owns writing this layer
+#   - `review` : the review skill run after this layer changes (null = none)
+#   - `order`  : dispatch order used by the update-context orchestrator
+# Delete layers you don't have; add your own following the same shape.
+# ---------------------------------------------------------------------------
+layers:
+  - id: decisions
+    title: "WHY — Architecture Decision Records (immutable, superseded not edited)"
+    path: docs/decisions/
+    skill: update-decisions
+    review: docs-review
+    order: 1
+
+  - id: strategy
+    title: "Strategy / positioning"
+    path: docs/strategy/
+    skill: update-strategy
+    review: docs-review
+    order: 2
+
+  - id: architecture
+    title: "Architecture synthesis + diagrams"
+    path: docs/architecture/
+    skill: update-architecture
+    review: docs-review
+    order: 3
+
+  - id: rules
+    title: "WHAT — per-package architectural rules"
+    # Claude Code convention: .claude/rules/. Tool-neutral alt: docs/rules/.
+    path: .claude/rules/
+    skill: update-rules
+    review: docs-review
+    order: 4
+
+  - id: ai-tooling
+    title: "AI tooling — the skills themselves"
+    # The host tool's skills directory: .claude/skills/ (Claude),
+    # .agents/skills/ (Codex), .cursor/skills/ (Cursor).
+    path: .claude/skills/
+    skill: update-skills
+    review: skill-review
+    order: 5
+
+  - id: open-questions
+    title: "Open questions (unresolved by definition — no review hook)"
+    path: docs/open_questions.md
+    skill: update-open-questions
+    review: null
+    order: 6
+
+  - id: orientation
+    title: "Project orientation (auto-loaded each session)"
+    path: CLAUDE.md
+    skill: update-orientation
+    review: docs-review
+    order: 7
+
+  - id: work-tracker
+    title: "WHEN — activity log (not authoritative — no review hook)"
+    path: work_tracker/
+    skill: update-work-tracker
+    review: null
+    order: 8
+
+# ---------------------------------------------------------------------------
+# Review-skill family. Each SKILL.md orchestrates the briefs bundled in its
+# own references/ directory. `domain` briefs are project-specific — the ones
+# shipped under plan-review/ and code-review/ are the Prism worked example;
+# replace them with briefs for YOUR architecture (see docs/customizing.md).
+# ---------------------------------------------------------------------------
+reviews:
+  docs-review:
+    reviews: "authoritative docs against each other"
+    briefs: [internal-consistency, decisional-clarity, temporal-decay, strategy-architecture-coherence]
+  skill-review:
+    reviews: "skills + their references against quality conventions"
+    briefs: [structural-integrity, anti-hallucination-quality, scope-focus, cross-skill-consistency]
+  plan-review:
+    reviews: "an implementation plan against the architecture, before code"
+    briefs: [architecture, ml-contracts, iac-discipline, security, testing, performance-cost]  # domain — replace
+  code-review:
+    reviews: "a diff/commit against the architecture"
+    briefs: [architecture, ml-contracts, iac-discipline, security, testing, performance-cost]  # domain — replace
+
+# Shared review conventions (kept consistent across the family by
+# cross-skill-consistency.md):
+conventions:
+  severity: [BLOCK, FIX, SUGGEST]
+  verdict: [READY, READY-WITH-FIXES, REVISE]
