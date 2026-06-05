@@ -31,6 +31,9 @@ should be checkable against a quotable rule or ADR, not a matter of taste.
   `file:line` (or `section:line`) citation. No quote or no citation → drop it.
 - "This violates rule X" findings quote **both** the offending text **and** the
   rule clause, each with a citation.
+- **For "missing element" findings, quote the surrounding context** where the
+  element should appear (the emit/query site, the output schema, the changed
+  logic), so the absence is verifiable — don't assert an absence without it.
 - An **empty report is correct** when there's nothing to flag. Do not invent
   findings.
 - Read the in-scope material before producing findings. No grep-and-go.
