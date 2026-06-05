@@ -56,8 +56,9 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
 1. **Every finding MUST include a verbatim quote** of the offending diff line. Format: `> "exact text from the diff"`. Paraphrases are invalid.
 2. **Every finding MUST cite `file:line`** — the file path and line number in the diff. No line number → finding invalid.
 3. **Cross-reference findings require quotes from BOTH sides.** A finding of the form "this code violates rule X" must include the verbatim diff line AND the verbatim rule clause being violated, with file:line for both.
-4. **An empty report is the correct output when no findings exist.** Specialists must not invent findings to justify the call. "No findings in this dimension" is a complete, valid report.
-5. **Out-of-scope corpus is invisible.** Each brief declares what it does NOT review (other specialists own those dimensions). Specialists must not flag concerns outside their declared lens.
+4. **"Missing element" findings quote the surrounding context** where the element should appear, so the absence is verifiable. Do not assert an absence without it.
+5. **An empty report is the correct output when no findings exist.** Specialists must not invent findings to justify the call. "No findings in this dimension" is a complete, valid report.
+6. **Out-of-scope corpus is invisible.** Each brief declares what it does NOT review (other specialists own those dimensions). Specialists must not flag concerns outside their declared lens.
 
 ## Do not flag (negative scope)
 

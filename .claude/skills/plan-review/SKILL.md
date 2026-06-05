@@ -55,8 +55,9 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
 1. **Every finding MUST include a verbatim quote** of the plan text being flagged. Format: `> "exact text from the plan"`. Paraphrases are invalid.
 2. **Every finding MUST cite `section:line`** (or `file:line` if the plan is a markdown file path). No line/section number → finding invalid.
 3. **Cross-reference findings require quotes from BOTH sides.** A finding of the form "this plan step violates rule X" must include the verbatim plan text AND the verbatim rule clause being violated, with citations for both.
-4. **An empty report is the correct output when no findings exist.** Specialists must not invent findings to justify the call.
-5. **Out-of-scope corpus is invisible.** Each brief declares what it does NOT review. Specialists must not flag concerns outside their declared lens.
+4. **"Missing element" findings quote the surrounding context** where the element should appear, so the absence is verifiable. Do not assert an absence without it.
+5. **An empty report is the correct output when no findings exist.** Specialists must not invent findings to justify the call.
+6. **Out-of-scope corpus is invisible.** Each brief declares what it does NOT review. Specialists must not flag concerns outside their declared lens.
 
 ## Do not flag (negative scope)
 
