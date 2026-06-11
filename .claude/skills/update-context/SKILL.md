@@ -27,13 +27,15 @@ orchestrator dispatches to them based on what discovery surfaces.
 | WHAT (per-package rules) | `.claude/rules/` | `update-rules` |
 | AI tooling | `.claude/skills/` (per-skill `references/`) | `update-skills` |
 | Open questions | `docs/open_questions.md` | `update-open-questions` |
+| FORWARD (work plan) | `work_tracker/work_plan.md` | `update-work-plan` |
 | Project orientation | `CLAUDE.md` / `AGENTS.md` | `update-orientation` |
 | WHEN (activity log) | `work_tracker/` | `update-work-tracker` |
 
 ADRs are upstream truth. Strategy and architecture reflect them. Rules
 cite both. Skills evolve when conventions shift. Open questions
-reconcile as ADRs land. The orientation file summarizes the whole. The
-work tracker logs the session.
+reconcile as ADRs land. The work plan reconciles with what landed. The
+orientation file summarizes the whole. The work tracker logs the
+session.
 
 ## Procedure
 
@@ -54,6 +56,7 @@ For everything mechanical, spawn ONE Explore subagent with this brief:
 >   - update-rules (rule changes driven by new ADRs or design shifts)
 >   - update-skills (new corpus directories, new specialist briefs, contract refinements)
 >   - update-open-questions (questions resolved by new ADRs, new questions surfaced)
+>   - update-work-plan (plan items landed/in-flight/dropped, new work discovered, blockers)
 >   - update-orientation (drift between the orientation file and current state)
 >   - update-work-tracker (always — captures the session)
 > Check: git log --since=<ts>, git status, and file mtimes under the
@@ -78,6 +81,7 @@ Dispatch plan:
 - update-decisions — <one-line reason>
 - update-architecture — <one-line reason>
 - update-rules — <one-line reason>
+- update-work-plan — <one-line reason>
 - update-work-tracker — always
 - (skipping: update-strategy, update-skills, update-open-questions, update-orientation — no changes detected)
 ```
@@ -99,13 +103,17 @@ Run only the skills in the confirmed plan, in this order:
    Status value, new doc directory, etc.).
 6. `update-open-questions` — reconcile resolved questions after
    ADRs land.
-7. `update-orientation` — orientation is downstream of everything.
-8. `update-work-tracker` — always last; logs the entire session.
+7. `update-work-plan` — reconcile the forward plan once decisions
+   and questions have settled.
+8. `update-orientation` — orientation is downstream of everything.
+9. `update-work-tracker` — always last; logs the entire session.
 
-**Suppress per-skill `docs-review` during this sweep.** Each narrow
-update skill has its own `docs-review` step for standalone use. When
-invoked from this orchestrator, skip the per-skill review — a single
-comprehensive review runs in step 4.
+**Suppress per-skill reviews during this sweep.** Each narrow update
+skill that has a review hook (`docs-review` or `skill-review`) runs it
+for standalone use. When invoked from this orchestrator, skip the
+per-skill review — a single comprehensive review runs in step 4.
+Likewise, narrow skills skip their own discovery subagent during a
+sweep — reuse the step 1 discovery findings instead.
 
 ### Step 4 — Final comprehensive review (in parallel)
 
@@ -165,6 +173,7 @@ narrow update skill directly:
 - `update-rules` — rule changes without sweep
 - `update-skills` — skills + their `references/` briefs
 - `update-open-questions` — question reconciliation only
+- `update-work-plan` — plan reconciliation only
 - `update-orientation` — orientation drift only
 - `update-work-tracker` — log without other changes
 
@@ -172,9 +181,9 @@ Each narrow update skill runs its own review at the end:
 - `update-decisions`, `update-strategy`, `update-architecture`,
   `update-rules`, `update-orientation` → `docs-review`
 - `update-skills` → `skill-review`
-- `update-work-tracker`, `update-open-questions` → no review hook
-  (work tracker is not authoritative; open questions are excluded from
-  review scope by definition)
+- `update-work-tracker`, `update-work-plan`, `update-open-questions` →
+  no review hook (work tracker and work plan are not authoritative;
+  open questions are excluded from review scope by definition)
 
 Prefer this orchestrator for end-of-session updates — it shares
 discovery and runs `docs-review` only once.

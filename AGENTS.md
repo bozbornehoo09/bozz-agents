@@ -8,9 +8,13 @@ files under `skills/`.
 ## What lives here
 
 - `skills/update-*/` — the **context-management** skills. `update-context` is the
-  end-of-session orchestrator; the eight narrow `update-<layer>` skills each own
-  one authoritative content layer (decisions, strategy, architecture, rules,
-  AI tooling, open questions, orientation, work tracker).
+  end-of-session orchestrator; the nine narrow `update-<layer>` skills each own
+  one content layer (decisions, strategy, architecture, rules, AI tooling,
+  open questions, work plan, orientation, work tracker).
+- `skills/context-up/` — the **session-start** bookend: a read-only loader that
+  resolves the layer map, loads the temporal core (latest tracker entry, work
+  plan next-up), and expands by task intent under an anti-greed contract
+  (index-first, fetch-only-cited).
 - `skills/{docs,skill,plan,code}-review/` — the **review** family. Each
   orchestrates the specialist briefs bundled in its own `references/` directory,
   fans them out in parallel, and returns `BLOCK`/`FIX`/`SUGGEST` findings with a

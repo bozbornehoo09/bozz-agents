@@ -38,8 +38,9 @@ bozz-agents/
 │   ├── plugin.json          # Claude Code plugin manifest
 │   └── marketplace.json     # so the repo installs via /plugin marketplace add
 ├── skills/                  # canonical SKILL.md skills (flat, tool-agnostic)
-│   ├── update-context/      #   orchestrator
-│   ├── update-decisions/  …  update-work-tracker/   # 8 content-layer skills
+│   ├── context-up/          #   session-start scoped context loader (read-only)
+│   ├── update-context/      #   end-of-session orchestrator
+│   ├── update-decisions/  …  update-work-tracker/   # 9 content-layer skills
 │   ├── docs-review/         #   review skills; specialist briefs live in
 │   ├── skill-review/        #   each skill's references/ subdirectory
 │   ├── plan-review/         #   (skeletons — add briefs for your own

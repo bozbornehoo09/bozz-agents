@@ -68,19 +68,26 @@ layers:
     review: null
     order: 6
 
+  - id: work-plan
+    title: "FORWARD — work plan (not authoritative — no review hook; stress-test with plan-review before a build phase)"
+    path: work_tracker/work_plan.md
+    skill: update-work-plan
+    review: null
+    order: 7
+
   - id: orientation
     title: "Project orientation (auto-loaded each session)"
     path: CLAUDE.md
     skill: update-orientation
     review: docs-review
-    order: 7
+    order: 8
 
   - id: work-tracker
     title: "WHEN — activity log (not authoritative — no review hook)"
     path: work_tracker/
     skill: update-work-tracker
     review: null
-    order: 8
+    order: 9
 
 # ---------------------------------------------------------------------------
 # Review-skill family. Each SKILL.md orchestrates the briefs bundled in its

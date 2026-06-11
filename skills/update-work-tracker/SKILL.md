@@ -58,7 +58,9 @@ Sections (omit any with no content):
 - **Rules updated** — list of `.claude/rules/` files touched (with
   `→ ADR-NNNN` citations where relevant)
 - **Open questions** — unresolved items to revisit
-- **Up next** — queued for the next session
+- **Up next** — a pointer to the work plan's "Next up"
+  (`work_tracker/work_plan.md`), noting only what changed this session.
+  The plan owns the forward view — do not restate the queue here.
 
 ## Pause-for-confirmation rules
 
