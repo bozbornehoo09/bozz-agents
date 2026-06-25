@@ -32,7 +32,7 @@ Never read, cite, or reason about: `docs/decisions/README.md`, `docs/strategy/re
 
 2. **Rule ↔ ADR contradictions.** A `.claude/rules/*.md` file states a rule whose cited ADR says something different. The rule may have been edited after the ADR or vice versa. Verify each `(see docs/decisions/00NN-*.md)` reference: open the cited ADR and confirm the rule's summary matches the ADR's actual decision.
 
-3. **Architecture ↔ ADR contradictions.** `prism_architecture_design.md` makes a claim that an Accepted ADR contradicts. The architecture doc is downstream of ADRs; if it disagrees, it's the architecture that's wrong (or a new ADR is implied — see `decisional-clarity.md`).
+3. **Architecture ↔ ADR contradictions.** `architecture_design.md` makes a claim that an Accepted ADR contradicts. The architecture doc is downstream of ADRs; if it disagrees, it's the architecture that's wrong (or a new ADR is implied — see `decisional-clarity.md`).
 
 4. **Rule ↔ Rule contradictions.** Two rule files make incompatible claims about the same concept. Most common form: ADR-0010 tenancy mentioned correctly in one rule but described differently in another.
 

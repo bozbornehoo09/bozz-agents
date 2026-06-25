@@ -18,7 +18,7 @@ cross-cutting concern that the design doc should describe.
 ## Scope
 
 In scope:
-- `docs/architecture/prism_architecture_design.md` — canonical design doc
+- `docs/architecture/architecture_design.md` — canonical design doc
 - `docs/architecture/README.md` — overview and index of architecture docs
 - `docs/architecture/architecture_diagram.mermaid` — visual system diagram
 
@@ -79,7 +79,7 @@ NOT durable (do not add):
 
 ### 4. Update the design doc
 
-Edit `prism_architecture_design.md` directly. Preserve section
+Edit `architecture_design.md` directly. Preserve section
 numbering — when adding a new sub-section, slot it into the existing
 numbering rather than renumbering the document. If renumbering is
 necessary (rare), update every cross-reference (rules cite by section

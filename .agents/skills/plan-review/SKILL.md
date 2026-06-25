@@ -5,7 +5,7 @@ description: Review an implementation plan against the project's architectural A
 
 # Plan Review
 
-> **Skeleton skill.** This ships the generic orchestration, anti-hallucination contract, and verdict logic, plus **one template brief** in `references/`. It does **not** know your architecture. Add one specialist brief per architectural concern (e.g. `architecture.md`, `security.md`, `performance.md`) to `references/`, then update the Specialists table below. For a full worked instantiation, see `docs/prism-case-study.md` — the Prism project's design briefs live in the Prism repo, not here.
+> **Skeleton skill.** This ships the generic orchestration, anti-hallucination contract, and verdict logic, plus **one template brief** in `references/`. It does **not** know your architecture. Add one specialist brief per architectural concern (e.g. `architecture.md`, `security.md`, `performance.md`) to `references/`, then update the Specialists table below. For how to add briefs for your architecture, see `docs/customizing.md`.
 
 Stress-test an implementation plan against the architecture **before** code lands — catching boundary/port violations, missed cross-cutting requirements, and decisions that need an ADR, at design time rather than at PR time. What counts as a violation is defined entirely by the briefs you add to `references/`.
 
