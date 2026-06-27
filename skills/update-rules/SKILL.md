@@ -3,18 +3,39 @@ name: update-rules
 description: Update per-package architectural rule files to reflect new ADRs or design shifts. Use when a decision changes a package's hard rules. Ends with docs-review.
 ---
 
-Update the per-package architectural rule files at <project-root>/.claude/rules/
-to reflect durable WHAT-decisions from recent work. Rules are per-package
-design documents the AI loads as authoritative context whenever it touches
-the matching files. Rationale ("why") lives in `docs/decisions/` (ADRs),
-not here.
+Update the per-package architectural rule files to reflect durable
+WHAT-decisions from recent work. Rules are per-package design documents
+the AI loads as authoritative context whenever it touches the matching
+files. Rationale ("why") lives in `docs/decisions/` (ADRs), not here.
+
+## Resolve the canonical source first
+
+Rule files may be authored directly, or **generated** from a tool-neutral
+canonical source (so one set of rules serves Claude, Antigravity, and
+other tools). **Never hand-edit a generated file — the next regenerate
+clobbers your edit.**
+
+1. **Locate the rules.** If a project `context-manifest.yaml` declares a
+   `rules` layer `path`, start there; otherwise default to `.claude/rules/`.
+2. **Check whether it is generated.** A sibling `GENERATED.md`, or a
+   `<!-- GENERATED — do not edit -->` / `# GENERATED — do not edit` header,
+   marks the directory as a build output. The marker names both the
+   **canonical source** (e.g. `rules/`) and the **regen command** (e.g.
+   `scripts/generate-tool-context.sh`).
+3. **Edit canonical, then regenerate.**
+   - *Generated layout:* edit the canonical source the marker names, then
+     run the regen command so every per-tool copy updates in lockstep.
+   - *Direct layout (no marker):* the located directory is itself canonical
+     — edit it directly.
+
+Below, "the rule files" always means the **canonical** ones resolved here.
 
 ## Steps
 
 ### 1. Read the existing rule files
 
-Read every current rule file under `.claude/rules/` to understand existing
-scope, descriptions, and constraints.
+Read every current canonical rule file to understand existing scope,
+descriptions, and constraints.
 
 ### 2. Discovery
 
@@ -23,8 +44,8 @@ surface here first; capture them directly.
 
 SECONDARY SOURCES — spawn ONE Explore subagent with this brief:
 
-> "Find what's changed that may require updates to per-package design
-> rules in <project-root>/.claude/rules/. Check:
+> "Find what's changed that may require updates to the per-package design
+> rules in <the canonical rules directory resolved above>. Check:
 > (a) any new ADRs in docs/decisions/ since the oldest rule file mtime
 > (these are the canonical source for durable decisions); (b)
 > `git log --since=<that mtime>` + `git status` and file mtimes under
@@ -61,7 +82,14 @@ If a brand-new package has emerged with no rule file, PAUSE and propose
 creating one (snake_case naming consistent with existing files). Do not
 create silently.
 
-### 6. Run docs-review
+### 6. Regenerate (generated layouts only)
+
+If the rules are generated, run the regen command the marker named (e.g.
+`scripts/generate-tool-context.sh`) so the per-tool copies reflect the
+canonical edits. Confirm its `--check` (or equivalent) is clean before
+moving on.
+
+### 7. Run docs-review
 
 After rule updates land, invoke the `docs-review` skill to verify rule
 edits did not desync from the ADRs they cite, contradict the
@@ -77,6 +105,8 @@ and either:
 ## Pause-for-confirmation rules
 
 Default to caution; loosen as trust grows.
+- PAUSE if you cannot tell whether the located rules are canonical or
+  generated — confirm before editing, never risk editing a build output.
 - PAUSE for any change that rewrites a CRITICAL OVERRIDE block.
 - PAUSE for any change that removes or weakens a hard rule.
 - PAUSE before creating a new rule file.
@@ -87,6 +117,7 @@ Default to caution; loosen as trust grows.
 
 ## Style
 
+- Edit the **canonical** source, never a generated copy.
 - Preserve the `glob:` frontmatter and structural conventions
   (CRITICAL OVERRIDE blocks, hard-rule lists, out-of-scope sections).
 - Rule files are durable design guidance, not a changelog. No date stamps

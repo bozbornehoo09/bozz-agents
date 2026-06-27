@@ -3,33 +3,49 @@ name: update-skills
 description: Update the project's AI tooling — skills and specialist briefs — when conventions shift. Use after adding a content domain or refining a review contract. Ends with skill-review.
 ---
 
-Update the AI tooling under `<project-root>/.claude/skills/`
-and `<project-root>/.claude/review-context/` to reflect
-changes in project conventions, the corpus the skills review, or the
-workflows they support. Skills are meta-tooling — they orchestrate AI
-behavior within the project. Like rules, they describe a current state
+Update the AI tooling — skill definitions and their specialist briefs —
+to reflect changes in project conventions, the corpus the skills review,
+or the workflows they support. Skills are meta-tooling — they orchestrate
+AI behavior within the project. Like rules, they describe a current state
 the AI loads as authoritative; like ADRs, they have structural
 conventions worth preserving.
+
+## Resolve the canonical source first
+
+Skills may be authored directly, or **generated** from a tool-neutral
+canonical source (e.g. a top-level `skills/` tree that generates
+`.claude/skills/`, `.agents/skills/`, …). **Never hand-edit a generated
+skill — the next regenerate clobbers it.** If a project
+`context-manifest.yaml` declares an AI-tooling layer `path`, start there;
+otherwise default to `.claude/skills/`. If that directory carries a sibling
+`GENERATED.md`, or a `<!-- GENERATED — do not edit -->` / `# GENERATED — do
+not edit` header, it is a build output that names the **canonical source**
+(e.g. `skills/`) and the **regen command** (e.g.
+`scripts/generate-tool-skills.sh`): edit the canonical source and run that
+command so every per-tool copy updates. Otherwise edit the located
+directory directly. Below, "the skills directory" means the canonical one
+resolved here.
 
 ## Scope
 
 In scope:
-- `.claude/skills/*/SKILL.md` — skill definitions (YAML frontmatter +
-  body).
-- `.claude/review-context/*.md` — specialist briefs invoked by skills.
+- `<the skills directory>/*/SKILL.md` — skill definitions (YAML
+  frontmatter + body).
+- the specialist briefs each skill invokes (per-skill `references/`, or a
+  shared `.claude/review-context/` in older layouts).
 
 Out of scope:
 - `prompts/*.md` — orchestration prompts; updated by hand or via a
   future `/update-prompts` flow.
-- `.claude/rules/*.md` — covered by `update-rules`.
+- the per-package rule files — covered by `update-rules`.
 - `docs/decisions/*.md` — covered by `update-decisions`.
 
 ## Steps
 
 ### 1. Read the existing skill set
 
-Read every current `SKILL.md` under `.claude/skills/` and every brief
-under `.claude/review-context/` to understand established structure,
+Read every current `SKILL.md` under the canonical skills directory and
+every specialist brief it invokes to understand established structure,
 specialist conventions, anti-hallucination contracts, output formats, and
 which skills invoke which briefs.
 
@@ -107,7 +123,11 @@ current briefs miss), PAUSE and propose adding a brief. The brief must:
 - Use the same output format conventions.
 - Be invoked from at least one `SKILL.md`.
 
-### 7. Run skill-review
+### 7. Regenerate (generated layouts only), then run skill-review
+
+If the skills are generated, run the regen command the marker named (e.g.
+`scripts/generate-tool-skills.sh`) so the per-tool copies reflect the
+canonical edits, and confirm its `--check` is clean.
 
 After skill or brief updates land, invoke the `skill-review` skill to
 verify structural integrity (frontmatter, required sections, brief
