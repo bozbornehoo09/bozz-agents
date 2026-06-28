@@ -28,12 +28,14 @@ orchestrator dispatches to them based on what discovery surfaces.
 | AI tooling | `.claude/skills/` (per-skill `references/`) | `update-skills` |
 | Open questions | `docs/open_questions.md` | `update-open-questions` |
 | FORWARD (work plan) | `work_tracker/work_plan.md` | `update-work-plan` |
+| Backlog (longer-term) | `work_tracker/backlog.md` | `update-backlog` |
 | Project orientation | `CLAUDE.md` / `AGENTS.md` | `update-orientation` |
 | WHEN (activity log) | `work_tracker/` | `update-work-tracker` |
 
 ADRs are upstream truth. Strategy and architecture reflect them. Rules
 cite both. Skills evolve when conventions shift. Open questions
-reconcile as ADRs land. The work plan reconciles with what landed. The
+reconcile as ADRs land. The work plan reconciles with what landed, and
+the backlog parks longer-term tasks until they are scheduled. The
 orientation file summarizes the whole. The work tracker logs the
 session.
 
@@ -57,6 +59,7 @@ For everything mechanical, spawn ONE Explore subagent with this brief:
 >   - update-skills (new corpus directories, new specialist briefs, contract refinements)
 >   - update-open-questions (questions resolved by new ADRs, new questions surfaced)
 >   - update-work-plan (plan items landed/in-flight/dropped, new work discovered, blockers)
+>   - update-backlog (longer-term tasks now scheduled out, or newly deferred in)
 >   - update-orientation (drift between the orientation file and current state)
 >   - update-work-tracker (always — captures the session)
 > Check: git log --since=<ts>, git status, and file mtimes under the
@@ -105,8 +108,10 @@ Run only the skills in the confirmed plan, in this order:
    ADRs land.
 7. `update-work-plan` — reconcile the forward plan once decisions
    and questions have settled.
-8. `update-orientation` — orientation is downstream of everything.
-9. `update-work-tracker` — always last; logs the entire session.
+8. `update-backlog` — reconcile the longer-term parking lot; promote
+   anything now scheduled into the plan (run after `update-work-plan`).
+9. `update-orientation` — orientation is downstream of everything.
+10. `update-work-tracker` — always last; logs the entire session.
 
 **Suppress per-skill reviews during this sweep.** Each narrow update
 skill that has a review hook (`docs-review` or `skill-review`) runs it
@@ -174,6 +179,7 @@ narrow update skill directly:
 - `update-skills` — skills + their `references/` briefs
 - `update-open-questions` — question reconciliation only
 - `update-work-plan` — plan reconciliation only
+- `update-backlog` — longer-term backlog reconciliation only
 - `update-orientation` — orientation drift only
 - `update-work-tracker` — log without other changes
 
@@ -181,9 +187,10 @@ Each narrow update skill runs its own review at the end:
 - `update-decisions`, `update-strategy`, `update-architecture`,
   `update-rules`, `update-orientation` → `docs-review`
 - `update-skills` → `skill-review`
-- `update-work-tracker`, `update-work-plan`, `update-open-questions` →
-  no review hook (work tracker and work plan are not authoritative;
-  open questions are excluded from review scope by definition)
+- `update-work-tracker`, `update-work-plan`, `update-backlog`,
+  `update-open-questions` → no review hook (work tracker, work plan, and
+  backlog are not authoritative; open questions are excluded from review
+  scope by definition)
 
 Prefer this orchestrator for end-of-session updates — it shares
 discovery and runs `docs-review` only once.

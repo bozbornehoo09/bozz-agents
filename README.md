@@ -7,10 +7,10 @@ project's *knowledge* — its decisions, architecture, rules, and docs — accur
 and coherent as the code evolves, then stress-test that knowledge against itself:
 
 - **`update-*` skills** — the **write** side. A discover-and-dispatch
-  orchestrator (`update-context`) plus eight narrow skills, one per
-  authoritative content layer (decisions, strategy, architecture, rules,
-  AI tooling, open questions, orientation, work tracker). Run at the end of a
-  session to capture what changed in the right place.
+  orchestrator (`update-context`) plus ten narrow skills, one per
+  content layer (decisions, strategy, architecture, rules, AI tooling,
+  open questions, work plan, backlog, orientation, work tracker). Run at
+  the end of a session to capture what changed in the right place.
 - **review skills** — the **check** side. A four-member review family
   (`docs-review`, `skill-review`, `plan-review`, `code-review`). Each fans out
   to 3–4 specialist briefs in parallel, reports findings as `BLOCK`/`FIX`/
@@ -40,7 +40,7 @@ bozz-agents/
 ├── skills/                  # canonical SKILL.md skills (flat, tool-agnostic)
 │   ├── context-up/          #   session-start scoped context loader (read-only)
 │   ├── update-context/      #   end-of-session orchestrator
-│   ├── update-decisions/  …  update-work-tracker/   # 9 content-layer skills
+│   ├── update-decisions/  …  update-work-tracker/   # 10 content-layer skills
 │   ├── docs-review/         #   review skills; specialist briefs live in
 │   ├── skill-review/        #   each skill's references/ subdirectory
 │   ├── plan-review/         #   (skeletons — add briefs for your own

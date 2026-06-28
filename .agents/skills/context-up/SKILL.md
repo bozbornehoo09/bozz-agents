@@ -18,8 +18,9 @@ Read `context-manifest.yaml` at the project root for layer paths. If
 absent, use the conventional defaults (`docs/decisions/`,
 `docs/strategy/`, `docs/architecture/`, `.claude/rules/`,
 `docs/open_questions.md`, `work_tracker/`,
-`work_tracker/work_plan.md`). The orientation file (CLAUDE.md /
-AGENTS.md) is already auto-loaded — do not re-read it.
+`work_tracker/work_plan.md`, `work_tracker/backlog.md`). The
+orientation file (CLAUDE.md / AGENTS.md) is already auto-loaded — do
+not re-read it.
 
 ### Step 2 — Determine session intent
 
@@ -70,8 +71,10 @@ still enters via its row's path (citation-first, never bulk).
   strategy), read the TOC, then only the sections that match the task.
 - **Don't preload "might need".** Name it as available instead; load it
   when the task actually touches it.
-- **Never load** research memos, superseded ADRs, or prior work-tracker
-  weeks unless the task is specifically about them.
+- **Never load** research memos, superseded ADRs, prior work-tracker
+  weeks, or the longer-term backlog (`work_tracker/backlog.md`) unless
+  the task is specifically about them — the backlog is a parking lot,
+  not part of resuming.
 
 ### Step 5 — Report and confirm readiness
 
