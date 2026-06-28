@@ -6,12 +6,12 @@ A skill or brief that does many things at once produces shallow findings on each
 
 ## Authoritative corpus (in scope)
 
-- `.claude/skills/*/SKILL.md`
-- `.claude/review-context/*.md`
+- `<skills-dir>/*/SKILL.md`
+- `<skills-dir>/*/references/*.md`
 
 ## Out of scope corpus (invisible)
 
-Never read or cite anything outside `.claude/skills/` and `.claude/review-context/`.
+Never read or cite anything outside each skill's `SKILL.md` and its `references/`.
 
 ## Family-norm reference points (for bloat detection)
 

@@ -3,6 +3,8 @@ name: update-decisions
 description: Capture WHY-rationale as immutable Architecture Decision Records (ADRs). Use after a decision is made that genuinely binds future work; writes a new numbered ADR and supersedes rather than edits. Ends with docs-review.
 ---
 
+# Update Decisions
+
 Update the Architecture Decision Records (ADRs) at <project-root>/docs/decisions/
 to capture WHY-rationale for decisions made in recent work. ADRs are
 *immutable* — never edit an accepted ADR's Decision or Alternatives. When

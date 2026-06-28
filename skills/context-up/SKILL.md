@@ -3,6 +3,8 @@ name: context-up
 description: Load just enough project context to resume work with confidence — where things stand, what's next, and the specific docs the task at hand needs. Use when the user says "context up", "load context", "pick up where I left off", "what was I working on", "what's the status", or starts a session with a task and no context loaded. Read-only; modifies nothing.
 ---
 
+# Context Up
+
 Load the minimum context needed to act with full confidence on THIS
 session's task — not the whole knowledge base. The project's layered
 docs exist precisely so you can navigate to the right ones; loading

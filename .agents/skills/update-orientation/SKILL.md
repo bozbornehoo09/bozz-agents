@@ -3,6 +3,8 @@ name: update-orientation
 description: Update the project orientation file (CLAUDE.md / AGENTS.md, or its neutral source) when it drifts from current state. Use when the auto-loaded onboarding context is stale. Ends with docs-review.
 ---
 
+# Update Orientation
+
 Update the project orientation to reflect changes in project
 conventions, the skill set, the layer structure, or behavioral rules.
 The orientation is loaded into **every** AI session, so drift here has

@@ -3,6 +3,8 @@ name: update-open-questions
 description: Reconcile the open-questions log: close questions resolved by new ADRs and record newly surfaced ones. Use after decisions land. No review hook (open questions are unresolved by definition).
 ---
 
+# Update Open Questions
+
 Update the open questions log at
 `<project-root>/docs/open_questions.md` to reconcile
 resolved questions, add newly-surfaced ones, and keep ranking aligned

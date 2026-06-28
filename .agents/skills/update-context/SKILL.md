@@ -3,6 +3,8 @@ name: update-context
 description: Discover-and-dispatch orchestrator for end-of-session context updates. Surveys what changed across the project, dispatches only the needed narrow update skills in dependency order, and ends with a single consolidated docs-review. Use at the end of a working session, after a major decision, or anytime you want to lock in everything that changed.
 ---
 
+# Update Context
+
 The end-of-session one-stop. Discovers what has changed across the
 project, identifies which authoritative content needs updating, invokes
 only the narrow update skills that are needed, and ends with a single

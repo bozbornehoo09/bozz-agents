@@ -6,12 +6,12 @@ A weak contract is the dominant failure mode for review skills. A skill or brief
 
 ## Authoritative corpus (in scope)
 
-- `.claude/skills/*/SKILL.md`
-- `.claude/review-context/*.md`
+- `<skills-dir>/*/SKILL.md`
+- `<skills-dir>/*/references/*.md`
 
 ## Out of scope corpus (invisible)
 
-Never read or cite anything outside `.claude/skills/` and `.claude/review-context/`.
+Never read or cite anything outside each skill's `SKILL.md` and its `references/`.
 
 ## Required guards (the contract every review skill must enforce)
 

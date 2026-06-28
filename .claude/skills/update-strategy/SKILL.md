@@ -3,6 +3,8 @@ name: update-strategy
 description: Update strategy and positioning docs to reflect new decisions or research artifacts. Use when positioning shifts or a strategy doc needs reconciling with landed ADRs. Ends with docs-review.
 ---
 
+# Update Strategy
+
 Update the strategy documents at
 `<project-root>/docs/strategy/` to reflect positioning,
 competitive analysis, and north-star refinements that surfaced during
