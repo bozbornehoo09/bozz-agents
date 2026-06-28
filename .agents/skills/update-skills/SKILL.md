@@ -3,6 +3,8 @@ name: update-skills
 description: Update the project's AI tooling — skills and specialist briefs — when conventions shift. Use after adding a content domain or refining a review contract. Ends with skill-review.
 ---
 
+# Update Skills
+
 Update the AI tooling — skill definitions and their specialist briefs —
 to reflect changes in project conventions, the corpus the skills review,
 or the workflows they support. Skills are meta-tooling — they orchestrate
@@ -87,9 +89,9 @@ NOT durable (do not add):
 ### 4. Cross-reference verification
 
 Each `SKILL.md` references its specialist briefs by path. Verify:
-- Every brief listed in a `SKILL.md` actually exists in
-  `.claude/review-context/`.
-- Every brief in `.claude/review-context/` is referenced by at least one
+- Every brief listed in a `SKILL.md` actually exists under that skill's
+  `references/`.
+- Every brief in a skill's `references/` is referenced by its
   `SKILL.md`. Orphaned briefs are dead weight — surface for deletion.
 - Corpus globs in `SKILL.md` and the briefs it invokes are consistent.
   If `SKILL.md` scopes `docs/strategy/*.md` but a brief lists individual

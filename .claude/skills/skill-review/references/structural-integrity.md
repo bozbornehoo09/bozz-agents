@@ -6,18 +6,18 @@ You are reviewing the project's skills and specialist briefs for conventional st
 
 The orchestrator passes you a concrete file list and a skill-brief map. Read every file in the list before producing findings.
 
-- `.claude/skills/*/SKILL.md` — every skill definition.
-- `.claude/review-context/*.md` — every specialist brief.
+- `<skills-dir>/*/SKILL.md` — every skill definition.
+- `<skills-dir>/*/references/*.md` — every specialist brief bundled with a skill.
 
 ## Out of scope corpus (invisible)
 
-Never read or cite anything outside `.claude/skills/` and `.claude/review-context/`. If a question requires reading another file, return "out of scope — cannot evaluate."
+Never read or cite anything outside each skill's `SKILL.md` and its `references/`. If a question requires reading another file, return "out of scope — cannot evaluate."
 
 ## Check for (in order of importance)
 
-1. **Broken brief references.** A `SKILL.md` references a brief by path; the brief file does not exist in `.claude/review-context/`. **BLOCK** — the skill cannot run.
+1. **Broken brief references.** A `SKILL.md` references a brief by path; the brief file does not exist under that skill's `references/`. **BLOCK** — the skill cannot run.
 
-2. **Orphan briefs.** A brief in `.claude/review-context/` is not referenced by any `SKILL.md`. The orchestrator surfaces these in the skill-brief map. **FIX** — either reference it or delete it; orphan briefs are dead weight.
+2. **Orphan briefs.** A brief in a skill's `references/` is not referenced by its `SKILL.md`. The orchestrator surfaces these in the skill-brief map. **FIX** — either reference it or delete it; orphan briefs are dead weight.
 
 3. **Missing or malformed YAML frontmatter in `SKILL.md`.** Every `SKILL.md` must open with:
    ```

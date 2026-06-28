@@ -3,6 +3,8 @@ name: update-work-tracker
 description: Append a session entry to the activity log (the WHEN layer). Use at the end of a session to record what changed, what was decided, and what was deferred. No review hook (the work tracker is not authoritative).
 ---
 
+# Update Work Tracker
+
 Update the work tracker at <project-root>/work_tracker with
 everything done since the last entry. The work tracker is the WHEN layer:
 short activity logs indexed by date, NOT deep rationale (rationale lives

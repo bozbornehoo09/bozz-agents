@@ -3,6 +3,8 @@ name: update-rules
 description: Update per-package architectural rule files to reflect new ADRs or design shifts. Use when a decision changes a package's hard rules. Ends with docs-review.
 ---
 
+# Update Rules
+
 Update the per-package architectural rule files to reflect durable
 WHAT-decisions from recent work. Rules are per-package design documents
 the AI loads as authoritative context whenever it touches the matching

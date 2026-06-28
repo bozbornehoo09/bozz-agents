@@ -66,6 +66,12 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
 - Anything the plan explicitly defers to a future iteration with an honest "out of scope" note.
 - Implementation details below the plan's stated abstraction level (those are `code-review`'s job after the plan is implemented).
 
+## Severity criteria
+
+- **BLOCK** — the plan contradicts an Accepted ADR or a CRITICAL OVERRIDE / hard rule, or commits to a *new* architectural decision with no ADR. Resolve before building.
+- **FIX** — the plan violates a rule but is correctable in the plan (a missed cross-cutting requirement, a boundary the plan can honor with a tweak).
+- **SUGGEST** — improvement that doesn't violate a rule (sequencing, clarity, future-proofing). Optional.
+
 ## Output template
 
 ```

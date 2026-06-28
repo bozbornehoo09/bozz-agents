@@ -6,12 +6,12 @@ Inconsistency across the family is not a per-file failure; it shows up only when
 
 ## Authoritative corpus (in scope)
 
-- `.claude/skills/*/SKILL.md`
-- `.claude/review-context/*.md`
+- `<skills-dir>/*/SKILL.md`
+- `<skills-dir>/*/references/*.md`
 
 ## Out of scope corpus (invisible)
 
-Never read or cite anything outside `.claude/skills/` and `.claude/review-context/`.
+Never read or cite anything outside each skill's `SKILL.md` and its `references/`.
 
 ## Established conventions (the canon)
 
@@ -21,7 +21,7 @@ These are the conventions the family has adopted. Divergence is a finding.
 - **Verdict labels:** `READY` / `REVISE` / `READY-WITH-FIXES`. Other labels (`PASS/FAIL`, `OK/NOT OK`) are non-canonical.
 - **Verdict mapping:** no BLOCKs → `READY`; only FIX/SUGGEST → `READY-WITH-FIXES`; any BLOCK → `REVISE`.
 - **Specialist invocation:** parallel via Agent (typically `subagent_type: general-purpose`), single message with multiple tool calls. Sequential invocation breaks the design.
-- **Specialist brief location:** `.claude/review-context/`. Not under each skill's directory; not elsewhere.
+- **Specialist brief location:** each skill's own `references/` subdirectory. Not a shared top-level directory; not elsewhere.
 - **Output template anchors:** `# <Skill Name>: <subject>`, then a `Specialists run:` line, then severity sections in order BLOCK → FIX → SUGGEST, then `Verdict:` line at end.
 - **Anti-hallucination contract anchor:** section heading `## Anti-hallucination contract` (or close variant). Variants like `## Hallucination prevention` or `## Quality guards` diverge from canon.
 - **Negative-scope anchor:** section heading `## Do not flag` or `## What this skill is NOT` (often both — the first inside the brief, the second on the SKILL.md).
@@ -37,7 +37,7 @@ These are the conventions the family has adopted. Divergence is a finding.
 
 4. **Specialist invocation pattern divergence.** A skill that invokes specialists sequentially when parallel is appropriate, or invokes them via a different mechanism than `Agent` with `subagent_type`. **FIX** if it's a stylistic choice; **BLOCK** if it changes the contract semantics (e.g., specialists pass state to each other).
 
-5. **Specialist brief location divergence.** A specialist brief stored under the skill's own directory (`.claude/skills/foo/specialists/`) instead of `.claude/review-context/`. **FIX** — relocate.
+5. **Specialist brief location divergence.** A specialist brief stored outside its owning skill's `references/` (e.g. a shared top-level directory, or `.claude/skills/foo/specialists/`). **FIX** — relocate into the skill's `references/`.
 
 6. **Anti-hallucination anchor divergence.** A skill or brief using a non-canonical heading for the contract section. The text may be fine; the anchor name is the convention. **FIX**.
 

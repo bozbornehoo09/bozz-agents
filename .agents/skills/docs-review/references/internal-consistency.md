@@ -51,6 +51,7 @@ Never read, cite, or reason about: `docs/decisions/README.md`, `docs/strategy/re
 - **Every finding requires a verbatim quote.** Format: `> "exact text from doc"`. Paraphrases are invalid.
 - **Every finding requires `file:line`.**
 - **Cross-reference findings need quotes from BOTH sides** with both file:line citations.
+- **"Missing" findings quote the surrounding context** where the missing element should appear (an unpropagated concept, a stale or absent pointer), so the absence is verifiable.
 - **Empty report is correct when no findings exist.** Do not invent findings.
 
 ## Output format

@@ -3,6 +3,8 @@ name: update-architecture
 description: Update the architecture design and diagrams to synthesize new ADRs — new services, ports, principles. Use after architecture-affecting decisions land. Ends with docs-review.
 ---
 
+# Update Architecture
+
 Update the architecture design documents at
 `<project-root>/docs/architecture/` to reflect ADR-driven
 and in-session changes to the system design. The architecture doc is the

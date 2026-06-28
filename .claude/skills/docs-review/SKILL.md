@@ -88,9 +88,10 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
 1. **Every finding MUST include a verbatim quote.** Format: `> "exact text from doc"`. Paraphrases are invalid. Specialist must copy the source text byte-for-byte.
 2. **Every finding MUST cite `file:line`.** If a specialist cannot produce a line number, the finding is invalid.
 3. **Cross-reference findings require quotes from BOTH sides.** A finding of the form "Doc A contradicts Doc B" must include verbatim quotes and line numbers from both A and B.
-4. **An empty report is the correct output when no findings exist.** Specialists must not invent findings to justify the call. "No findings in this dimension" is a complete, valid report.
-5. **Out-of-scope corpus is invisible.** Specialists do not read, cite, or reason about anything in the "Out of scope" list. If a question requires reading an out-of-scope file, the specialist returns "out of scope — cannot evaluate" rather than guessing.
-6. **Specialists must read every in-scope file before producing findings.** No grep-and-go. Findings produced without full corpus read are invalid.
+4. **"Missing element" findings quote the surrounding context** where the element should appear, so the absence is verifiable. Do not assert an absence (a missing Status field, an unpropagated concept) without it.
+5. **An empty report is the correct output when no findings exist.** Specialists must not invent findings to justify the call. "No findings in this dimension" is a complete, valid report.
+6. **Out-of-scope corpus is invisible.** Specialists do not read, cite, or reason about anything in the "Out of scope" list. If a question requires reading an out-of-scope file, the specialist returns "out of scope — cannot evaluate" rather than guessing.
+7. **Specialists must read every in-scope file before producing findings.** No grep-and-go. Findings produced without full corpus read are invalid.
 
 ## Do not flag (negative scope)
 

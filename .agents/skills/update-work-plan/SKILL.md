@@ -3,6 +3,8 @@ name: update-work-plan
 description: Reconcile the forward work plan with reality — mark landed items, promote the next focus, record plan changes with their why. Use at the end of a session or after a decision reshapes the plan. No review hook (the plan is not authoritative); run plan-review before starting a build phase.
 ---
 
+# Update Work Plan
+
 Update the work plan at <project-root>/work_tracker/work_plan.md (or the
 path declared in `context-manifest.yaml`). The work plan is the FORWARD
 layer: what's next, in what order, and why — the mirror of the work
