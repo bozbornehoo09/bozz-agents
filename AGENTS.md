@@ -8,9 +8,9 @@ files under `skills/`.
 ## What lives here
 
 - `skills/update-*/` — the **context-management** skills. `update-context` is the
-  end-of-session orchestrator; the nine narrow `update-<layer>` skills each own
+  end-of-session orchestrator; the ten narrow `update-<layer>` skills each own
   one content layer (decisions, strategy, architecture, rules, AI tooling,
-  open questions, work plan, orientation, work tracker).
+  open questions, work plan, backlog, orientation, work tracker).
 - `skills/context-up/` — the **session-start** bookend: a read-only loader that
   resolves the layer map, loads the temporal core (latest tracker entry, work
   plan next-up), and expands by task intent under an anti-greed contract
