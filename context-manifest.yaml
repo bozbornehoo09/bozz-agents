@@ -1,0 +1,92 @@
+# bozz-agents — context manifest
+#
+# Declares this repo's own authoritative content layers so the update-* and
+# review skills can run ON bozz-agents itself (dogfooding). Paths are relative
+# to the project root. bozz-agents is a developer-tool repo — no application
+# packages — so the `rules` and `strategy` layers are intentionally omitted
+# (conventions live in AGENTS.md; positioning lives in README.md).
+
+project:
+  name: "bozz-agents"
+  # Tool-neutral orientation. There is no CLAUDE.md at root; AGENTS.md is the
+  # canonical cross-tool orientation file.
+  orientation: ["AGENTS.md"]
+
+layers:
+  - id: decisions
+    title: "WHY — Architecture Decision Records (immutable, superseded not edited)"
+    path: docs/decisions/
+    skill: update-decisions
+    review: docs-review
+    order: 1
+
+  - id: architecture
+    title: "Design / concepts — how the layer + review model works"
+    path: docs/concepts.md
+    skill: update-architecture
+    review: docs-review
+    order: 2
+
+  - id: ai-tooling
+    title: "AI tooling — the canonical skills (skills/; per-tool .claude/.agents copies are generated)"
+    path: skills/
+    skill: update-skills
+    review: skill-review
+    order: 3
+
+  - id: open-questions
+    title: "Open questions (unresolved by definition — no review hook)"
+    path: docs/open_questions.md
+    skill: update-open-questions
+    review: null
+    order: 4
+
+  - id: work-plan
+    title: "FORWARD — work plan (not authoritative — no review hook)"
+    path: work_tracker/work_plan.md
+    skill: update-work-plan
+    review: null
+    order: 5
+
+  - id: backlog
+    title: "Backlog — longer-term parking lot (not authoritative — no review hook)"
+    path: work_tracker/backlog.md
+    skill: update-backlog
+    review: null
+    order: 6
+
+  - id: orientation
+    title: "Project orientation (auto-loaded each session)"
+    path: AGENTS.md
+    skill: update-orientation
+    review: docs-review
+    order: 7
+
+  - id: work-tracker
+    title: "WHEN — activity log (not authoritative — no review hook)"
+    path: work_tracker/
+    skill: update-work-tracker
+    review: null
+    order: 8
+
+# Review-skill family. docs-review and skill-review ship ready and are the
+# load-bearing ones for this repo (it reviews docs + the skills themselves).
+# plan-review and code-review remain skeletons — this repo has no architecture
+# briefs of its own to add.
+reviews:
+  docs-review:
+    reviews: "authoritative docs against each other"
+    briefs: [internal-consistency, decisional-clarity, temporal-decay, strategy-architecture-coherence]
+  skill-review:
+    reviews: "skills + their references against quality conventions"
+    briefs: [structural-integrity, anti-hallucination-quality, scope-focus, cross-skill-consistency]
+  plan-review:
+    reviews: "an implementation plan against the architecture, before code"
+    briefs: []   # skeleton — no project-specific briefs
+  code-review:
+    reviews: "a diff/commit against the architecture"
+    briefs: []   # skeleton — no project-specific briefs
+
+conventions:
+  severity: [BLOCK, FIX, SUGGEST]
+  verdict: [READY, READY-WITH-FIXES, REVISE]

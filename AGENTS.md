@@ -20,6 +20,18 @@ files under `skills/`.
   fans them out in parallel, and returns `BLOCK`/`FIX`/`SUGGEST` findings with a
   `READY` / `READY-WITH-FIXES` / `REVISE` verdict.
 
+## Context system
+
+This repo **dogfoods its own skills**: it declares its authoritative content
+layers in `context-manifest.yaml` and runs the `update-*` / review skills on
+itself *(see `docs/decisions/0001-bozz-agents-maintains-own-context.md`)*. The
+layers are `docs/decisions/` (ADRs), `docs/concepts.md` (design), `skills/` (the
+AI tooling), `docs/open_questions.md`, `work_tracker/` (work plan, backlog,
+activity log), and this `AGENTS.md` (orientation). The `rules` and `strategy`
+layers are intentionally omitted — this is a tool repo, so conventions live
+below and positioning lives in `README.md`. End a working session with
+`/update-context`.
+
 ## Conventions (keep these stable)
 
 - Skills are authored to the open Agent Skills spec: a folder + `SKILL.md` with

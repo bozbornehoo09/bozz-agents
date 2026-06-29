@@ -17,7 +17,8 @@ bozz-agents names these layers explicitly and gives each one:
 - a place in a **dependency order** (decisions are upstream truth; strategy,
   architecture, and rules reflect them; orientation summarizes the whole).
 
-The layers are declared in `config/context-manifest.yaml`. The shipped defaults
+The layers are declared in a project-root `context-manifest.yaml` (copy the
+shipped `config/context-manifest.example.yaml` to start). The shipped defaults
 match a common documentation layout, but the set is yours to define.
 
 ## The write side: discover → dispatch → review
