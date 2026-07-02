@@ -20,8 +20,8 @@ A complete anti-hallucination contract has **all five** of these guards. Missing
 1. **Verbatim quote requirement.** Every specialist finding must include a verbatim quote from the source, formatted as a markdown blockquote. Paraphrases are explicitly invalid.
 2. **File:line citation requirement.** Every finding must cite a specific file and line number. No line number → finding invalid.
 3. **Cross-reference symmetry.** Findings of the form "A contradicts B" must include verbatim quotes and line numbers from BOTH sides.
-4. **Empty-report validity.** A specialist that finds nothing reports nothing. Inventing findings to justify the call is explicitly prohibited.
-5. **Negative scope ("do not flag" list).** The skill or brief enumerates what NOT to flag — style, grammar, formatting, out-of-scope concerns. Without this, specialists drift.
+4. **Empty-report validity.** When present, the guard must explicitly state that inventing findings is prohibited — not merely encourage accuracy or say "try to avoid."
+5. **Negative scope ("do not flag" list).** When present, the enumeration must be specific and binding — concrete out-of-scope concerns named, not vague categories that leave room for drift.
 
 ## Check for (in order of importance)
 
@@ -36,6 +36,11 @@ A complete anti-hallucination contract has **all five** of these guards. Missing
 5. **Missing brief-level contract restatement.** Each specialist brief should restate at least the verbatim-quote and file:line requirements (so a specialist invoked with only the brief sees the binding rules). A brief with no contract restatement, relying entirely on the SKILL.md, is fragile. **FIX**.
 
 6. **Missing "missing element" handling.** Briefs that flag missing structure (e.g., missing Status field, missing supersedence chain) should require the specialist to quote the *surrounding context* where the missing element should appear. Without this, "missing" findings are unverifiable assertions. **FIX**.
+
+**Do not flag:** a wholly missing negative-scope section or missing
+canonical closing line is a missing-section failure owned by
+`structural-integrity.md` — flag here only guards that are present
+but weak or aspirational, and contracts missing key guard CONTENT.
 
 ## Anti-hallucination contract (binding on you, the reviewer)
 

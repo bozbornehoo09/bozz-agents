@@ -30,7 +30,7 @@ Never read or cite: `docs/decisions/README.md`, `docs/strategy/research/**`, `do
 
 ## Check for (in order of importance)
 
-1. **Vendor capability claims without dates.** Statements about what a third-party product does, supports, or offers. The vendor changes their product; the claim ages. Examples that need dates: "Twelve Labs Marengo provides verticalized video-native embeddings," "Vertex AI Vector Search supports `(tenant_id, domain_id)` partition keys."
+1. **Vendor capability claims without dates.** Statements about what a third-party product does, supports, or offers. The vendor changes their product; the claim ages. Examples that need dates: "Provider X supports Y embedding dimensions natively," "Managed vector database Z supports composite partition keys."
 
 2. **Model leadership claims.** "Currently best-in-class," "frontier," "leading," "Gemini's video lead today is real." Frontier model leadership shifts every 3–6 months. Need explicit "as of YYYY-MM" or a hedge phrase that explicitly acknowledges fluidity.
 
@@ -46,7 +46,7 @@ Never read or cite: `docs/decisions/README.md`, `docs/strategy/research/**`, `do
 
 - Explicit date qualifier in the sentence: "as of 2026-05-06."
 - Citation to a dated research artifact: "per `docs/strategy/research/2026-05-05_gemini_revised_report.md`."
-- Hedge phrase that explicitly acknowledges decay: "treat current model leadership as fluid" — this is the recommended pattern from `inference_worker.md` §Model Router Contract, and is acceptable when paired with a configuration mechanism that lets the claim be revised without code change.
+- Hedge phrase that explicitly acknowledges decay: e.g. "treat current model leadership as fluid" — this pattern is acceptable when paired with a configuration mechanism that lets the claim be revised without code change.
 - Internal pattern: a rule that cites ADR-NNNN for a decision whose underpinning rationale was time-sensitive — the ADR's date IS the decay flag, provided the ADR is dated.
 
 ## Severity guidance

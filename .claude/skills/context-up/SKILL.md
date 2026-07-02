@@ -62,6 +62,28 @@ Expand by intent. Each row lists what to ADD — nothing else.
 If the task spans multiple intents, take the union — but each piece
 still enters via its row's path (citation-first, never bulk).
 
+### Step 5 — Report and confirm readiness
+
+Print the report defined in `## Output format`, then confirm readiness.
+
+If, once work starts, a gap appears (an uncited constraint, an
+unfamiliar term), fetch the specific doc then — scoped loading means
+late binding, not flying blind.
+
+## Output format
+
+Print a tight summary (≤10 lines):
+
+- **Project + phase:** one line.
+- **Last session:** 1–2 lines from the latest tracker entry.
+- **Next up:** the plan's top unchecked item (or the user's stated task).
+- **Blockers / pending:** open blockers, Proposed ADRs awaiting sign-off.
+- **Loaded:** the files/sections actually read.
+- **Skipped (by design):** the layers deliberately not loaded, e.g.
+  "architecture §§1–8, strategy, research — say the word to pull any in."
+
+Then: "Context loaded. Ready to continue."
+
 ## Anti-greed contract
 
 - **Index first, then fetch.** Reach ADRs through the decisions index
@@ -77,21 +99,3 @@ still enters via its row's path (citation-first, never bulk).
   weeks, or the longer-term backlog (`work_tracker/backlog.md`) unless
   the task is specifically about them — the backlog is a parking lot,
   not part of resuming.
-
-### Step 5 — Report and confirm readiness
-
-Print a tight summary (≤10 lines):
-
-- **Project + phase:** one line.
-- **Last session:** 1–2 lines from the latest tracker entry.
-- **Next up:** the plan's top unchecked item (or the user's stated task).
-- **Blockers / pending:** open blockers, Proposed ADRs awaiting sign-off.
-- **Loaded:** the files/sections actually read.
-- **Skipped (by design):** the layers deliberately not loaded, e.g.
-  "architecture §§1–8, strategy, research — say the word to pull any in."
-
-Then: "Context loaded. Ready to continue."
-
-If, once work starts, a gap appears (an uncited constraint, an
-unfamiliar term), fetch the specific doc then — scoped loading means
-late binding, not flying blind.

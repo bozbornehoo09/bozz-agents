@@ -30,12 +30,12 @@ Never read or cite: `docs/decisions/README.md`, `docs/strategy/research/**`, `do
 ## Check for (in order of importance)
 
 1. **Strategy claim with no architectural mechanism.** A strategy doc claims a capability, wedge, or competitive differentiator. The architecture and rules must have a corresponding port, service, constraint, or rule that delivers it. If the mechanism is missing, the strategy claim is unbacked.
-   - "Self-host capability is a procurement wedge" → must trace to ADR-0014 *and* concrete port discipline in every relevant rule.
-   - "Two-pass cognition enables student-model economy" → must trace to a Two-Pass discipline section in `inference_worker.md`.
-   - "AdapterPack is productized domain expertise" → must trace to AdapterPack discipline in `inference_worker.md` and a Model Router contract.
-   - "Embedding-as-infrastructure" → must trace to `EmbeddingModel` port abstraction in `discovery_rag.md`.
+   - "Our two-tier processing enables the cost advantage" → must trace to a processing-discipline section in the relevant rule file.
+   - "Productized domain expertise" → must trace to a packaging discipline in a rule file and an enforcing contract.
+   - "Embedding-as-infrastructure" → must trace to an embedding port abstraction in the relevant rule file.
+   - "Platform capability is a procurement wedge for regulated buyers" → must trace to concrete port discipline in every relevant rule file.
 
-2. **North-star reservation without preserved seam.** `north_star.md` and architecture §2.7 name reserved future services (Consolidation, Identity, Agent). For each, verify that current rules explicitly preserve the seam — for example, Recognition Service output JSON should accommodate adding a `stable_entity_id` field without breaking consumers, and `discovery_rag.md` should describe forward-compatibility with a future Agent Service. If a reserved service is named but no rule preserves its seam, the reservation is decorative.
+2. **North-star reservation without preserved seam.** Strategy and architecture docs may name reserved future services. For each, verify that current rules explicitly preserve the seam — for example, a service whose output schema should accommodate a future consumer field without breaking existing consumers, or a rule file that should describe forward-compatibility with a planned future service. If a reserved service is named but no rule preserves its seam, the reservation is decorative.
 
 3. **Strategic exclusion without architectural constraint.** A strategy doc explicitly says "the project does NOT do X." The architecture should have a constraint (or absent mechanism) preventing scope creep into X. Concrete: if `competitive_positioning.md` excludes consumer-grade single-user paths, no rule should have a single-user / unauthenticated mode in scope.
 

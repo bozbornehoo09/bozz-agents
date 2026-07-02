@@ -22,8 +22,8 @@ Third member of the review-skill family:
 - `docs/decisions/*.md` — every ADR file (excluding `README.md` per "Out of scope" below).
 - `docs/architecture/*.md` and `docs/architecture/*.mermaid` — every architecture doc and diagram.
 - `docs/strategy/*.md` — every strategy doc at the top level (the `research/` subdirectory is excluded; see below).
-- `.claude/rules/*.md` — every per-package rule file.
-- `CLAUDE.md`
+- Rule files: resolve the canonical source first. If `.claude/rules/` is a generated output (a `GENERATED.md` marker or a `<!-- GENERATED — do not edit -->` header in individual files names a canonical source), use that canonical source instead (e.g., `rules/*.md` at the repo root or the designated canonical directory). Otherwise use `.claude/rules/*.md` directly. Generated copies are out of scope — reviewing a build output produces findings that regeneration clobbers.
+- Orientation file: resolve the canonical source first. If `CLAUDE.md` or `AGENTS.md` carries a `<!-- GENERATED — do not edit -->` header naming a canonical source (e.g., `ORIENTATION.md`), use that canonical source. Otherwise use `CLAUDE.md` or `AGENTS.md` directly.
 
 **Out of scope.** Never reviewed by this skill, even if cited by an in-scope doc.
 
@@ -76,7 +76,7 @@ Four briefs. All four run on every invocation — the corpus is small enough tha
 
 | Brief | Lens | Looks for |
 |---|---|---|
-| `internal-consistency.md` | Cross-doc factual agreement | Two in-scope docs that make contradictory claims; an ADR cited by a rule file with the wrong number, status, or summary; a concept added to one doc that should propagate to dependents but did not (e.g., §2.7 architecture addition not reflected in relevant rule files; ADR-0010 tenancy not enforced in every data-flow rule). |
+| `internal-consistency.md` | Cross-doc factual agreement | Two in-scope docs that make contradictory claims; an ADR cited by a rule file with the wrong number, status, or summary; a concept added to one doc that should propagate to dependents but did not (e.g., a new architecture section not reflected in the rule files it constrains; a cross-cutting ADR — tenancy, auth — not enforced in every rule file it binds). |
 | `strategy-architecture-coherence.md` | Vertical (strategy → architecture → rules) | Strategy doc claims a capability or wedge with no corresponding mechanism in the architecture or rules; architecture provides a mechanism with no strategic justification (orphaned design); reserved future services named in strategy whose seams are not actually preserved in current architecture/rules. |
 | `decisional-clarity.md` | Quality of individual decisions | An ADR that does not actually decide (mush, multiple options left open, no committed direction); a rule's CRITICAL OVERRIDE or Hard Rule that is not falsifiable (a future engineer cannot tell whether it was followed); ADR missing the "what changes if reversed" implicit signal — i.e., the decision is non-load-bearing. |
 | `temporal-decay.md` | Epistemic hygiene | Claims that age — vendor capability rankings, model leadership, benchmark scores, prices, "currently best-in-class" language — without an explicit date or decay flag; absolute statements about external systems where the underlying state changes in months. |
@@ -143,28 +143,30 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
 
 ## Output template
 
+The block below illustrates the format only — file names are placeholders and findings are fabricated for the example.
+
 ```
-# Docs Review
+# Docs Review: <project name>
 
 Corpus reviewed: <count> files
 Specialists run: internal-consistency, strategy-architecture-coherence, decisional-clarity, temporal-decay
 
 ## BLOCK
-- [internal-consistency] docs/decisions/0014-self-host-capable-architecture.md:42 ↔ .claude/rules/inference_worker.md:88
-  ADR-0014 says:
-  > "Workers do not import GCP-specific SDKs outside the adapter layer."
+- [internal-consistency] docs/decisions/0007-example-decision.md:42 ↔ .claude/rules/example_package.md:88
+  ADR-0007 says:
+  > "Workers do not import provider-specific SDKs outside the adapter layer."
   Rule says:
-  > "Workers may call `google-cloud-aiplatform` directly for hot paths."
+  > "Workers may call the provider SDK directly for hot paths."
   These cannot both be true. Resolve which is authoritative.
 
 ## FIX
 - [strategy-architecture-coherence] docs/strategy/competitive_positioning.md:103
-  > "Self-host capability is a procurement wedge for regulated buyers."
-  No corresponding mechanism in `inference_worker.md` enforcing self-host port discipline. Either propagate the constraint to the rule or scope down the strategy claim.
+  > "Our two-tier processing enables a 5× cost advantage over single-pass alternatives."
+  No corresponding mechanism in `example_package.md` enforcing the processing discipline. Either propagate the constraint to the rule or scope down the strategy claim.
 
 ## SUGGEST
 - [temporal-decay] docs/strategy/competitive_positioning.md:88
-  > "Gemini 1.5 Pro 78.6% on Video-MME v2"
+  > "Frontier model X 78.6% on Benchmark Y v2"
   Add date qualifier — frontier benchmark scores age in months. Mark as "as of <YYYY-MM>".
 
 Verdict: REVISE

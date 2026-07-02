@@ -41,15 +41,8 @@ should be checkable against a quotable rule or ADR, not a matter of taste.
 ## Output format
 
 ```
-## BLOCK
-- [<lens>] <file>:<line>
-  > "<verbatim offending text>"
-  <why it violates the rule>
-  → <rule/ADR file> "<verbatim rule clause>"
-
-## FIX
-- [<lens>] ...
-
-## SUGGEST
-- [<lens>] ...
+[<lens>] <file:line> [BLOCK|FIX|SUGGEST]
+Finding: <one sentence>
+Quote: > "<verbatim offending text>"
+Citation: <ADR or rule-file path + the specific clause violated>
 ```

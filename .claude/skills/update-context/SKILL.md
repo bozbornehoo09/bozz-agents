@@ -1,6 +1,6 @@
 ---
 name: update-context
-description: Discover-and-dispatch orchestrator for end-of-session context updates. Surveys what changed across the project, dispatches only the needed narrow update skills in dependency order, and ends with a single consolidated docs-review. Use at the end of a working session, after a major decision, or anytime you want to lock in everything that changed.
+description: Discover what changed across the project and dispatch only the needed narrow update skills in dependency order, ending with a single consolidated docs-review. Use at the end of a working session, after a major decision, or anytime you want to lock in everything that changed.
 ---
 
 # Update Context
@@ -78,22 +78,10 @@ week.
 ### Step 2 — Categorize and confirm the dispatch plan
 
 From your conversation + the subagent's report, build the list of
-narrow update skills that need to run. Surface this list to the user
-before executing:
-
-```
-Dispatch plan:
-- update-decisions — <one-line reason>
-- update-architecture — <one-line reason>
-- update-rules — <one-line reason>
-- update-work-plan — <one-line reason>
-- update-work-tracker — always
-- (skipping: update-strategy, update-skills, update-open-questions, update-orientation — no changes detected)
-```
-
-PAUSE for the user to confirm or adjust the plan before proceeding.
-The user may add a domain the discovery missed, or remove one they
-don't want touched.
+narrow update skills that need to run. Print the dispatch plan in the
+format defined in `## Output format` and pause for confirmation. The
+user may add a domain the discovery missed, or remove one they don't
+want touched.
 
 ### Step 3 — Invoke narrow update skills in dependency order
 
@@ -154,7 +142,24 @@ been surfaced to the user.
 
 ### Step 5 — Confirm sweep complete
 
-Surface a tight summary to the user:
+Surface the final summary defined in `## Output format`.
+
+## Output format
+
+**Dispatch plan** (print before executing; pause for confirmation):
+
+```
+Dispatch plan:
+- update-decisions — <one-line reason>
+- update-architecture — <one-line reason>
+- update-rules — <one-line reason>
+- update-work-plan — <one-line reason>
+- update-work-tracker — always
+- (skipping: update-strategy, update-skills, update-open-questions, update-orientation — no changes detected)
+```
+
+**Final summary** (print after all skills complete):
+
 - Which skills ran.
 - Which skills were skipped (and why).
 - The final `docs-review` verdict.
