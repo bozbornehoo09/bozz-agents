@@ -34,13 +34,13 @@ Never read or cite: `docs/decisions/README.md`, `docs/strategy/research/**`, `do
    - The ADR could be deleted without anything in the codebase or rules changing — it is not load-bearing.
 
 2. **Unfalsifiable Hard Rule.** A rule's `CRITICAL OVERRIDE` or `Hard Rule` section that a future engineer cannot tell whether they violated. Falsifiability test: can the rule be reduced to a binary check?
-   - **Falsifiable** (good): "no provider SDK imports outside the adapter layer," "all events carry `tenant_id` and `domain_id`," "Pub/Sub messages stay under 256 KB."
+   - **Falsifiable** (good): "no provider SDK imports outside the adapter layer," "all events carry the required tenant key fields," "Pub/Sub messages stay under 256 KB."
    - **Unfalsifiable** (bad): "use idiomatic Rust," "good test coverage," "prefer simple designs," "appropriate logging."
    - Soft signals that suggest unfalsifiability: words like "appropriate," "reasonable," "good," "best-practice," "where appropriate," "as needed."
 
 3. **Missing supersedence chain.** An ADR that supersedes another should include `**Supersedes:** ADR-NNNN` near the top, and the superseded ADR should be marked `**Status:** Superseded by ADR-NNNN`. Flag broken chains in either direction.
 
-4. **Status field absent or wrong.** Every ADR should have `**Status:** Accepted | Proposed | Superseded | Deprecated`. An ADR being treated as authoritative by other docs (cited by rules as a binding decision) but marked `Proposed`, `Draft`, `Superseded`, or `Deprecated` is a decisional clarity failure — it cannot be both not-authoritative and authoritatively cited.
+4. **Status field absent or wrong.** Every ADR should have `**Status:** Accepted | Proposed | Superseded | Deprecated`. Flag the Status field if it is absent, malformed, or not one of those four values. Do not flag cross-doc citations of non-Accepted ADRs here — that finding (a current rule citing a Proposed, Superseded, or Deprecated ADR as authoritative) is owned by `internal-consistency.md`.
 
 5. **Rule missing structural anchors.** Rule files use a consistent structure: `CRITICAL OVERRIDE` (where applicable), `Hard Rules` (numbered, falsifiable), `Out of Scope`. A rule whose claims are scattered across prose without these anchors cannot be enforced consistently.
 

@@ -11,6 +11,19 @@ layer: what's next, in what order, and why — the mirror of the work
 tracker, which records what already happened. Rationale lives in ADRs;
 the plan only points at it.
 
+## Scope
+
+In scope:
+- `work_tracker/work_plan.md` (or the manifest-declared path)
+
+Out of scope:
+- the longer-term backlog `work_tracker/backlog.md` →
+  `update-backlog`
+- the activity log (weekly tracker entries) →
+  `update-work-tracker`
+- decision rationale → `update-decisions` (the plan only
+  points at ADRs)
+
 ## Steps
 
 ### 1. Locate or create the plan

@@ -32,6 +32,16 @@ clobbers your edit.**
 
 Below, "the rule files" always means the **canonical** ones resolved here.
 
+## Scope
+
+In scope:
+- the per-package rule files at the canonical location resolved above
+
+Out of scope:
+- the orientation file → `update-orientation`
+- ADRs → `update-decisions`
+- skills and briefs → `update-skills`
+
 ## Steps
 
 ### 1. Read the existing rule files

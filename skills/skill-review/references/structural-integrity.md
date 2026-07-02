@@ -28,13 +28,24 @@ Never read or cite anything outside each skill's `SKILL.md` and its `references/
    ```
    Flag missing frontmatter, missing `name` or `description`, leading-slash on the name (should be `docs-review`, not `/docs-review`), or multi-line descriptions.
 
-4. **Missing required sections in `SKILL.md`.** A well-formed skill has (at minimum):
+4. **Missing required sections in `SKILL.md`.** Skills fall into two families with different required shapes. Classify first, then check.
+
+   **Review-family skills** (identifiable by a Specialists table — they fan out to specialist subagents):
    - A `# Heading` matching the skill's purpose
    - **Inputs** OR **Corpus** section (defines what the skill operates on)
-   - **Specialists** or equivalent (if the skill fans out)
+   - **Specialists** section
    - **Orchestration** section (numbered steps)
    - **Output template** or **Output format** (so output is deterministic)
    - **What this skill is NOT** (negative scope)
+
+   **Authoring-family skills** (single-agent — the update-* family and read-only loaders like context-up):
+   - A `# Heading` matching the skill's purpose
+   - A scope-defining section (`## Scope`, `## What belongs here (and what does not)`, `## Authoritative content layers`, or equivalent)
+   - A numbered `## Steps` or `## Procedure`
+   - `## Pause-for-confirmation rules` and `## Style` for skills that write files (read-only loaders are exempt from these two)
+   - `## Output format` whenever the skill emits a structured report
+
+   **How to classify:** a skill that spawns specialist reviewers is review-family; a skill that runs single-agent is authoring-family.
 
    *(The presence/quality of an anti-hallucination contract section is owned by `anti-hallucination-quality.md` — do not flag it here.)*
 
@@ -46,7 +57,7 @@ Never read or cite anything outside each skill's `SKILL.md` and its `references/
    - Output format
    - Closing line: `Empty report is a valid result. Do not invent findings to look thorough.`
 
-6. **Structural anchor mismatches.** Skills in the family share anchor labels (e.g., `## Anti-hallucination contract`, `## Do not flag`, `## Severity criteria`). A skill that uses `## Hallucination prevention` instead of `## Anti-hallucination contract` is a structural drift. Flag for normalization.
+**Do not flag:** anchor-name divergence across skills (e.g. `## Hallucination prevention` vs `## Anti-hallucination contract`) is owned by `cross-skill-consistency.md` — do not flag it here.
 
 ## Anti-hallucination contract
 
@@ -65,7 +76,7 @@ Quote: > "<verbatim source text>"
 [for "missing" findings:]
 Surrounding context (<file:line-range>):
 > "<verbatim text where the missing element should appear>"
-Failure mode: <broken-brief-ref | orphan-brief | missing-frontmatter | malformed-frontmatter | missing-section | missing-anchor>
+Failure mode: <broken-brief-ref | orphan-brief | missing-frontmatter | malformed-frontmatter | missing-section>
 ```
 
 Empty report is a valid result. Do not invent findings to look thorough.

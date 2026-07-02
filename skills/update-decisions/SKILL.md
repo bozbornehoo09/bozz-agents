@@ -10,6 +10,19 @@ to capture WHY-rationale for decisions made in recent work. ADRs are
 *immutable* — never edit an accepted ADR's Decision or Alternatives. When
 something changes, write a NEW ADR that supersedes the old one.
 
+## Scope
+
+In scope:
+- `docs/decisions/*.md` — the ADR files
+- `docs/decisions/README.md` — the status index
+
+Out of scope:
+- open-questions reconciliation → `update-open-questions`
+- propagating decisions into the architecture design →
+  `update-architecture`
+- propagating decisions into rule files → `update-rules`
+- the work plan → `update-work-plan`
+
 ## Steps
 
 ### 1. Read the existing ADRs

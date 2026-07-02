@@ -40,7 +40,7 @@ Four briefs. All four run on every invocation. Each lives in this skill's `refer
 
 | Brief | Lens | Looks for |
 |---|---|---|
-| `structural-integrity.md` | Conventional structure | Missing or malformed YAML frontmatter (required `name`/`description`; `name` must be lowercase-kebab, ≤64 chars, and match the parent directory); missing required sections (Inputs / Corpus, Specialists, Anti-hallucination contract, Orchestration, Output template, What this skill is NOT, or the brief equivalents); skill-references-brief integrity (every brief referenced by a SKILL.md exists under that skill's `references/`; every brief in a skill's `references/` is referenced by its SKILL.md — orphan briefs are dead weight). |
+| `structural-integrity.md` | Conventional structure | Missing or malformed YAML frontmatter (required `name`/`description`; `name` must be lowercase-kebab, ≤64 chars, and match the parent directory); missing required sections for the skill's family (review fan-out skills: Inputs/Corpus, Specialists, Orchestration, Output template, What this skill is NOT; single-agent authoring skills: Scope, Steps, Pause-for-confirmation rules, Style, Output format where a structured report is emitted; briefs: their equivalents); skill-references-brief integrity (every brief referenced by a SKILL.md exists under that skill's `references/`; every brief in a skill's `references/` is referenced by its SKILL.md — orphan briefs are dead weight). |
 | `anti-hallucination-quality.md` | Contract strength | Skill or brief that lacks an explicit anti-hallucination contract; contract present but missing key guards (verbatim-quote requirement, file:line citation, empty-report-is-correct, negative-scope "do not flag" list); contract guards that are aspirational ("specialists should be careful") rather than binding ("findings without a quote are dropped"). |
 | `scope-focus.md` | Single-purpose discipline | A skill doing more than one thing (review + author + transform); a brief whose "Check for" list spans multiple lenses that should be split; bloat (skill body over the spec's recommended ~500-line ceiling, or a brief well over family-norm length, without justification); overlap between briefs within a skill, or between skills. |
 | `cross-skill-consistency.md` | Family conventions | Severity vocabulary divergence (one skill uses BLOCK/FIX/SUGGEST, another uses ERROR/WARN/INFO); verdict label divergence (READY / REVISE / READY-WITH-FIXES vs. PASS / FAIL); output template structural divergence; aggregation pattern divergence. |
@@ -107,7 +107,7 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
 The block below illustrates the format only. `foo` and `wibble` are placeholder skill names and the findings are fabricated for the example — real output cites real files in the project's skills directory.
 
 ```
-# Skill Review
+# Skill Review: <skills directory>
 
 Skills reviewed: <count>
 Briefs reviewed: <count>

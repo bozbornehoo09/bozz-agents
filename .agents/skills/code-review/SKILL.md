@@ -48,6 +48,7 @@ Convention: keep 2–3 "always" briefs and gate the rest on changed-file paths.
 4. **Spot-check FIX/SUGGEST findings.** Verify at least 3 random findings per severity. Drop mismatches.
 5. Deduplicate: if two specialists flag the same line for related reasons, merge into one finding tagged with both dimensions.
 6. Rank by severity, then by file order.
+7. End with a one-line verdict: `READY` (no BLOCKs), `REVISE` (BLOCKs present), or `READY-WITH-FIXES` (only FIX/SUGGEST).
 
 ## Anti-hallucination contract (binding on every specialist)
 
@@ -93,7 +94,7 @@ Specialists run: <your brief names>
 ## SUGGEST
 - ...
 
-Verdict: REVISE | READY-WITH-FIXES | READY
+Verdict: REVISE
 ```
 
 ## What this skill is NOT

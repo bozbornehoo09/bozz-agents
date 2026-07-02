@@ -25,7 +25,7 @@ These are the conventions the family has adopted. Divergence is a finding.
 - **Output template anchors:** `# <Skill Name>: <subject>`, then a `Specialists run:` line, then severity sections in order BLOCK → FIX → SUGGEST, then `Verdict:` line at end.
 - **Anti-hallucination contract anchor:** section heading `## Anti-hallucination contract` (or close variant). Variants like `## Hallucination prevention` or `## Quality guards` diverge from canon.
 - **Negative-scope anchor:** section heading `## Do not flag` or `## What this skill is NOT` (often both — the first inside the brief, the second on the SKILL.md).
-- **Empty-report closing line in briefs:** `Empty report is a valid result. Do not invent findings to look thorough.` (or close variant).
+- **Empty-report closing line in briefs:** `Empty report is a valid result. Do not invent findings to look thorough.` (or close variant). (convention defined here; enforcement owned by `structural-integrity.md`)
 
 ## Check for (in order of importance)
 
@@ -41,9 +41,9 @@ These are the conventions the family has adopted. Divergence is a finding.
 
 6. **Anti-hallucination anchor divergence.** A skill or brief using a non-canonical heading for the contract section. The text may be fine; the anchor name is the convention. **FIX**.
 
-7. **Closing-line divergence in briefs.** A brief omitting the canonical closing line (or using a substantively different one). The line is small but reinforces the empty-report-is-correct guard. **SUGGEST**.
+7. **Inconsistent description tone in frontmatter.** SKILL.md `description:` fields should be one-line, imperative, and explain when to invoke. A skill whose description is multi-line, narrative, or describes what the skill *is* rather than when to use it. **SUGGEST**.
 
-8. **Inconsistent description tone in frontmatter.** SKILL.md `description:` fields should be one-line, imperative, and explain when to invoke. A skill whose description is multi-line, narrative, or describes what the skill *is* rather than when to use it. **SUGGEST**.
+**Do not flag:** a missing or divergent canonical closing line in a brief is a required-section failure owned by `structural-integrity.md` — do not flag it here.
 
 ## Anti-hallucination contract
 
@@ -61,7 +61,7 @@ Finding: <one sentence>
 Diverging quote: > "<verbatim source text>"
 Canonical example at <other-file:line>:
 > "<verbatim canonical convention>"
-Convention violated: <severity-vocab | verdict-labels | verdict-mapping | output-template | invocation-pattern | brief-location | anti-hallucination-anchor | closing-line | description-tone>
+Convention violated: <severity-vocab | verdict-labels | verdict-mapping | output-template | invocation-pattern | brief-location | anti-hallucination-anchor | description-tone>
 ```
 
 Empty report is a valid result. Do not invent findings to look thorough.

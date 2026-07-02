@@ -10,6 +10,18 @@ everything done since the last entry. The work tracker is the WHEN layer:
 short activity logs indexed by date, NOT deep rationale (rationale lives
 in `docs/decisions/` ADRs).
 
+## Scope
+
+In scope:
+- the weekly directories and daily entries under `work_tracker/`
+  (plus each week's README.md summary)
+
+Out of scope:
+- the forward work plan `work_tracker/work_plan.md` →
+  `update-work-plan`
+- the backlog → `update-backlog`
+- rationale → ADRs via `update-decisions`
+
 ## Steps
 
 ### 1. Determine today's date and day-of-week
