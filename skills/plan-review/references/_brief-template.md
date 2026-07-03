@@ -46,3 +46,5 @@ Finding: <one sentence>
 Quote: > "<verbatim offending text>"
 Citation: <ADR or rule-file path + the specific clause violated>
 ```
+
+Empty report is a valid result. Do not invent findings to look thorough.

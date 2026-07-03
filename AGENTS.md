@@ -41,6 +41,14 @@ below and positioning lives in `README.md`. End a working session with
 - Severity vocabulary is **BLOCK / FIX / SUGGEST**; verdicts are
   **READY / READY-WITH-FIXES / REVISE**. Do not introduce a second vocabulary —
   `cross-skill-consistency.md` exists to catch exactly that.
+- Skill structure follows two family shapes (enforced by `skill-review`'s
+  `structural-integrity` brief): review skills carry Corpus / Specialists /
+  Orchestration / Output template / What-this-skill-is-NOT; authoring skills
+  carry Scope / Steps / Pause-for-confirmation rules / Style, plus Output
+  format when they emit a structured report.
+- Specialist findings use the per-finding line
+  `[lens] file:line [BLOCK|FIX|SUGGEST]`; review output headings are
+  `# <Skill Name>: <subject>`.
 - Every review specialist operates under the anti-hallucination contract:
   a finding without a verbatim quote and a `file:line` citation is dropped.
 

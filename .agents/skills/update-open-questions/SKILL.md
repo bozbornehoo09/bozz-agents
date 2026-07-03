@@ -90,12 +90,6 @@ mutation to existing-but-not-resolved questions that is routine.
 - If the document has shifted in scope or audience, update the Status
   line.
 
-### 7. No docs-review hook
-
-`docs/open_questions.md` is explicitly out of scope for `docs-review`
-(it is unresolved by definition; it cannot be inconsistent with
-anything authoritative). Skip the review step.
-
 ## Pause-for-confirmation rules
 
 - PAUSE before removing a question (resolution is final; partial
@@ -119,3 +113,9 @@ anything authoritative). Skip the review step.
   is the authoritative source).
 - Resolved questions become one-line pointers, not deletions —
   deletion loses audit trail.
+
+## Review hook
+
+None — `docs/open_questions.md` is explicitly out of scope for
+`docs-review` (unresolved by definition; it cannot be inconsistent
+with anything authoritative). Skip the review step.

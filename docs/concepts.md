@@ -31,8 +31,10 @@ match a common documentation layout, but the set is yours to define.
    dependency order, pausing for your confirmation on the plan.
 3. **Reviews** once at the end, instead of after every layer.
 
-Each narrow `update-*` skill also stands alone and bakes in its own review hook,
-so you can run just `update-decisions` mid-session and still get checked.
+Each narrow `update-*` skill also stands alone, and the ones owning
+authoritative layers bake in their own review hook — run just `update-decisions`
+mid-session and you still get checked. The temporal layers (work plan, backlog,
+work tracker, open questions) have no hook; they are not authoritative.
 
 ## The check side: the review-skill family
 
