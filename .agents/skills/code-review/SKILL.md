@@ -34,7 +34,8 @@ Convention: keep 2–3 "always" briefs and gate the rest on changed-file paths.
 ## Orchestration
 
 1. Resolve the diff. Capture `git diff` output and the list of changed files.
-2. Spawn specialists in parallel via Agent (`subagent_type: general-purpose`) — one Agent call per applicable brief, all in a single message:
+2. Spawn independent specialists in parallel using the host agent's subagent or
+   delegation facility — one specialist per applicable brief in a single fan-out:
    ```
    Review this diff against {brief_path}.
    Changed files: {file_list}

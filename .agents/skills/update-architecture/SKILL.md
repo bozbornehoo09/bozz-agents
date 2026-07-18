@@ -9,7 +9,7 @@ Update the architecture design documents at
 `<project-root>/docs/architecture/` to reflect ADR-driven
 and in-session changes to the system design. The architecture doc is the
 synthesized view that applies decisions in `docs/decisions/` and is cited
-by the rule files in `.claude/rules/`.
+by the manifest-resolved canonical rule files.
 
 This prompt is **downstream of** `update-decisions` (ADRs land first
 because they decide) and **upstream of** `update-rules` (rule files
@@ -28,7 +28,7 @@ Out of scope:
 - ADRs — `update-decisions`
 - Rule files — `update-rules`
 - Strategy docs (`docs/strategy/`) — separate prompt if added
-- CLAUDE.md — separate prompt if added
+- Project orientation — maintained by `update-orientation`
 
 ## Steps
 
@@ -44,14 +44,15 @@ PRIMARY SOURCE — the current conversation. Architectural changes surface
 here first (a new service decision, a new port, a renumbering). Capture
 these directly — a subagent cannot see them.
 
-SECONDARY SOURCES — spawn ONE Explore subagent with this brief and use
+SECONDARY SOURCES — run ONE discovery subagent using the host's subagent or
+delegation facility with this brief and use
 only its summarized report:
 
 > "Find architectural changes in <project-root> that may
 > require updates to docs/architecture/. Check: (a) new ADRs in
 > docs/decisions/ since the design doc's mtime — these are the
 > canonical drivers of architectural change; (b) new rule files or
-> CRITICAL OVERRIDE blocks in .claude/rules/ that imply a
+> CRITICAL OVERRIDE blocks in the manifest-resolved rule files that imply a
 > not-yet-documented service or port; (c) git log + status across
 > src/ and infrastructure/ for evidence of new components; (d) the
 > most recent work_tracker/ entries for explicit `Decided X` lines

@@ -18,7 +18,7 @@ Read-only: this skill never modifies files.
 
 Read `context-manifest.yaml` at the project root for layer paths. If
 absent, use the conventional defaults (`docs/decisions/`,
-`docs/strategy/`, `docs/architecture/`, `.claude/rules/`,
+`docs/strategy/`, `docs/architecture/`, `rules/` with host-specific fallback,
 `docs/open_questions.md`, `work_tracker/`,
 `work_tracker/work_plan.md`, `work_tracker/backlog.md`). The
 orientation file (CLAUDE.md / AGENTS.md) is already auto-loaded — do
@@ -53,7 +53,7 @@ Expand by intent. Each row lists what to ADD — nothing else.
 | Intent | Add |
 |---|---|
 | **Resume / status** | Nothing. Core load is complete. |
-| **Implement in package X** | The rules file for X (e.g. `.claude/rules/<x>.md`); then ONLY the ADRs and architecture sections that rules file cites. If the work plan names a spec for the item (e.g. an implementation-plan file), read that spec. |
+| **Implement in package X** | The manifest-resolved rules file for X (e.g. `rules/<x>.md`); then ONLY the ADRs and architecture sections that rules file cites. If the work plan names a spec for the item (e.g. an implementation-plan file), read that spec. |
 | **Design / architect** | Architecture README + the design sections covering the affected area (navigate by the doc's numbered TOC; do not read the design end-to-end); related ADRs found via the index; relevant `docs/open_questions.md` entries. |
 | **Decide an open question** | That question's entry in `docs/open_questions.md` + the research memos and ADRs it links. Other questions stay unread. |
 | **Strategy / positioning** | `docs/strategy/` top-level docs. Research memos only if the task cites them. |

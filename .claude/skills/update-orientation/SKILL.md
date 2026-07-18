@@ -23,7 +23,8 @@ generated file — the next regenerate clobbers your edit.**
 
 1. **Locate the orientation.** If a project `context-manifest.yaml`
    declares an `orientation` path (or list of paths), inspect those;
-   otherwise default to `CLAUDE.md` (or `AGENTS.md`).
+   otherwise prefer a neutral `ORIENTATION.md`, then the orientation file the
+   current host loaded (`AGENTS.md`, `CLAUDE.md`, or equivalent).
 2. **Check whether it is generated.** A `<!-- GENERATED — do not edit -->`
    / `# GENERATED — do not edit` header marks the file as a build output
    (a generated *directory* is marked by a sibling `GENERATED.md` instead);
@@ -66,7 +67,8 @@ PRIMARY SOURCE — the current conversation. Convention changes,
 behavioral-rule additions, or new skills surface here first. Capture
 directly.
 
-SECONDARY SOURCES — spawn ONE Explore subagent with this brief:
+SECONDARY SOURCES — run ONE discovery subagent using the host's subagent or
+delegation facility with this brief:
 
 > "Find drift between the canonical orientation source (resolved above)
 > and current project state. Specifically check: (a) does the skill /

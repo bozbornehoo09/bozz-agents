@@ -36,7 +36,8 @@ PRIMARY SOURCE — the current conversation. Decisions and rationale surface
 here first and ONLY exist in the main thread's context. Capture these
 directly; do not delegate this part.
 
-SECONDARY SOURCES — spawn ONE Explore subagent with this brief and use only
+SECONDARY SOURCES — run ONE discovery subagent using the host's subagent or
+delegation facility with this brief and use only
 its summarized report (do not re-read raw output into main context):
 
 > "Find decisions made in <project-root> that are missing
@@ -44,7 +45,7 @@ its summarized report (do not re-read raw output into main context):
 > `git log --since=<last ADR mtime>` + `git status` for evidence of
 > implementation choices; (b) work_tracker/ entries from this week and
 > last week, looking for `Decided X` lines that have no ADR-NNNN
-> reference; (c) .claude/rules/*.md files, looking for CRITICAL OVERRIDE
+> reference; (c) the manifest-resolved rule files, looking for CRITICAL OVERRIDE
 > blocks or hard rules with no `(see docs/decisions/...)` citation. Report
 > a tight bullet list of candidate decisions with one-line context for
 > each. Under 300 words."
@@ -87,7 +88,7 @@ triggered the question.>
 - **Revisit when:** (optional) trigger for reopening this decision
 
 ## References
-- Related rules: .claude/rules/<file>.md
+- Related rules: <manifest-resolved-rules-path>/<file>.md
 - Related design: docs/architecture/<design-doc>#<section>
 - Related: ADR-NNNN, ADR-MMMM
 ```

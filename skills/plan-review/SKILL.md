@@ -16,7 +16,9 @@ Stress-test an implementation plan against the architecture **before** code land
 
 ## Specialists
 
-Each brief is a self-contained reviewer instruction file in `references/`, covering exactly one lens. Spawn them in parallel via the Agent tool with `subagent_type: general-purpose` (or `agent-teams:team-reviewer` if running inside a `team-spawn`).
+Each brief is a self-contained reviewer instruction file in `references/`,
+covering exactly one lens. Run them as independent specialists in parallel using
+the host agent's subagent or delegation facility.
 
 Declare your briefs and their run-conditions here. Replace this table with your own:
 
@@ -32,7 +34,7 @@ Convention: keep 2–3 "always" briefs (the load-bearing lenses) and gate the re
 ## Orchestration
 
 1. Read the plan once. Note its package scope and which specialists apply.
-2. Send the **same prompt shape** to each specialist in a single message (parallel Agent calls via `subagent_type: general-purpose`):
+2. Send the **same prompt shape** to each specialist in one parallel fan-out:
    ```
    Review this plan against {brief_path}. Plan content: {plan}.
    Anti-hallucination contract: every finding requires a verbatim quote

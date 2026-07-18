@@ -44,7 +44,8 @@ Read `docs/open_questions.md` end-to-end. Note the structure:
 PRIMARY SOURCE — the current conversation. New questions surface here;
 in-session decisions resolve existing ones. Capture both directly.
 
-SECONDARY SOURCES — spawn ONE Explore subagent with this brief:
+SECONDARY SOURCES — run ONE discovery subagent using the host's subagent or
+delegation facility with this brief:
 
 > "Find what's changed in <project-root> that affects
 > docs/open_questions.md. Three checks: (a) new ADRs in

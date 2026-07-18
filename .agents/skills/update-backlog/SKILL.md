@@ -43,7 +43,8 @@ items, terse.
 PRIMARY SOURCE — the current conversation. Tasks get deferred, and
 deferred tasks get scheduled, in the main thread; capture both directly.
 
-SECONDARY SOURCES — spawn ONE Explore subagent (skip this when
+SECONDARY SOURCES — run ONE discovery subagent using the host's subagent or
+delegation facility (skip this when
 dispatched from `update-context`; reuse the orchestrator's shared
 discovery instead):
 

@@ -52,7 +52,8 @@ Never read or cite anything outside each skill's `SKILL.md` and its `references/
 5. **Missing required sections in specialist briefs.** A well-formed brief has:
    - `# Specialist Brief: <Name>` opening
    - Authoritative corpus / sources section (what to read)
-   - "Check for" section with numbered/ordered list
+   - "Check for" section (ordering and prioritization are owned by
+     `scope-focus.md`)
    - Out-of-scope clarification
    - Output format
    - Closing line: `Empty report is a valid result. Do not invent findings to look thorough.`

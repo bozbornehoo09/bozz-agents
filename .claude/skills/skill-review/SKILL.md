@@ -72,7 +72,8 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
    - Briefs referenced by their owning SKILL.md → live.
    - Briefs present in a skill's `references/` but not referenced by its SKILL.md → orphans (`structural-integrity` finding, FIX severity).
    - Briefs referenced by a SKILL.md but not present under that skill's `references/` → broken references (`structural-integrity` finding, BLOCK severity).
-3. **Spawn all four specialists in parallel** via Agent (`subagent_type: general-purpose`). Single message, four tool calls. Each specialist gets:
+3. **Spawn all four specialists in parallel** using the host agent's subagent
+   or delegation facility. Use one parallel fan-out. Each specialist gets:
    ```
    Review the project's skills and specialist briefs against {brief_path}.
    Concrete corpus:
