@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cross-review requester"
+  short_description: "Coordinate and fold file-based external reviews"
+  default_prompt: "Use $cross-review-requester to open and manage a file-based cross-agent review."

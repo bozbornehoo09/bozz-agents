@@ -1,8 +1,8 @@
 {
   "name": "bozz-agents",
-  "description": "Context-management and review skills for AI coding agents. Keeps a project's decisions, architecture, rules, and docs coherent (update-* skills), and stress-tests them with a parallel review-skill family (docs/skill/plan/code review). Authored to the open Agent Skills standard — works in Claude Code and Codex.",
+  "description": "Context-management, review, and file-scoped cross-agent review skills. Keeps project knowledge coherent, stress-tests changes with parallel reviewers, and coordinates requester/reviewer/folding loops with adaptive polling and independent finding adjudication.",
   "version": "0.3.0",
   "author": { "name": "Ben Osborne" },
   "license": "MIT",
-  "keywords": ["agent-skills", "context-management", "code-review", "docs-review", "adr", "documentation"]
+  "keywords": ["agent-skills", "context-management", "code-review", "cross-review", "multi-agent", "adr", "documentation"]
 }

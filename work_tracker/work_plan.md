@@ -18,7 +18,7 @@ STATUS MARKERS: [ ] not started   [~] in progress   [x] complete
                 [—] dropped (with reason)
 -->
 
-**As of:** 2026-07-03
+**As of:** 2026-07-18
 **Scope:** Plugin development and publishing — the skills are the product;
 no application build phases.
 **Companion docs:** `docs/decisions/` (the why), `docs/concepts.md` (the
@@ -29,17 +29,26 @@ at session end). No review hook.
 
 ---
 
-## 0. Status snapshot (as of 2026-07-03)
+## 0. Status snapshot (as of 2026-07-18)
 
 **Done.**
 - Context bootstrap — manifest, ADR-0001, work_tracker seeded
   → work_tracker week_27 tuesday_6-30
 - Skill-family convention hardening (two-round skill-review + fixes,
-  incl. prism instance sync) → PR #5 (bozz), PR #22 (prism), both open
+  incl. prism instance sync) → PR #5 (bozz) merged 2026-07-02
+- Host-neutral distribution + Codex plugin packaging (canonical `skills/`,
+  generated per-host trees, plugin manifests) → PR #6 merged 2026-07-18,
+  ADR-0002
+
+**In progress.**
+- File-scoped cross-agent review lifecycle: requester, reviewer, independent
+  finding fold, adaptive polling, helper/tests, and generated host trees are
+  implemented and under final review. → ADR-0003
 
 **Not started.**
 - v0.3.0 publish — the installed / marketplace plugin is still cached at
-  v0.2.0; consumers have neither `update-backlog` nor the convention fixes.
+  v0.2.0; no git tag exists yet. Scope now also includes the host-neutral
+  genericization, Codex plugin packaging (PR #6), and ADR-0003 lifecycle.
 
 ---
 
@@ -48,10 +57,14 @@ at session end). No review hook.
 The immediate, ordered focus. When one clears, promote the next and log the
 landing in the work tracker.
 
-1. **[~] Merge PR #5 (bozz-agents) and PR #22 (prism)** — the skill-fix
-   companion pair; #5 gates the version bump.
+1. **[~] Land the ADR-0003 cross-review lifecycle** — final implementation
+   re-review, then commit/PR the three skills, bridge helper/tests, generated
+   trees, and docs.
 2. **[ ] Publish v0.3.0** — bump the installed / marketplace plugin so the
-   merged skills reach consumers. Promoted from the backlog.
+   merged skills reach consumers (including PR #6 and ADR-0003). No git tag
+   exists yet.
+
+(Companion prism PR #22 tracked in that repo; not verified this session.)
 
 ---
 
@@ -68,3 +81,5 @@ Append-only. One row per meaningful plan change.
 | Date | What changed | Why |
 |---|---|---|
 | 2026-07-03 | Plan created (seeded from template) | First `update-context` sweep to need the FORWARD layer; `context-manifest.yaml` declared the path but the file did not exist |
+| 2026-07-18 | PR #5 marked merged; PR #6 (host-neutral distribution + Codex plugin) landed unplanned, recorded as ADR-0002; v0.3.0 promoted to sole next-up | Skill genericization + Codex packaging completed the portability arc, and the merge cleared the PR #5 gate on the version bump |
+| 2026-07-18 | ADR-0003 cross-review lifecycle inserted ahead of v0.3.0; publish scope expanded to include its three skills and helper | The live Prism bridge proved independent review but also exposed global-file growth, numbering collisions, static polling, and unverified-fold risks that should be fixed before the next plugin release |

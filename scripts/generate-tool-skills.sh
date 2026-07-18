@@ -60,14 +60,14 @@ for target in "${TARGETS[@]}"; do
     echo "checking $target/ ..."
     [ ! -d "$target" ] && { echo "  DRIFT: $target missing — run scripts/generate-tool-skills.sh"; fail=1; continue; }
     tmp="$(mktemp -d)"
-    rsync -a --delete --exclude='.*' "$CANON"/ "$tmp"/; marker_note > "$tmp/GENERATED.md"
+    rsync -a --delete --exclude='.*' --exclude='__pycache__/' --exclude='*.pyc' "$CANON"/ "$tmp"/; marker_note > "$tmp/GENERATED.md"
     if diff -rq --exclude='.*' "$tmp" "$target" >/dev/null 2>&1; then echo "  OK — in sync";
     else echo "  DRIFT: $target out of sync"; diff -rq --exclude='.*' "$tmp" "$target" || true; fail=1; fi
     rm -rf "$tmp"
   else
     echo "generating $target/ from $CANON/ ..."
     mkdir -p "$target"
-    rsync -a --delete --exclude='.*' "$CANON"/ "$target"/
+    rsync -a --delete --exclude='.*' --exclude='__pycache__/' --exclude='*.pyc' "$CANON"/ "$target"/
     marker_note > "$target/GENERATED.md"
   fi
 done

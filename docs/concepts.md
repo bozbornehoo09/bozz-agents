@@ -71,10 +71,35 @@ rest, dropping anything whose quote doesn't match byte-for-byte. This is what
 keeps a parallel fan-out of LLM reviewers from inventing plausible-but-false
 problems.
 
+## Across agents: request → review → adjudicate → fold
+
+The review family answers “what is wrong with this pinned artifact?” The
+cross-review lifecycle answers “how do two independent agent platforms carry
+that review through multiple implementation rounds without trusting either
+side blindly?”
+
+Each gate gets one append-only active file with local event IDs. The requester
+pins scope and revision; the reviewer invokes the appropriate review-family
+skill; then a separate folding skill verifies each finding in a fresh context
+before changing code. Both requester and reviewer publish absolute ETA + grace
+windows and use the same adaptive watcher, so long work remains unattended
+without turning silence into closure. Explicit terminal events move the raw,
+hashed transcript to an archive. When a confirmed finding targets an
+authoritative layer, the fold invokes that layer's owning `update-*` skill; it
+does not create a second writer. See ADR-0003.
+
 ## Why this is portable
 
 None of the above is tool-specific. The layers are markdown, the skills are
 `SKILL.md` folders in the open Agent Skills format, and the review contract is
 just prose discipline. The same package runs wherever the standard is read —
-Claude Code, Codex, and others — which is why bozz-agents is authored to the
-format first and treats each tool as an adapter.
+Claude Code and Codex today, with the set expected to grow — which is why
+bozz-agents is authored to the format first and treats each tool as an adapter.
+
+The structure enforces that portability rather than leaving it to discipline:
+one canonical, host-neutral `skills/` tree is the single source of truth;
+per-host discovery directories (`.claude/skills/`, `.agents/skills/`) are
+generated from it by `scripts/generate-tool-skills.sh` (CI regenerates on push;
+they carry GENERATED markers and are never hand-edited); and per-host packaging
+is a thin manifest pointing back at canonical `skills/` (`.claude-plugin/`,
+`.codex-plugin/`). Adding a host is a manifest, never a fork. See ADR-0002.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fold review findings"
+  short_description: "Verify and fold confirmed review findings"
+  default_prompt: "Use $fold-review-findings to independently adjudicate and fold the completed review findings."
