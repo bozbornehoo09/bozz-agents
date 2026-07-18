@@ -13,3 +13,5 @@ recorded below as they land.
 | ADR | Title | Status |
 |---|---|---|
 | [ADR-0001](0001-bozz-agents-maintains-own-context.md) | bozz-agents maintains its own context | Accepted |
+| [ADR-0002](0002-host-neutral-skills-generated-trees.md) | Host-neutral skills, generated per-host trees, packaging by manifest | Accepted |
+| [ADR-0003](0003-file-scoped-cross-agent-review-lifecycle.md) | File-scoped cross-agent review lifecycle with independent finding adjudication | Accepted |

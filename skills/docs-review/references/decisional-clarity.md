@@ -6,8 +6,9 @@ You are reviewing the quality of individual decisions in ADRs and Hard Rules. Sc
 
 The orchestrator expands these globs at invocation time and passes you a concrete file list. Read every file in the list before producing findings.
 
-- `docs/decisions/*.md` — every ADR (excluding `README.md`).
-- Manifest-resolved canonical rules — every per-package rule.
+- Manifest-resolved decisions and rules files from the orchestrator's concrete
+  corpus. An intentionally omitted rules layer contributes no files. Without a
+  manifest, use the conventional corpus defined by `docs-review/SKILL.md`.
 
 (Architecture and strategy docs are not the focus of this brief — they describe and reference, they do not decide. They are read only when an ADR or rule cites them and the citation needs verification.)
 

@@ -17,19 +17,26 @@ Third member of the review-skill family:
 
 ## Corpus (exhaustive — do not infer)
 
-**In scope.** Specialists read these as needed. The orchestrator expands the globs at invocation time and passes the resulting concrete file list to every specialist.
+**In scope.** Resolve the concrete corpus before delegation and pass the same
+list to every specialist.
 
-- `docs/decisions/*.md` — every ADR file (excluding `README.md` per "Out of scope" below).
-- `docs/architecture/*.md` and `docs/architecture/*.mermaid` — every architecture doc and diagram.
-- `docs/strategy/*.md` — every strategy doc at the top level (the `research/` subdirectory is excluded; see below).
-- Rule files: use the manifest-declared `rules` layer. If absent, prefer a
-  canonical `rules/` directory, then fall back to a host convention such as
-  `.agents/rules/` or `.claude/rules/`. If the selected path is generated, use
-  the canonical source named by its marker. Generated copies are out of scope.
-- Orientation file: use `project.orientation` or the manifest-declared
-  `orientation` layer. If absent, resolve the host's loaded orientation file
-  (`AGENTS.md`, `CLAUDE.md`, or equivalent). If it names a generated source such
-  as `ORIENTATION.md`, review that canonical source instead.
+When `context-manifest.yaml` exists, use its declared `decisions`,
+`architecture`, `strategy`, and `rules` layer paths plus `project.orientation`
+or the `orientation` layer. A declared path may be one file or a directory;
+expand directories to their top-level Markdown files (plus Mermaid files for
+architecture), exclude the decisions index and strategy `research/`, and follow
+generated-file markers to canonical sources. A layer omitted from the manifest
+is intentionally absent for that project and contributes no files.
+
+Without a manifest, use the conventional corpus:
+
+- `docs/decisions/*.md` excluding `README.md`;
+- `docs/architecture/*.md` and `docs/architecture/*.mermaid`;
+- top-level `docs/strategy/*.md`, excluding `research/`;
+- canonical `rules/`, then host fallbacks such as `.agents/rules/` or
+  `.claude/rules/`;
+- the loaded canonical orientation file (`AGENTS.md`, `CLAUDE.md`, or its
+  generated source).
 
 **Out of scope.** Never reviewed by this skill, even if cited by an in-scope doc.
 
@@ -44,7 +51,9 @@ If the user points at a doc not covered by either list, stop and ask. Do not gue
 
 ### Corpus maintenance
 
-Globs auto-include new files within existing directories — adding a new ADR or a new rule file requires no skill update. **Adding a new authoritative directory does require a skill update** (e.g., introducing `docs/specs/` or `docs/runbooks/`). When that happens, update this section in `SKILL.md` and the corpus list in each of the four specialist briefs. New top-level directories are rare events; the skill itself documents what counts as authoritative.
+Manifest-declared directories auto-include new top-level files. Add a new
+authoritative content layer to the manifest; without a manifest, adding a new
+authoritative directory requires updating this skill and the specialist briefs.
 
 ### Status manifest (`docs/decisions/README.md`)
 
@@ -82,7 +91,7 @@ Four briefs. All four run on every invocation — the corpus is small enough tha
 
 | Brief | Lens | Looks for |
 |---|---|---|
-| `internal-consistency.md` | Cross-doc factual agreement | Two in-scope docs that make contradictory claims; an ADR cited by a rule file with the wrong number, status, or summary; a concept added to one doc that should propagate to dependents but did not (e.g., a new architecture section not reflected in the rule files it constrains; a cross-cutting ADR — tenancy, auth — not enforced in every rule file it binds). |
+| `internal-consistency.md` | Cross-doc factual agreement | Two in-scope docs that make contradictory claims; an ADR cited by a rule file with the wrong number, status, or summary; a binding cross-cutting ADR — such as tenancy or auth — not propagated to every rule file it governs. Strategic future-service seams belong to `strategy-architecture-coherence`. |
 | `strategy-architecture-coherence.md` | Vertical (strategy → architecture → rules) | Strategy doc claims a capability or wedge with no corresponding mechanism in the architecture or rules; architecture provides a mechanism with no strategic justification (orphaned design); reserved future services named in strategy whose seams are not actually preserved in current architecture/rules. |
 | `decisional-clarity.md` | Quality of individual decisions | An ADR that does not actually decide (mush, multiple options left open, no committed direction); a rule's CRITICAL OVERRIDE or Hard Rule that is not falsifiable (a future engineer cannot tell whether it was followed); ADR missing the "what changes if reversed" implicit signal — i.e., the decision is non-load-bearing. |
 | `temporal-decay.md` | Epistemic hygiene | Claims that age — vendor capability rankings, model leadership, benchmark scores, prices, "currently best-in-class" language — without an explicit date or decay flag; absolute statements about external systems where the underlying state changes in months. |
@@ -111,7 +120,11 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
 
 ## Orchestration
 
-1. **Verify corpus.** Expand the globs in the "In scope" list to a concrete file list. If a directory is missing or empty, stop and ask. Never proceed with a partial corpus — partial review produces false negatives on propagation findings.
+1. **Verify corpus.** Resolve the manifest paths or fallback globs in the "In
+   scope" section to a concrete file list. If a declared path is missing or a
+   declared directory is empty, stop and ask. An omitted manifest layer is
+   intentionally empty, not an error. Without a manifest, a missing conventional
+   directory is an ambiguity: stop and ask. Never proceed with a partial corpus.
 2. **Build and verify the status manifest.**
    - Read `docs/decisions/README.md` and parse the index lines into `(adr_number, filename, title, status)` tuples.
    - For every ADR file in the corpus, read just the `**Status:**` line from the body (typically within the first ~10 lines). Compare to the README's status for that ADR.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cross-reviewer"
+  short_description: "Conduct file-based independent cross-reviews"
+  default_prompt: "Use $cross-reviewer to review the next ready file-based cross-agent request."

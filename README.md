@@ -2,7 +2,7 @@
 
 Context-management and review skills for AI coding agents.
 
-Two families of [Agent Skills](https://agentskills.io/specification) that keep a
+Three families of [Agent Skills](https://agentskills.io/specification) that keep a
 project's *knowledge* — its decisions, architecture, rules, and docs — accurate
 and coherent as the code evolves, then stress-test that knowledge against itself:
 
@@ -17,6 +17,11 @@ and coherent as the code evolves, then stress-test that knowledge against itself
   `SUGGEST`, and returns a verdict of `READY` / `READY-WITH-FIXES` / `REVISE`.
   Every specialist runs under an **anti-hallucination contract**: each finding
   needs a verbatim quote and a `file:line` citation, or it is dropped.
+- **cross-review skills** — the **independent handoff** side. A requester,
+  reviewer, and evidence-first finding folder coordinate iterative reviews
+  through one append-only file per review. Both active roles poll adaptively
+  from agent-published ETA + grace windows; completed findings are independently
+  adjudicated before the requester changes code.
 
 It's a **local developer tool**. Nothing imports it; you install the skills into
 your agent (user-level) and they're available across every project you open.
@@ -48,7 +53,10 @@ bozz-agents/
 │   ├── docs-review/         #   review skills; specialist briefs live in
 │   ├── skill-review/        #   each skill's references/ subdirectory
 │   ├── plan-review/         #   (skeletons — add briefs for your own
-│   └── code-review/         #    architecture; a template brief is included)
+│   ├── code-review/         #    architecture; a template brief is included)
+│   ├── cross-review-requester/  # file lifecycle + adaptive polling
+│   ├── cross-reviewer/          # independent review + adaptive polling
+│   └── fold-review-findings/    # impartial adjudication before edits
 ├── config/
 │   └── context-manifest.example.yaml   # the one file you customize
 ├── docs/                    # concepts.md, customizing.md, prism-case-study.md
@@ -66,7 +74,8 @@ bozz-agents/
 ```
 
 Skills then invoke as `/bozz-agents:docs-review`, `/bozz-agents:update-context`,
-and so on. Updates are a `git pull` away (or `/plugin marketplace update`).
+`/bozz-agents:cross-review-requester`, and so on. Updates are a `git pull` away
+(or `/plugin marketplace update`).
 
 For a quick local try without the marketplace, symlink the skills into your
 user skills directory:

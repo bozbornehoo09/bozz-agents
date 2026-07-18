@@ -1,14 +1,14 @@
 {
   "name": "bozz-agents",
   "owner": { "name": "Ben Osborne" },
-  "description": "Single-plugin marketplace: context-management + review skills for AI coding agents.",
+  "description": "Single-plugin marketplace: context-management, review, and cross-agent review skills.",
   "plugins": [
     {
       "name": "bozz-agents",
       "source": "./",
-      "description": "Context-management (update-*) and review-family skills, in the open Agent Skills format.",
+      "description": "Context-management, review-family, and file-scoped cross-agent review skills in the open Agent Skills format.",
       "category": "productivity",
-      "keywords": ["context-management", "code-review", "documentation"]
+      "keywords": ["context-management", "code-review", "cross-review", "multi-agent", "documentation"]
     }
   ]
 }

@@ -2,8 +2,9 @@
 
 This repository is a portable set of **Agent Skills** for managing and reviewing
 a project's authoritative knowledge. It is a developer tool, not an application:
-there is no build, no runtime, no service. The deliverables are the `SKILL.md`
-files under `skills/`.
+there is no application runtime or service. The deliverables are the canonical
+skill packages under `skills/` (including references and helper scripts), their
+generated discovery trees, and thin per-host plugin/marketplace manifests.
 
 ## What lives here
 
@@ -19,6 +20,10 @@ files under `skills/`.
   orchestrates the specialist briefs bundled in its own `references/` directory,
   fans them out in parallel, and returns `BLOCK`/`FIX`/`SUGGEST` findings with a
   `READY` / `READY-WITH-FIXES` / `REVISE` verdict.
+- `skills/{cross-review-requester,cross-reviewer,fold-review-findings}/` — the
+  file-scoped **cross-agent review lifecycle**. The requester and reviewer both
+  use ETA/grace-aware polling; every completed review passes through an
+  independent finding-adjudication fold before edits (ADR-0003).
 
 ## Context system
 
@@ -51,6 +56,14 @@ below and positioning lives in `README.md`. End a working session with
   `# <Skill Name>: <subject>`.
 - Every review specialist operates under the anti-hallucination contract:
   a finding without a verbatim quote and a `file:line` citation is dropped.
+- Cross-review findings are hypotheses, not instructions. The requester always
+  invokes `fold-review-findings` after `REVIEW_COMPLETE`; only independently
+  confirmed findings may change the reviewed artifact (ADR-0003).
+- Edit the canonical `skills/` tree only. The per-host discovery directories
+  (`.claude/skills/`, `.agents/skills/`) are generated from it by
+  `scripts/generate-tool-skills.sh` and carry GENERATED markers — never
+  hand-edit them; regenerate instead. Per-host packaging is a thin manifest
+  pointing at canonical `skills/`, never a fork (see ADR-0002).
 
 ## Working in this repo
 
