@@ -50,11 +50,12 @@ section, replace it, or cancel.
 PRIMARY SOURCE — the current conversation. In-session decisions and intent
 ONLY exist in the main thread's context.
 
-SECONDARY SOURCES — spawn ONE Explore subagent:
+SECONDARY SOURCES — run ONE discovery subagent using the host's subagent or
+delegation facility:
 
 > "Discover what's changed in <project-root> since
 > <timestamp>. Check: `git log --since=<ts>` + `git status`; file mtimes
-> under src/, infrastructure/, .claude/rules/, docs/, prompts/; the most
+> under source, infrastructure, manifest-resolved rules, docs, and prompts; the most
 > recent file in work_tracker/<current-week>/ for the prior baseline; any
 > new files in docs/decisions/. Report a tight bullet list of what
 > changed and where, with file paths. Under 300 words."
@@ -69,7 +70,7 @@ Sections (omit any with no content):
   `Decided X (no ADR — minor)`. One line each. Do NOT explain why — the
   ADR holds that.
 - **Implemented** — concrete things built or changed, with file paths
-- **Rules updated** — list of `.claude/rules/` files touched (with
+- **Rules updated** — list manifest-resolved rule files touched (with
   `→ ADR-NNNN` citations where relevant)
 - **Open questions** — unresolved items to revisit
 - **Up next** — a pointer to the work plan's "Next up"

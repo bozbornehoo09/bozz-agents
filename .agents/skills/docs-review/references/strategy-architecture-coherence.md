@@ -9,8 +9,8 @@ The orchestrator expands these globs at invocation time and passes you a concret
 - `docs/strategy/*.md` — top-level only; `research/` subdirectory is out of scope.
 - `docs/architecture/*.md` and `docs/architecture/*.mermaid`
 - `docs/decisions/*.md` — every ADR (excluding `README.md`).
-- `.claude/rules/*.md` — every per-package rule.
-- `CLAUDE.md`
+- Manifest-resolved canonical rules — every per-package rule.
+- Manifest-resolved canonical orientation file.
 
 ## ADR status handling and read scope
 

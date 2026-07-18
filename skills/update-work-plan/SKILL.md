@@ -37,7 +37,8 @@ fill only the sections the project has real content for; delete the rest.
 PRIMARY SOURCE — the current conversation. In-session decisions, scope
 changes, and newly discovered work ONLY exist in the main thread's context.
 
-SECONDARY SOURCES — spawn ONE Explore subagent (skip this when
+SECONDARY SOURCES — run ONE discovery subagent using the host's subagent or
+delegation facility (skip this when
 dispatched from `update-context`; reuse the orchestrator's shared
 discovery instead):
 

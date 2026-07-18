@@ -20,7 +20,9 @@ These are the conventions the family has adopted. Divergence is a finding.
 - **Severity vocabulary:** `BLOCK` / `FIX` / `SUGGEST`. Three levels, in that case. Other vocabularies (`ERROR/WARN/INFO`, `HIGH/MEDIUM/LOW`, `🔴/🟡/🟢`) are non-canonical.
 - **Verdict labels:** `READY` / `REVISE` / `READY-WITH-FIXES`. Other labels (`PASS/FAIL`, `OK/NOT OK`) are non-canonical.
 - **Verdict mapping:** no BLOCKs → `READY`; only FIX/SUGGEST → `READY-WITH-FIXES`; any BLOCK → `REVISE`.
-- **Specialist invocation:** parallel via Agent (typically `subagent_type: general-purpose`), single message with multiple tool calls. Sequential invocation breaks the design.
+- **Specialist invocation:** independent specialists run in parallel through
+  the host's subagent or delegation facility. Sequential invocation breaks the
+  design; the facility's product-specific name is irrelevant.
 - **Specialist brief location:** each skill's own `references/` subdirectory. Not a shared top-level directory; not elsewhere.
 - **Output template anchors:** `# <Skill Name>: <subject>`, then a `Specialists run:` line, then severity sections in order BLOCK → FIX → SUGGEST, then `Verdict:` line at end.
 - **Anti-hallucination contract anchor:** section heading `## Anti-hallucination contract` (or close variant). Variants like `## Hallucination prevention` or `## Quality guards` diverge from canon.
@@ -35,7 +37,10 @@ These are the conventions the family has adopted. Divergence is a finding.
 
 3. **Output template structural divergence.** A skill whose output template changes the section order, omits the `Verdict:` line, or restructures findings in a way that breaks family visual consistency. **FIX**.
 
-4. **Specialist invocation pattern divergence.** A skill that invokes specialists sequentially when parallel is appropriate, or invokes them via a different mechanism than `Agent` with `subagent_type`. **FIX** if it's a stylistic choice; **BLOCK** if it changes the contract semantics (e.g., specialists pass state to each other).
+4. **Specialist invocation pattern divergence.** A skill that invokes
+   specialists sequentially when parallel is appropriate, or allows specialists
+   to share state when independence is required. Do not flag host-specific tool
+   names. **FIX** if stylistic; **BLOCK** if it changes contract semantics.
 
 5. **Specialist brief location divergence.** A specialist brief stored outside its owning skill's `references/` (e.g. a shared top-level directory, or `.claude/skills/foo/specialists/`). **FIX** — relocate into the skill's `references/`.
 

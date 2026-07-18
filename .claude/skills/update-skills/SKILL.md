@@ -19,7 +19,8 @@ canonical source (e.g. a top-level `skills/` tree that generates
 `.claude/skills/`, `.agents/skills/`, …). **Never hand-edit a generated
 skill — the next regenerate clobbers it.** If a project
 `context-manifest.yaml` declares an AI-tooling layer `path`, start there;
-otherwise default to `.claude/skills/`. If that directory carries a sibling
+otherwise prefer `skills/`, then fall back to a host discovery directory such
+as `.agents/skills/` or `.claude/skills/`. If that directory carries a sibling
 `GENERATED.md`, or a `<!-- GENERATED — do not edit -->` / `# GENERATED — do
 not edit` header, it is a build output that names the **canonical source**
 (e.g. `skills/`) and the **regen command** (e.g.
@@ -33,8 +34,7 @@ resolved here.
 In scope:
 - `<the skills directory>/*/SKILL.md` — skill definitions (YAML
   frontmatter + body).
-- the specialist briefs each skill invokes (per-skill `references/`, or a
-  shared `.claude/review-context/` in older layouts).
+- the specialist briefs each skill invokes in its own `references/` directory.
 
 Out of scope:
 - `prompts/*.md` — orchestration prompts; updated by hand or via a
@@ -57,14 +57,15 @@ PRIMARY SOURCE — the current conversation. Skill changes typically arise
 from session-level decisions about how AI tooling should behave.
 Capture these directly — a subagent cannot see them.
 
-SECONDARY SOURCES — spawn ONE Explore subagent with this brief:
+SECONDARY SOURCES — run ONE discovery subagent using the host's subagent or
+delegation facility with this brief:
 
 > "Find what's changed in <project-root> that may require
 > updates to AI skills or specialist briefs. Check: (a) new directories
 > under docs/ that should be added to docs-review's corpus globs;
 > (b) new ADR Status values, rule structural conventions, or other
 > doc conventions that briefs reference; (c) git log + status across
-> .claude/ since the oldest mtime in .claude/skills/. Report a tight
+> the canonical AI-tooling tree since its oldest skill mtime. Report a tight
 > bullet list with file paths. Under 300 words."
 
 ### 3. For each skill, decide whether anything counts as a *durable* update

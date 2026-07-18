@@ -44,7 +44,8 @@ Read `docs/open_questions.md` end-to-end. Note the structure:
 PRIMARY SOURCE — the current conversation. New questions surface here;
 in-session decisions resolve existing ones. Capture both directly.
 
-SECONDARY SOURCES — spawn ONE Explore subagent with this brief:
+SECONDARY SOURCES — run ONE discovery subagent using the host's subagent or
+delegation facility with this brief:
 
 > "Find what's changed in <project-root> that affects
 > docs/open_questions.md. Three checks: (a) new ADRs in
@@ -90,12 +91,6 @@ mutation to existing-but-not-resolved questions that is routine.
 - If the document has shifted in scope or audience, update the Status
   line.
 
-### 7. No docs-review hook
-
-`docs/open_questions.md` is explicitly out of scope for `docs-review`
-(it is unresolved by definition; it cannot be inconsistent with
-anything authoritative). Skip the review step.
-
 ## Pause-for-confirmation rules
 
 - PAUSE before removing a question (resolution is final; partial
@@ -119,3 +114,9 @@ anything authoritative). Skip the review step.
   is the authoritative source).
 - Resolved questions become one-line pointers, not deletions —
   deletion loses audit trail.
+
+## Review hook
+
+None — `docs/open_questions.md` is explicitly out of scope for
+`docs-review` (unresolved by definition; it cannot be inconsistent
+with anything authoritative). Skip the review step.

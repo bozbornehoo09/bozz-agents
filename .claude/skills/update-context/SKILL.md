@@ -26,8 +26,8 @@ orchestrator dispatches to them based on what discovery surfaces.
 | WHY (decisions) | `docs/decisions/` | `update-decisions` |
 | Strategy (positioning) | `docs/strategy/` | `update-strategy` |
 | Architecture (synthesis) | `docs/architecture/` | `update-architecture` |
-| WHAT (per-package rules) | `.claude/rules/` | `update-rules` |
-| AI tooling | `.claude/skills/` (per-skill `references/`) | `update-skills` |
+| WHAT (per-package rules) | manifest-declared rules path | `update-rules` |
+| AI tooling | manifest-declared canonical skills path | `update-skills` |
 | Open questions | `docs/open_questions.md` | `update-open-questions` |
 | FORWARD (work plan) | `work_tracker/work_plan.md` | `update-work-plan` |
 | Backlog (longer-term) | `work_tracker/backlog.md` | `update-backlog` |
@@ -49,7 +49,8 @@ The current conversation is your PRIMARY source for in-session
 decisions, intent, and rationale. Capture these directly — a subagent
 cannot see them.
 
-For everything mechanical, spawn ONE Explore subagent with this brief:
+For everything mechanical, run ONE discovery subagent using the host's
+subagent or delegation facility with this brief:
 
 > "Discover what's changed in <project-root> since
 > <timestamp> across all authoritative content. Map findings to one
@@ -164,6 +165,13 @@ Dispatch plan:
 - Which skills were skipped (and why).
 - The final `docs-review` verdict.
 - Any deferred findings.
+
+## Pause-for-confirmation rules
+
+- Pause after printing the dispatch plan and before invoking any narrow update
+  skill.
+- Reuse confirmation already given for that exact dispatch plan; do not ask
+  again between narrow skills unless one surfaces a new decision or scope.
 
 ## Style across all layers
 

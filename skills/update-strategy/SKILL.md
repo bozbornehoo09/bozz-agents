@@ -44,7 +44,8 @@ here first (a new vertical considered, a competitive observation, a
 revised north-star framing). Capture these directly — a subagent
 cannot see them.
 
-SECONDARY SOURCES — spawn ONE Explore subagent with this brief:
+SECONDARY SOURCES — run ONE discovery subagent using the host's subagent or
+delegation facility with this brief:
 
 > "Find changes in <project-root> that may require
 > updates to strategy docs. Check: (a) new research artifacts in

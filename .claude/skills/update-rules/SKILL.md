@@ -18,7 +18,8 @@ other tools). **Never hand-edit a generated file — the next regenerate
 clobbers your edit.**
 
 1. **Locate the rules.** If a project `context-manifest.yaml` declares a
-   `rules` layer `path`, start there; otherwise default to `.claude/rules/`.
+   `rules` layer `path`, start there; otherwise prefer `rules/`, then fall back
+   to the current host's rule-discovery directory.
 2. **Check whether it is generated.** A sibling `GENERATED.md`, or a
    `<!-- GENERATED — do not edit -->` / `# GENERATED — do not edit` header,
    marks the directory as a build output. The marker names both the
@@ -54,7 +55,8 @@ descriptions, and constraints.
 PRIMARY SOURCE — the current conversation. Decisions and design changes
 surface here first; capture them directly.
 
-SECONDARY SOURCES — spawn ONE Explore subagent with this brief:
+SECONDARY SOURCES — run ONE discovery subagent using the host's subagent or
+delegation facility with this brief:
 
 > "Find what's changed that may require updates to the per-package design
 > rules in <the canonical rules directory resolved above>. Check:

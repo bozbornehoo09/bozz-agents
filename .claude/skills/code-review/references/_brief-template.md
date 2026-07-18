@@ -9,6 +9,12 @@ You are reviewing a plan/diff for **<one specific concern>**. Scope is
 specialists own those). Stay strictly in your lane; overlap produces
 contradictory findings.
 
+## Authoritative corpus
+
+- The plan or diff supplied by the orchestrating review skill.
+- The project ADRs, rules, and architecture sources explicitly named by this
+  brief, resolved through the project's context manifest when present.
+
 ## What to check for
 
 Enumerate the concrete, falsifiable violations this lens catches. Each item
@@ -46,3 +52,5 @@ Finding: <one sentence>
 Quote: > "<verbatim offending text>"
 Citation: <ADR or rule-file path + the specific clause violated>
 ```
+
+Empty report is a valid result. Do not invent findings to look thorough.

@@ -22,8 +22,14 @@ Third member of the review-skill family:
 - `docs/decisions/*.md` — every ADR file (excluding `README.md` per "Out of scope" below).
 - `docs/architecture/*.md` and `docs/architecture/*.mermaid` — every architecture doc and diagram.
 - `docs/strategy/*.md` — every strategy doc at the top level (the `research/` subdirectory is excluded; see below).
-- Rule files: resolve the canonical source first. If `.claude/rules/` is a generated output (a `GENERATED.md` marker or a `<!-- GENERATED — do not edit -->` header in individual files names a canonical source), use that canonical source instead (e.g., `rules/*.md` at the repo root or the designated canonical directory). Otherwise use `.claude/rules/*.md` directly. Generated copies are out of scope — reviewing a build output produces findings that regeneration clobbers.
-- Orientation file: resolve the canonical source first. If `CLAUDE.md` or `AGENTS.md` carries a `<!-- GENERATED — do not edit -->` header naming a canonical source (e.g., `ORIENTATION.md`), use that canonical source. Otherwise use `CLAUDE.md` or `AGENTS.md` directly.
+- Rule files: use the manifest-declared `rules` layer. If absent, prefer a
+  canonical `rules/` directory, then fall back to a host convention such as
+  `.agents/rules/` or `.claude/rules/`. If the selected path is generated, use
+  the canonical source named by its marker. Generated copies are out of scope.
+- Orientation file: use `project.orientation` or the manifest-declared
+  `orientation` layer. If absent, resolve the host's loaded orientation file
+  (`AGENTS.md`, `CLAUDE.md`, or equivalent). If it names a generated source such
+  as `ORIENTATION.md`, review that canonical source instead.
 
 **Out of scope.** Never reviewed by this skill, even if cited by an in-scope doc.
 
@@ -111,7 +117,8 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
    - For every ADR file in the corpus, read just the `**Status:**` line from the body (typically within the first ~10 lines). Compare to the README's status for that ADR.
    - For each mismatch, record an `internal-consistency` finding (FIX severity): README claims X, body says Y. Resolution: body is truth; update README.
    - The verified manifest passed to specialists uses **body status**, not README status, when they disagree. Specialists should not have to re-do this check.
-3. **Spawn all four specialists in parallel** via Agent (`subagent_type: general-purpose`). Single message, four tool calls. Each specialist gets:
+3. **Spawn all four specialists in parallel** using the host agent's subagent
+   or delegation facility. Use one parallel fan-out. Each specialist gets:
    ```
    Review the project's authoritative docs against {brief_path}.
    Concrete corpus (file list from glob expansion):
@@ -152,7 +159,7 @@ Corpus reviewed: <count> files
 Specialists run: internal-consistency, strategy-architecture-coherence, decisional-clarity, temporal-decay
 
 ## BLOCK
-- [internal-consistency] docs/decisions/0007-example-decision.md:42 ↔ .claude/rules/example_package.md:88
+- [internal-consistency] docs/decisions/0007-example-decision.md:42 ↔ rules/example_package.md:88
   ADR-0007 says:
   > "Workers do not import provider-specific SDKs outside the adapter layer."
   Rule says:

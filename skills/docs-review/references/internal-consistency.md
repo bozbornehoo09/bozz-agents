@@ -9,8 +9,8 @@ The orchestrator expands these globs at invocation time and passes you a concret
 - `docs/decisions/*.md` — every ADR (excluding `README.md`).
 - `docs/architecture/*.md` and `docs/architecture/*.mermaid`
 - `docs/strategy/*.md` — top-level only; `research/` subdirectory is out of scope.
-- `.claude/rules/*.md` — every per-package rule.
-- `CLAUDE.md`
+- Manifest-resolved canonical rules — every per-package rule.
+- Manifest-resolved canonical orientation file.
 
 ## ADR status handling and read scope
 
@@ -30,7 +30,9 @@ Never read, cite, or reason about: `docs/decisions/README.md`, `docs/strategy/re
 
 1. **ADR ↔ ADR contradictions among Accepted ADRs.** One Accepted ADR claims X, another Accepted ADR claims not-X without explicit supersedence. Two ADRs deciding overlapping problems in different directions.
 
-2. **Rule ↔ ADR contradictions.** A `.claude/rules/*.md` file states a rule whose cited ADR says something different. The rule may have been edited after the ADR or vice versa. Verify each `(see docs/decisions/00NN-*.md)` reference: open the cited ADR and confirm the rule's summary matches the ADR's actual decision.
+2. **Rule ↔ ADR contradictions.** A manifest-resolved rule file states a rule
+   whose cited ADR says something different. Verify each ADR reference against
+   the actual decision.
 
 3. **Architecture ↔ ADR contradictions.** `architecture_design.md` makes a claim that an Accepted ADR contradicts. The architecture doc is downstream of ADRs; if it disagrees, it's the architecture that's wrong (or a new ADR is implied — see `decisional-clarity.md`).
 
@@ -44,7 +46,8 @@ Never read, cite, or reason about: `docs/decisions/README.md`, `docs/strategy/re
    - A cross-cutting ADR constraining external dependencies → every affected service rule must reference the constraint where that dependency is in scope.
    - A cross-cutting ADR governing endpoint security → every UI/API rule whose service falls in scope must reference it.
 
-7. **`CLAUDE.md` drift.** Paths, conventions, or doc names referenced by `CLAUDE.md` that no longer exist or have moved.
+7. **Orientation drift.** Paths, conventions, or doc names referenced by the
+   canonical orientation file no longer exist or have moved.
 
 **Do not flag:** supersedence-chain defects (an old ADR not marked
 Superseded, broken chain markers) are owned by
