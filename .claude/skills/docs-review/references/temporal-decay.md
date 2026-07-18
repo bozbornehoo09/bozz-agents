@@ -8,11 +8,10 @@ A claim is decay-prone when its truth value depends on the state of an external 
 
 The orchestrator expands these globs at invocation time and passes you a concrete file list. Read every file in the list before producing findings.
 
-- `docs/strategy/*.md` — top-level only; `research/` subdirectory is out of scope.
-- `docs/decisions/*.md` — every ADR (excluding `README.md`).
-- `docs/architecture/*.md` and `docs/architecture/*.mermaid`
-- Manifest-resolved canonical rules — every per-package rule.
-- Manifest-resolved canonical orientation file.
+- Manifest-resolved strategy, decisions, architecture, rules, and orientation
+  files from the orchestrator's concrete corpus. Layers intentionally omitted
+  by the project manifest contribute no files. Without a manifest, use the
+  conventional corpus defined by `docs-review/SKILL.md`.
 
 ## ADR status handling and read scope
 

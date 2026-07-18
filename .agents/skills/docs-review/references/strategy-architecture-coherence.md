@@ -6,11 +6,10 @@ You are reviewing the vertical alignment from strategy → architecture → rule
 
 The orchestrator expands these globs at invocation time and passes you a concrete file list. Read every file in the list before producing findings.
 
-- `docs/strategy/*.md` — top-level only; `research/` subdirectory is out of scope.
-- `docs/architecture/*.md` and `docs/architecture/*.mermaid`
-- `docs/decisions/*.md` — every ADR (excluding `README.md`).
-- Manifest-resolved canonical rules — every per-package rule.
-- Manifest-resolved canonical orientation file.
+- Manifest-resolved strategy, architecture, decisions, rules, and orientation
+  files from the orchestrator's concrete corpus. Layers intentionally omitted
+  by the project manifest contribute no files. Without a manifest, use the
+  conventional corpus defined by `docs-review/SKILL.md`.
 
 ## ADR status handling and read scope
 

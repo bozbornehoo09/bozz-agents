@@ -6,11 +6,10 @@ You are reviewing the project's authoritative documentation set against itself f
 
 The orchestrator expands these globs at invocation time and passes you a concrete file list. Read every file in the list before producing findings. No grep-and-go.
 
-- `docs/decisions/*.md` — every ADR (excluding `README.md`).
-- `docs/architecture/*.md` and `docs/architecture/*.mermaid`
-- `docs/strategy/*.md` — top-level only; `research/` subdirectory is out of scope.
-- Manifest-resolved canonical rules — every per-package rule.
-- Manifest-resolved canonical orientation file.
+- Manifest-resolved decisions, architecture, strategy, rules, and orientation
+  files from the orchestrator's concrete corpus. Layers intentionally omitted
+  by the project manifest contribute no files. Without a manifest, use the
+  conventional corpus defined by `docs-review/SKILL.md`.
 
 ## ADR status handling and read scope
 
@@ -40,11 +39,15 @@ Never read, cite, or reason about: `docs/decisions/README.md`, `docs/strategy/re
 
 5. **Inaccurate cross-citations.** A rule cites "ADR-NNNN" by number; verify the cited file's title, status, and decision actually match what the rule claims. Catches typos, copy-paste errors, and stale references after ADR renumbering. **Citing a non-Accepted ADR (Superseded, Deprecated, Proposed, Draft) as authoritative is itself a finding** — FIX severity.
 
-6. **Missed propagation.** A concept added to one doc that should propagate to dependents but did not. Concrete examples to scan for:
-   - An architecture section reserving future services → must appear (or be referenced) in the rule files of the packages it constrains.
+6. **Missed factual or decisional propagation.** A binding ADR or rule contract
+   added to one doc should propagate to every dependent it governs. Concrete
+   examples to scan for:
    - A cross-cutting ADR (e.g., every record carries the tenant key) → every rule touching data flow, events, or queries must enforce the required fields.
    - A cross-cutting ADR constraining external dependencies → every affected service rule must reference the constraint where that dependency is in scope.
    - A cross-cutting ADR governing endpoint security → every UI/API rule whose service falls in scope must reference it.
+
+   Do not assess whether reserved future services preserve a strategic seam;
+   `strategy-architecture-coherence.md` owns that vertical check.
 
 7. **Orientation drift.** Paths, conventions, or doc names referenced by the
    canonical orientation file no longer exist or have moved.
