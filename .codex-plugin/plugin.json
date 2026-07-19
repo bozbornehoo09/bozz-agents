@@ -1,6 +1,6 @@
 {
   "name": "bozz-agents",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Agent-agnostic context-management, review, and file-scoped cross-agent review skills.",
   "author": {
     "name": "Ben Osborne"
