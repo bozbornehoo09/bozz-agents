@@ -1,7 +1,7 @@
 {
   "name": "bozz-agents",
   "description": "Context-management, review, and file-scoped cross-agent review skills. Keeps project knowledge coherent, stress-tests changes with parallel reviewers, and coordinates requester/reviewer/folding loops with adaptive polling and independent finding adjudication.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": { "name": "Ben Osborne" },
   "license": "MIT",
   "keywords": ["agent-skills", "context-management", "code-review", "cross-review", "multi-agent", "adr", "documentation"]
