@@ -40,8 +40,11 @@ work tracker, open questions) have no hook; they are not authoritative.
 
 A review skill is a small, fixed shape — the **family pattern**:
 
-- One `SKILL.md` orchestrates **3–4 specialist briefs** (in `references/`).
-- Briefs **fan out in parallel**; each owns one lens and is blind to the others.
+- One `SKILL.md` orchestrates its specialist briefs (in `references/`): the
+  fully configured members carry **3–4**, while `plan-review` and `code-review`
+  ship with a template until a consumer adds project-specific briefs.
+- Configured briefs **fan out in parallel**; each owns one lens and is blind to
+  the others.
 - Findings use one severity vocabulary: **BLOCK / FIX / SUGGEST**.
 - The skill returns one verdict: **READY / READY-WITH-FIXES / REVISE**.
 
