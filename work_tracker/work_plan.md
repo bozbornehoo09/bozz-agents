@@ -39,16 +39,18 @@ at session end). No review hook.
 - Host-neutral distribution + Codex plugin packaging (canonical `skills/`,
   generated per-host trees, plugin manifests) → PR #6 merged 2026-07-18,
   ADR-0002
+- Manifest-resolved `docs-review` corpus discovery → commit `2364c45`
+- File-scoped cross-agent review lifecycle: requester, reviewer, independent
+  finding fold, adaptive polling, helper/tests, and generated host trees
+  → PR #8 merged 2026-07-18, ADR-0003
+- v0.4.0 published with the host-neutral distribution and cross-review
+  lifecycle → PR #9 merged 2026-07-18
 
 **In progress.**
-- File-scoped cross-agent review lifecycle: requester, reviewer, independent
-  finding fold, adaptive polling, helper/tests, and generated host trees are
-  implemented and under final review. → ADR-0003
+- None.
 
 **Not started.**
-- v0.3.0 publish — the installed / marketplace plugin is still cached at
-  v0.2.0; no git tag exists yet. Scope now also includes the host-neutral
-  genericization, Codex plugin packaging (PR #6), and ADR-0003 lifecycle.
+- No scheduled milestone.
 
 ---
 
@@ -57,12 +59,8 @@ at session end). No review hook.
 The immediate, ordered focus. When one clears, promote the next and log the
 landing in the work tracker.
 
-1. **[~] Land the ADR-0003 cross-review lifecycle** — final implementation
-   re-review, then commit/PR the three skills, bridge helper/tests, generated
-   trees, and docs.
-2. **[ ] Publish v0.3.0** — bump the installed / marketplace plugin so the
-   merged skills reach consumers (including PR #6 and ADR-0003). No git tag
-   exists yet.
+No active milestone is scheduled. Select the next scope before implementation;
+longer-term candidates remain in `work_tracker/backlog.md`.
 
 (Companion prism PR #22 tracked in that repo; not verified this session.)
 
@@ -83,3 +81,4 @@ Append-only. One row per meaningful plan change.
 | 2026-07-03 | Plan created (seeded from template) | First `update-context` sweep to need the FORWARD layer; `context-manifest.yaml` declared the path but the file did not exist |
 | 2026-07-18 | PR #5 marked merged; PR #6 (host-neutral distribution + Codex plugin) landed unplanned, recorded as ADR-0002; v0.3.0 promoted to sole next-up | Skill genericization + Codex packaging completed the portability arc, and the merge cleared the PR #5 gate on the version bump |
 | 2026-07-18 | ADR-0003 cross-review lifecycle inserted ahead of v0.3.0; publish scope expanded to include its three skills and helper | The live Prism bridge proved independent review but also exposed global-file growth, numbering collisions, static polling, and unverified-fold risks that should be fixed before the next plugin release |
+| 2026-07-18 | ADR-0003 lifecycle and docs-review corpus resolution marked complete; planned v0.3.0 replaced by shipped v0.4.0; active queue cleared | PR #8 and PR #9 landed the reviewed lifecycle and release, leaving no user-selected next milestone |

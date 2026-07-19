@@ -16,10 +16,11 @@ generated discovery trees, and thin per-host plugin/marketplace manifests.
   resolves the layer map, loads the temporal core (latest tracker entry, work
   plan next-up), and expands by task intent under an anti-greed contract
   (index-first, fetch-only-cited).
-- `skills/{docs,skill,plan,code}-review/` — the **review** family. Each
-  orchestrates the specialist briefs bundled in its own `references/` directory,
-  fans them out in parallel, and returns `BLOCK`/`FIX`/`SUGGEST` findings with a
-  `READY` / `READY-WITH-FIXES` / `REVISE` verdict.
+- `skills/{docs,skill,plan,code}-review/` — the **review** family. `docs-review`
+  and `skill-review` fan out their bundled specialist briefs; `plan-review` and
+  `code-review` ship as templates for consumer-supplied briefs. All use
+  `BLOCK`/`FIX`/`SUGGEST` findings and a `READY` / `READY-WITH-FIXES` /
+  `REVISE` verdict.
 - `skills/{cross-review-requester,cross-reviewer,fold-review-findings}/` — the
   file-scoped **cross-agent review lifecycle**. The requester and reviewer both
   use ETA/grace-aware polling; every completed review passes through an
