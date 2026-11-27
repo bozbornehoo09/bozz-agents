@@ -19,6 +19,10 @@ verifier to implement. Prohibit recursive delegation.
   a focused reproduction demonstrates it.
 - **REJECTED:** exact counter-evidence or reproduction disproves the claim.
   Mere disagreement, passing unrelated tests, or author intent is insufficient.
+  A quote absent from the cited file's pinned bytes is sufficient
+  counter-evidence when the report shows the line's actual text.
+  A rejected BLOCK or FIX is carried into the next request's focus so the
+  reviewer can contest it with new evidence.
 - **DEFERRED:** the finding is valid, the gate policy permits deferral, and the
   report names a durable destination, owner, and return trigger.
 - **UNRESOLVED:** evidence conflicts or cannot be obtained safely. Return
@@ -37,4 +41,8 @@ cited evidence before confirming or rejecting it.
 - Use the smallest coherent change that resolves the proven defect.
 - Re-run the original reproduction plus proportionate regression checks.
 - Compare the resulting diff to every disposition before returning.
-- Do not smuggle adjacent improvements into the fold.
+- Do not smuggle adjacent improvements into the fold. Other instances of the
+  *same* confirmed defect are not adjacent improvements: find and fix them,
+  and name the search.
+- Never apply a fix that reverses or reinterprets an Accepted ADR or another
+  recorded decision; return `BLOCKED` with the question instead.

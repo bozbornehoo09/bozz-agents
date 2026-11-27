@@ -50,7 +50,8 @@ of the family. That *shape* is what you reuse; the *rules* are what you replace.
   `code-review` keep the generic machinery plus a `_brief-template.md`. Prism's
   six real design briefs live in the **Prism repo's** own `.claude/skills/`, next
   to the architecture they review. Writing your own is step 2 of
-  [`customizing.md`](customizing.md).
+  [`customizing.md`](customizing.md). (Since ADR-0004 both skills also ship
+  architecture-neutral built-in lenses; the Prism briefs run alongside them.)
 
 If you're adapting bozz-agents, read a couple of these briefs first — they're the
 clearest illustration of how much architecture you can encode in a few hundred

@@ -97,16 +97,16 @@ layers:
 reviews:
   docs-review:
     reviews: "authoritative docs against each other"
-    briefs: [internal-consistency, decisional-clarity, temporal-decay, strategy-architecture-coherence]
+    briefs: [internal-consistency, decisional-clarity, temporal-decay, strategy-architecture-coherence, layer-fidelity]
   skill-review:
     reviews: "skills + their references against quality conventions"
     briefs: [structural-integrity, anti-hallucination-quality, scope-focus, cross-skill-consistency]
   plan-review:
     reviews: "an implementation plan against the architecture, before code"
-    briefs: []   # skeleton — add your own (e.g. architecture, security, performance)
+    briefs: []   # built-in lenses always run; add your own here (e.g. architecture, security, performance)
   code-review:
     reviews: "a diff/commit against the architecture"
-    briefs: []   # skeleton — add your own (e.g. architecture, security, performance)
+    briefs: []   # built-in lenses always run; add your own here (e.g. architecture, security, performance)
 
 # Shared review conventions (kept consistent across the family by
 # cross-skill-consistency.md):

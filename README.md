@@ -1,8 +1,9 @@
 # bozz-agents
 
-Context-management and review skills for AI coding agents.
+Context-management, review, planning and writing skills for AI coding agents,
+plus the manager/worker agents that run them.
 
-Three families of [Agent Skills](https://agentskills.io/specification) that keep a
+Five families of [Agent Skills](https://agentskills.io/specification) that keep a
 project's *knowledge* — its decisions, architecture, rules, and docs — accurate
 and coherent as the code evolves, then stress-test that knowledge against itself:
 
@@ -11,9 +12,11 @@ and coherent as the code evolves, then stress-test that knowledge against itself
   content layer (decisions, strategy, architecture, rules, AI tooling,
   open questions, work plan, backlog, orientation, work tracker). Run at
   the end of a session to capture what changed in the right place.
-- **review skills** — the **check** side. A four-member review family
-  (`docs-review`, `skill-review`, `plan-review`, `code-review`). Each fans out
-  to 3–4 specialist briefs in parallel, reports findings as `BLOCK`/`FIX`/
+- **review skills** — the **check** side. A five-member review family
+  (`docs-review`, `skill-review`, `plan-review`, `code-review`,
+  `design-doc-review`). Each fans out to its specialist briefs in parallel —
+  `plan-review` and `code-review` ship built-in generic lenses and take your
+  architecture briefs alongside them — reports findings as `BLOCK`/`FIX`/
   `SUGGEST`, and returns a verdict of `READY` / `READY-WITH-FIXES` / `REVISE`.
   Every specialist runs under an **anti-hallucination contract**: each finding
   needs a verbatim quote and a `file:line` citation, or it is dropped.
@@ -22,6 +25,21 @@ and coherent as the code evolves, then stress-test that knowledge against itself
   through one append-only file per review. Both active roles poll adaptively
   from agent-published ETA + grace windows; completed findings are independently
   adjudicated before the requester changes code.
+- **plan → build → PR skills** — `writing-implementation-plans` drafts a plan an
+  implementer agent can build without making design choices and runs
+  `plan-review` to a closed pass; `implementing-a-plan` builds it one step per
+  commit and stops on the first deviation; `preparing-code-reviews` turns the
+  branch into one reviewable pull request (never pushed without your go).
+  `deciding-calls-by-debate` settles a reversible design call by structured
+  debate when you are away, and parks the rest for you.
+- **writing skills** — `design-doc-write` / `design-doc-edit` for human-facing
+  design docs (HLD, LLD, mini-design) with a cold-reader gate,
+  `refining-technical-writing` for prose and code comments, and
+  `design-diagrams` for PlantUML, draw.io and SVG diagrams.
+
+The **agents** in `agents/` — a manager you talk to, architect and implementer
+workers, and read-only reviewer subagents — run these skills as a team, locally
+or in a cloud session. See [`docs/agents.md`](docs/agents.md).
 
 It's a **local developer tool**. Nothing imports it; you install the skills into
 your agent (user-level) and they're available across every project you open.
@@ -52,15 +70,21 @@ bozz-agents/
 │   ├── update-decisions/  …  update-work-tracker/   # 10 content-layer skills
 │   ├── docs-review/         #   review skills; specialist briefs live in
 │   ├── skill-review/        #   each skill's references/ subdirectory
-│   ├── plan-review/         #   (skeletons — add briefs for your own
-│   ├── code-review/         #    architecture; a template brief is included)
+│   ├── plan-review/         #   (built-in generic lenses; add briefs for
+│   ├── code-review/         #    your own architecture from the template)
+│   ├── design-doc-review/   #   one human-facing design doc
+│   ├── writing-implementation-plans/ implementing-a-plan/ preparing-code-reviews/
+│   ├── deciding-calls-by-debate/
+│   ├── design-doc-write/ design-doc-edit/ design-diagrams/ refining-technical-writing/
 │   ├── cross-review-requester/  # file lifecycle + adaptive polling
 │   ├── cross-reviewer/          # independent review + adaptive polling
 │   └── fold-review-findings/    # impartial adjudication before edits
+├── agents/                  # manager/worker agent definitions (Claude Code)
+│   └── shared/              #   worker contract, owner rules, shell deny lists
 ├── config/
 │   └── context-manifest.example.yaml   # the one file you customize
-├── docs/                    # concepts.md, customizing.md, prism-case-study.md
-├── codex/                   # Codex install/usage notes
+├── docs/                    # concepts.md, customizing.md, agents.md, decisions/
+├── codex/                   # Codex install/usage notes; agents/ (generated roles)
 └── AGENTS.md                # cross-tool orientation
 ```
 
@@ -74,7 +98,8 @@ bozz-agents/
 ```
 
 Skills then invoke as `/bozz-agents:docs-review`, `/bozz-agents:update-context`,
-`/bozz-agents:cross-review-requester`, and so on. Updates are a `git pull` away
+`/bozz-agents:cross-review-requester`, and so on; agents load as
+`bozz-agents:manager`, `bozz-agents:cold-reader`, and so on. Updates are a `git pull` away
 (or `/plugin marketplace update`).
 
 For a quick local try without the marketplace, symlink the skills into your
@@ -123,10 +148,14 @@ conventions with host-specific legacy fallbacks. To adapt:
 
 1. Copy `config/context-manifest.example.yaml` to your project as
    `context-manifest.yaml` and remap the layer paths.
-2. Give `plan-review` / `code-review` **briefs for your architecture**. They
-   ship as skeletons with a `_brief-template.md`; copy it into each skill's
-   `references/` (one brief per concern). The Prism project's real design briefs
-   live in the Prism repo as a worked example — see `docs/prism-case-study.md`.
+2. Optionally give `plan-review` / `code-review` **briefs for your
+   architecture**. Their built-in generic lenses run regardless; copy
+   `_brief-template.md` into each skill's `references/` (one brief per concern)
+   to add project-specific checks. The Prism project's real design briefs live
+   in the Prism repo as a worked example — see `docs/prism-case-study.md`.
+3. Optionally add an **overrides register** (`docs/overrides.md`, format in
+   `skills/code-review/references/register.md`) for recurring corrections the
+   reviewers should enforce.
 
 Full guide: [`docs/customizing.md`](docs/customizing.md). The pattern itself is
 explained in [`docs/concepts.md`](docs/concepts.md), and the original Prism

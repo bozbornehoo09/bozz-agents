@@ -9,7 +9,9 @@ on:
     paths:
       - 'skills/**'
       - 'scripts/generate-tool-skills.sh'
-      - 'tests/test_review_bridge.py'
+      - 'tests/**'
+      - 'agents/**'
+      - 'codex/agents/**'
 
 jobs:
   validate:
@@ -18,5 +20,14 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate canonical skills against the Agent Skills spec
         run: bash scripts/generate-tool-skills.sh --validate-only
-      - name: Test cross-review bridge state machine
-        run: python3 -m unittest -v tests/test_review_bridge.py
+      - name: Repo tests (bridge, context helpers, agents, skill measurements)
+        run: python3 -I -m unittest discover -v -s tests
+      - name: Skill script tests
+        run: |
+          python3 -I -m unittest discover -s skills/refining-technical-writing/scripts
+          python3 -I -m unittest discover -s skills/design-doc-write/scripts
+          python3 -I skills/preparing-code-reviews/scripts/test_review_loop.py
+      - name: Skill size limits
+        run: python3 -I skills/skill-review/scripts/measure_skills.py skills --strict
+      - name: Codex roles match canonical agents
+        run: python3 -I agents/shared/build_codex_roles.py --check

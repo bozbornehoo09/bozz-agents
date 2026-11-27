@@ -760,6 +760,65 @@ def cmd_archive(args: argparse.Namespace) -> int:
     return 0
 
 
+FINGERPRINT_PREFIX = "files-sha256:"
+
+
+def content_fingerprint(repo_root: Path, paths: list[str]) -> dict[str, Any]:
+    """Pin uncommitted or document artifacts by content, not by commit.
+
+    Each path is relative to ``repo_root``; a directory expands to every regular
+    file beneath it whose path has no hidden component. The identity is the
+    SHA-256 of the sorted ``"<sha256>  <relative path>"`` lines, so it changes
+    when any byte, file name, or membership changes.
+    """
+    root = repo_root.resolve()
+    if not root.is_dir():
+        raise BridgeError(f"repo root is not a directory: {repo_root}")
+    if not paths:
+        raise BridgeError("fingerprint requires at least one path")
+    files: dict[str, str] = {}
+    for raw in paths:
+        candidate = Path(raw)
+        if candidate.is_absolute():
+            raise BridgeError(f"fingerprint path must be relative to the repo root: {raw!r}")
+        target = (root / candidate).resolve()
+        if target != root and root not in target.parents:
+            raise BridgeError(f"fingerprint path escapes the repo root: {raw!r}")
+        if target.is_dir():
+            members = [
+                item
+                for item in sorted(target.rglob("*"))
+                if item.is_file() and not any(part.startswith(".") for part in item.relative_to(root).parts)
+            ]
+            if not members:
+                raise BridgeError(f"fingerprint directory has no files: {raw!r}")
+        elif target.is_file():
+            members = [target]
+        else:
+            raise BridgeError(f"fingerprint path does not exist: {raw!r}")
+        for member in members:
+            files[member.relative_to(root).as_posix()] = sha256_file(member)
+    manifest = "".join(f"{digest}  {path}\n" for path, digest in sorted(files.items()))
+    return {
+        "identity": FINGERPRINT_PREFIX + sha256_bytes(manifest.encode()),
+        "repo_root": str(root),
+        "files": [{"path": path, "sha256": digest} for path, digest in sorted(files.items())],
+    }
+
+
+def cmd_fingerprint(args: argparse.Namespace) -> int:
+    if args.expect is not None:
+        validate_scalar("expect", args.expect)
+    result = content_fingerprint(Path(args.repo_root), args.paths)
+    if args.expect is not None:
+        result["expected"] = args.expect
+        result["match"] = result["identity"] == args.expect
+        print(json.dumps(result, sort_keys=True))
+        return 0 if result["match"] else 4
+    print(json.dumps(result, sort_keys=True))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -812,6 +871,15 @@ def build_parser() -> argparse.ArgumentParser:
     archive.add_argument("--file", required=True)
     archive.add_argument("--root", default=".agent-bridge")
     archive.set_defaults(func=cmd_archive)
+
+    fingerprint = subparsers.add_parser(
+        "fingerprint",
+        help="Print a content identity for files/directories (use as --head/--revision for uncommitted artifacts)",
+    )
+    fingerprint.add_argument("--repo-root", default=".")
+    fingerprint.add_argument("--expect", help="exit 4 unless the current identity equals this value")
+    fingerprint.add_argument("paths", nargs="+")
+    fingerprint.set_defaults(func=cmd_fingerprint)
     return parser
 
 

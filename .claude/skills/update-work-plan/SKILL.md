@@ -69,8 +69,16 @@ work_tracker entry.
   goes in "Blocked" with what unblocks it.
 - **Record every structural change** — additions, reorderings, drops,
   scope reshapes — as a dated row in the "Plan Changes" table. The table
-  is append-only; never rewrite or delete prior rows.
-- **Refresh the "As of" dates** in the header and status snapshot.
+  is append-only; never rewrite or delete prior rows (aged rows leave the
+  live file only by verbatim archival in step 5).
+- **Refresh the "As of" dates** in the header and status snapshot. Take
+  every date from the system clock (`date +%Y-%m-%d`), never from
+  reasoning about the calendar.
+- **Flag, don't guess.** When an item's phase or priority is ambiguous,
+  leave it where it is and name it in the report.
+- **Respect deliberate divergence.** If the user has restructured the plan
+  on purpose, keep their layout and record the divergence as a Plan
+  Changes row instead of forcing the template back.
 
 ### 4. Consistency pointers (do not duplicate)
 
@@ -80,11 +88,23 @@ work_tracker entry.
 - If reconciliation reveals a decision that was never captured, flag it
   for `update-decisions` — do not bury rationale in the plan.
 
+### 5. Compaction (only when flagged or requested)
+
+When `update-context` reports `compaction due` for the plan and the user
+accepted it, or the user asks to compact the plan, run the procedure in
+`../update-context/references/compaction.md` after steps 3–4. Typical
+candidates: Plan Changes rows past the live horizon, item rows of phases
+whose exit criteria are met, and stacked prior status snapshots. Current
+phase, "Next up", "Blocked", and the latest snapshot are always KEEP.
+Archive to `work_tracker/archive/work_plan-history.md` (beside the
+manifest-declared plan path).
+
 ## Pause-for-confirmation rules
 
 - PAUSE before creating the plan file from the template.
 - PAUSE before deleting or restructuring whole sections (phases,
   legends) — marking items and appending rows never needs confirmation.
+- PAUSE on the compaction plan before archiving or compressing anything.
 
 ## Style
 

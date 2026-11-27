@@ -19,15 +19,29 @@ Require:
 - exact base/head revision or immutable document identity;
 - review skill the reviewer must invoke;
 - initial acknowledgement ETA and grace;
-- complete scope, rules/ADRs to load, and proportionate verification commands.
+- complete scope, rules/ADRs to load, and proportionate verification commands;
+- known-open, settled, and deferred items the reviewer must not re-flag;
+- internal preflight policy: `EVERY_REQUEST` (recommended), `FIRST_ONLY`, or
+  `NONE`. Ask once if missing, then state it in every request so a resumed
+  session does not ask again.
 
 Read [references/protocol.md](references/protocol.md) completely before opening
-or resuming a review.
+or resuming a review. If the reviewer cannot run the helper, also read
+[references/out-of-band-reviewer.md](references/out-of-band-reviewer.md).
 
 ## Workflow
 
 1. **Inspect before opening.** Confirm the requested artifact exists, resolve
    immutable identities, check the worktree, and preserve unrelated changes.
+   Pin uncommitted files or a document set with
+   `review_bridge.py fingerprint --repo-root <root> <path>...` and use its
+   `files-sha256:` identity as the revision.
+   **Internal preflight** (per policy): run the applicable installed
+   review-family skills first — `code-review` for a diff, `plan-review` for a
+   plan, `design-doc-review` for a design doc, `docs-review` for authoritative
+   docs, `skill-review` for skills — fix
+   what they confirm, and list each skill with its verdict in the request. If
+   a skill is unavailable, say so; never claim it ran.
 2. **Create one review file.** Run `scripts/review_bridge.py init`; never append
    by patching an EOF anchor. Put everything the reviewer needs in the first
    request. The file name is generated from kind, subject, and stable review ID.
@@ -47,13 +61,18 @@ or resuming a review.
    with one stable finding ID per `CONFIRMED`, `REJECTED`, or `DEFERRED`
    disposition, exact evidence, changed revision, and checks run.
 6. **Continue or close.** If code/docs changed, append a new
-   `REVIEW_REQUESTED` pinned to the new head and resume adaptive polling. If the
-   fold confirms a clean final verdict and the gate policy is satisfied, append
-   `CLOSE` with outcome and final revision, then run `archive`.
+   `REVIEW_REQUESTED` pinned to the new head (re-run preflight per policy) and
+   resume adaptive polling. Name every `REJECTED` BLOCK or FIX in its requested
+   focus, with the counter-evidence, so the reviewer re-adjudicates it. A
+   `BASELINE: STALE` review never supports closing: re-pin and re-request. If
+   the fold confirms a clean final verdict and the gate policy is satisfied,
+   append `CLOSE` with outcome and final revision, then run `archive`.
 
 Post `WORK_UPDATE` or `FOLD_PROGRESS` before an ETA expires. The update must
 carry a replacement `EXPECTED_BY`, `GRACE`, and, for longer work,
-`NEXT_UPDATE_BY`.
+`NEXT_UPDATE_BY`. Requests may also carry an estimate for full closure
+(range, confidence, assumptions — counting expected fold and review rounds),
+revised each round; it informs humans and is never a deadline.
 
 ## Finding discipline
 
@@ -76,6 +95,7 @@ python3 scripts/review_bridge.py status --file <active-review>
 python3 scripts/review_bridge.py wait --file <active-review> --baseline-sha <sha>
 python3 scripts/review_bridge.py append ...
 python3 scripts/review_bridge.py archive --file <closed-review>
+python3 scripts/review_bridge.py fingerprint --repo-root <root> <path>... [--expect <identity>]
 ```
 
 Use a body file or stdin for multiline content; do not interpolate untrusted

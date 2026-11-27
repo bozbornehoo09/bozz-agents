@@ -21,18 +21,30 @@ completely before acting.
    confirm `READY_FOR_REVIEW`, resolve the pinned base/head/scope, and append
    `REVIEW_STARTED` with a realistic `EXPECTED_BY`, `GRACE`, and optional
    `NEXT_UPDATE_BY`. Claiming prevents duplicate reviewers.
+   - **Independence check first:** compare your own agent/thread identity with
+     the header's `REQUESTER`. If they are the same thread, disclose the
+     self-review and pause for explicit user approval before claiming.
+   - **Baseline check:** confirm the pinned revision resolves to the bytes you
+     will read — `git rev-parse` for commits, or
+     `review_bridge.py fingerprint --repo-root <root> <paths> --expect <revision>`
+     for a `files-sha256:` identity (exit 4 = moved).
 2. **Invoke the requested review engine.** Use the header’s `REVIEW_SKILL`
    (`code-review`, `plan-review`, `docs-review`, or a project-specific review
    skill). Follow that skill completely. Review surrounding context only to
    understand the requested scope.
 3. **Publish progress before expiry.** For long work, append
    `REVIEW_PROGRESS` with a replacement ETA/grace before the prior ETA expires.
-4. **Append the review.** Use `REVIEW` / `REVIEW_COMPLETE`. Give every finding
-   a stable ID (`F<round>.<sequence>`), severity `BLOCK|FIX|SUGGEST`, exact
-   location and quote, and governing cross-reference evidence. Explicitly say
-   when there are no findings. Include verification commands and the canonical
-   verdict: `READY` (no findings), `READY-WITH-FIXES` (only FIX/SUGGEST), or
-   `REVISE` (any BLOCK).
+4. **Append the review.** Re-run the baseline check immediately before
+   appending. If the bytes moved at either check, discard findings for that
+   baseline and append `REVIEW` with first body line `BASELINE: STALE`, the
+   observed mismatch, and no findings — never review mixed versions.
+   Otherwise use `REVIEW` / `REVIEW_COMPLETE`. Give every finding
+   a stable ID (`F<round>.<sequence>`), severity `BLOCK|FIX|SUGGEST`, an
+   `OBSERVED` or `HYPOTHESIS` label, exact location and quote, and governing
+   cross-reference evidence. Explicitly say when there are no findings, and
+   list what you checked and cleared under `NON-FINDINGS`. Include
+   verification commands and the review engine's verdict: REVISE if any
+   BLOCK; READY-WITH-FIXES if no BLOCK and at least one FIX; READY otherwise.
 5. **Wait adaptively.** Capture the returned SHA and run
    `review_bridge.py wait --baseline-sha ...`. Both reviewer and requester use
    the same algorithm: slow polling before the owner’s expected window,
@@ -60,6 +72,24 @@ the active file resumable.
 - An empty report is correct; never invent findings to appear thorough.
 - Preserve scope discipline; adjacent code is context, not a target unless the
   requested change causes a demonstrable contradiction there.
+- Label uncertainty `HYPOTHESIS` and name the missing evidence; never present
+  an inaccessible live-system claim as a confirmed failure.
+- Do not re-flag the request's known-open items unless their stated
+  disposition is unsound or contradicted by the artifact.
+
+## Severity
+
+- **BLOCK** — unsound or unsafe behavior, data loss, security exposure, or a
+  contradiction that prevents approval. For code, name the concrete failing
+  behavior.
+- **FIX** — a concrete correction required before approval that leaves the
+  overall approach intact. For code, name the concrete failing behavior.
+- **SUGGEST** — optional; current behavior is sound and approval does not
+  depend on it. A design SUGGEST may say the approach is sound but another is
+  better.
+
+Do not elevate style, naming, or preference without functional impact, and do
+not report pre-existing issues the requested change did not touch.
 
 ## Helper
 
@@ -71,7 +101,8 @@ polling behavior on both sides.
 
 Pause and publish a resumable progress event when the pinned artifact cannot be
 resolved, the requested review skill is unavailable, the request contradicts
-its stated scope, or completing it would require new authority. Do not silently
+its stated scope, completing it would require new authority, or your identity
+matches the requester's thread (self-review). Do not silently
 substitute a review engine, broaden scope, close the thread, or modify artifacts.
 
 ## Style

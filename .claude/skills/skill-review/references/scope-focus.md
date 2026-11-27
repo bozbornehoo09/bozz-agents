@@ -15,16 +15,27 @@ Never read or cite anything outside each skill's `SKILL.md` and its `references/
 
 ## Family-norm reference points (for bloat detection)
 
-Existing skills approximately:
-- `code-review/SKILL.md`, `plan-review/SKILL.md`: ~70-80 lines
-- `docs-review/SKILL.md`, `skill-review/SKILL.md`: ~100-160 lines (more specialists, more anti-hallucination apparatus)
+Judge size against the skill's own family, using the measurement output for
+the real numbers rather than remembered ones. Rough bands at the time of
+writing:
 
-Existing briefs approximately:
-- `architecture.md`, `security.md`, etc. (code-review/plan-review briefs): ~40-50 lines
-- `internal-consistency.md`, `decisional-clarity.md`, etc. (docs-review briefs): ~50-65 lines
-- New briefs (skill-review): expected ~50-70 lines
+- Review skills that ship built-in specialists (`code-review`, `plan-review`)
+  and those with heavier anti-hallucination apparatus (`docs-review`,
+  `skill-review`): a `SKILL.md` of roughly 150–250 lines. The size comes from
+  the specialist tables, the orchestration steps, and the shared contract.
+- Other skills (the `update-*` authoring family, the cross-review lifecycle,
+  loaders) vary more, roughly 90–240 lines; an orchestrator such as
+  `update-context` sits at the top of that band. Compare a skill with siblings
+  of the same shape.
+- Specialist briefs: about 50–100 lines. A brief past 100 lines needs a
+  contents list (the measurement shows `no` when it lacks one) and should
+  earn its length with genuinely distinct checks.
+- `_brief-template.md` files stay short (~50–60 lines): a skeleton, not a brief.
 
-These are reference points for bloat detection, not hard limits. A brief well past its family norm should justify the size or be split.
+The test is relative: a file far larger than its siblings in the same family,
+not one that crosses a fixed number. These bands are reference points, not
+hard limits. A brief well past its family norm should justify the size or be
+split.
 
 ## Check for (in order of importance)
 

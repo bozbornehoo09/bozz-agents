@@ -77,7 +77,8 @@ recent work_tracker entry.
 - **Drop landed items** — if a parked task was built anyway, remove the
   line. Confirm the landing before dropping (discovery reports items
   that *appear* done). Its record lives in the tracker, not here.
-- **Refresh the "As of" date** in the header.
+- **Refresh the "As of" date** in the header, from the system clock
+  (`date +%Y-%m-%d`).
 
 ### 4. Keep it terse (anti-bloat)
 
@@ -85,6 +86,11 @@ The backlog earns its keep only by staying short. One line per item.
 If an item has grown a paragraph of rationale, the rationale belongs in
 an ADR or the design doc — cite it and cut the prose. A backlog that
 reads like a plan has failed; promote or drop instead of elaborating.
+When tightening an overgrown line, follow the MEGA-ENTRY rule in
+`../update-context/references/compaction.md`: keep every fact and the
+trigger, and drop prose only when it survives in the cited ADR or design
+doc. The backlog has no archive — landed and promoted lines leave it
+entirely, and their record is the work plan's Plan Changes and the tracker.
 
 ## Pause-for-confirmation rules
 

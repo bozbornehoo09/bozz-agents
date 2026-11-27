@@ -43,6 +43,16 @@ cp -R /absolute/path/to/bozz-agents/.agents/skills/docs-review .agents/skills/
 skill discovery at the generated `.agents/skills/`; plugin packaging points at
 the canonical `skills/` tree.)
 
+## Agent roles
+
+`codex/agents/*.toml` are Codex custom-agent roles for the read-only subagent
+roles (`review-specialist`, `cold-reader`, `cold-reader-deep`,
+`artifact-verifier`), generated from the canonical `agents/*.md` by
+`agents/shared/build_codex_roles.py` — never edit them by hand. Copy them into
+`.codex/agents/` (one repo) or `~/.codex/agents/` (every repo). The session roles
+(manager, architect, implementer) run on Codex from an explicit prompt; see
+`docs/agents.md`.
+
 ## Invoke
 
 - Explicitly: `/skills`, or type `$` and mention a skill (e.g. `$docs-review`).

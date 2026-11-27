@@ -19,11 +19,11 @@ These are the conventions the family has adopted. Divergence is a finding.
 
 - **Severity vocabulary:** `BLOCK` / `FIX` / `SUGGEST`. Three levels, in that case. Other vocabularies (`ERROR/WARN/INFO`, `HIGH/MEDIUM/LOW`, `🔴/🟡/🟢`) are non-canonical.
 - **Verdict labels:** `READY` / `REVISE` / `READY-WITH-FIXES`. Other labels (`PASS/FAIL`, `OK/NOT OK`) are non-canonical.
-- **Verdict mapping:** no BLOCKs → `READY`; only FIX/SUGGEST → `READY-WITH-FIXES`; any BLOCK → `REVISE`.
+- **Verdict mapping:** REVISE if any BLOCK; READY-WITH-FIXES if no BLOCK and at least one FIX; READY otherwise. A SUGGEST-only result is `READY`.
 - **Specialist invocation:** independent specialists run in parallel through
   the host's subagent or delegation facility. Sequential invocation breaks the
   design; the facility's product-specific name is irrelevant.
-- **Specialist brief location:** each skill's own `references/` subdirectory. Not a shared top-level directory; not elsewhere.
+- **Specialist brief location:** every brief lives in its owning skill's own `references/` subdirectory — not a shared top-level directory, not elsewhere. A skill may dispatch a sibling skill's brief by relative path (`../<skill>/references/<brief>.md`); the brief still has one owner and one location, and the dispatching skill must not keep a copy.
 - **Output template anchors:** `# <Skill Name>: <subject>`, then a `Specialists run:` line, then severity sections in order BLOCK → FIX → SUGGEST, then `Verdict:` line at end.
 - **Anti-hallucination contract anchor:** section heading `## Anti-hallucination contract` (or close variant). Variants like `## Hallucination prevention` or `## Quality guards` diverge from canon.
 - **Negative-scope anchor:** section heading `## Do not flag` or `## What this skill is NOT` (often both — the first inside the brief, the second on the SKILL.md).
@@ -42,7 +42,7 @@ These are the conventions the family has adopted. Divergence is a finding.
    to share state when independence is required. Do not flag host-specific tool
    names. **FIX** if stylistic; **BLOCK** if it changes contract semantics.
 
-5. **Specialist brief location divergence.** A specialist brief stored outside its owning skill's `references/` (e.g. a shared top-level directory, or `.claude/skills/foo/specialists/`). **FIX** — relocate into the skill's `references/`.
+5. **Specialist brief location divergence.** A specialist brief stored outside its owning skill's `references/` (e.g. a shared top-level directory, or `.claude/skills/foo/specialists/`), or a copy of a sibling skill's brief kept in a second skill instead of a `../<skill>/references/<brief>.md` pointer. **FIX** — relocate into the owning skill's `references/` and point to it. A relative-path dispatch of a sibling's brief is canonical; do not flag it.
 
 6. **Anti-hallucination anchor divergence.** A skill or brief using a non-canonical heading for the contract section. The text may be fine; the anchor name is the convention. **FIX**.
 

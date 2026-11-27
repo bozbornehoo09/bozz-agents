@@ -1,0 +1,9 @@
+# general-rules.md "Plain statements": never nest one parenthetical inside another. Vale strips
+# Markdown link syntax before this sentence-scoped check, so a link in parentheses is not a hit.
+extends: existence
+message: "Nested parentheses (general-rules.md, Plain statements): move the inner aside out."
+level: warning
+scope: sentence
+nonword: true
+tokens:
+  - '\([^()]*\('

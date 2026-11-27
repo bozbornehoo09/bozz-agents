@@ -1,5 +1,7 @@
 # Cross-review protocol v1
 
+Contents: [Identity and storage](#identity-and-storage) · [States](#states) · [Timing](#timing) · [Artifact identity](#artifact-identity-and-stale-baselines) · [Anti-hallucination contract](#anti-hallucination-contract) · [Independence](#independence) · [Folding evidence](#folding-evidence) · [Out-of-band reviewers](#out-of-band-reviewers) · [Atomicity and archive](#atomicity-and-archive)
+
 ## Identity and storage
 
 - Use one file per review under `.agent-bridge/active/`.
@@ -47,6 +49,22 @@ Both roles use the same adaptive watcher:
 - stop watching on timeout without changing state;
 - never archive due to inactivity.
 
+## Artifact identity and stale baselines
+
+- A pinned revision is a git commit or range for committed work. For
+  uncommitted work or a document set, pin content instead:
+  `review_bridge.py fingerprint --repo-root <root> <path>...` prints a
+  `files-sha256:<digest>` identity over every named file (a directory expands
+  to its non-hidden files). Use that value as `--head` / `--revision`, and list
+  the fingerprinted paths in the request body.
+- The reviewer re-verifies the pinned identity **before reviewing and again
+  immediately before appending `REVIEW`** (`git rev-parse` for commits;
+  `fingerprint --expect <identity>` for content, which exits 4 on mismatch).
+- If the bytes moved, the reviewer must not review mixed versions. It appends
+  `REVIEW` against the pinned revision with first body line
+  `BASELINE: STALE`, the observed mismatch, and no findings. The fold treats a
+  stale review as "re-pin and re-request"; it never supports `CLOSE`.
+
 ## Anti-hallucination contract
 
 - Pin base/head and complete requested scope.
@@ -56,15 +74,39 @@ Both roles use the same adaptive watcher:
 - Assign stable IDs such as `F1.1`.
 - Include exact location and verbatim quote for every finding.
 - Cross-reference findings cite and quote both sides.
-- A clean report is explicit and valid.
-- Verdicts are `READY` (no findings), `READY-WITH-FIXES` (only FIX/SUGGEST), or
-  `REVISE` (any BLOCK).
+- Label each finding `OBSERVED` (the cited bytes or a reproduction show it) or
+  `HYPOTHESIS` (a concern the reviewer could not fully verify, with the missing
+  evidence named). These are reviewer confidence labels, not fold
+  dispositions.
+- A clean report is explicit and valid; a `NON-FINDINGS` list records what was
+  checked and cleared.
+- Known-open items listed in the request are not re-flagged unless their stated
+  disposition is unsound or contradicted by the artifact.
+- Verdicts follow the review family's rule: REVISE if any BLOCK;
+  READY-WITH-FIXES if no BLOCK and at least one FIX; READY otherwise.
+
+## Independence
+
+The header names `REQUESTER` and `REVIEWER`. A reviewer whose own agent/thread
+identity matches the requester's discloses the self-review and pauses for
+explicit user approval before claiming. Sharing a model family is allowed;
+sharing the implementing thread is not.
 
 ## Folding evidence
 
 Map every finding ID to `CONFIRMED`, `REJECTED`, or `DEFERRED`. The requester
 must use a fresh impartial verifier before editing. Record resulting revision,
-tests, and exact evidence. Re-request review after any fold.
+tests, and exact evidence. Re-request review after any fold. A re-request
+names every `REJECTED` BLOCK or FIX in its requested focus, with the
+counter-evidence, so the reviewer adjudicates the disagreement again instead
+of it disappearing.
+
+## Out-of-band reviewers
+
+A reviewer that cannot run the helper (a browser chat model, another machine)
+joins through the requester's relay: see
+`references/out-of-band-reviewer.md`. The lifecycle, transcript, and mandatory
+fold are unchanged; relayed events say so in their first body line.
 
 ## Atomicity and archive
 

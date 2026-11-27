@@ -40,9 +40,10 @@ work tracker, open questions) have no hook; they are not authoritative.
 
 A review skill is a small, fixed shape — the **family pattern**:
 
-- One `SKILL.md` orchestrates its specialist briefs (in `references/`): the
-  fully configured members carry **3–4**, while `plan-review` and `code-review`
-  ship with a template until a consumer adds project-specific briefs.
+- One `SKILL.md` orchestrates its specialist briefs (in `references/`), usually
+  four or five. `plan-review` and `code-review` ship built-in generic lenses
+  and also run any project-specific briefs a consumer adds from the template
+  (ADR-0004).
 - Configured briefs **fan out in parallel**; each owns one lens and is blind to
   the others.
 - Findings use one severity vocabulary: **BLOCK / FIX / SUGGEST**.
@@ -56,6 +57,11 @@ The four members:
 | `skill-review` | skills + their references | quality conventions |
 | `plan-review` | an implementation plan | the architecture (pre-code) |
 | `code-review` | a diff/commit | the architecture (post-code) |
+| `design-doc-review` | one human-facing design doc | the tone, structure and cold-reader gates |
+
+`docs-review` checks the project's authoritative layers against each other;
+`design-doc-review` checks one document written for human reviewers. They do not
+overlap.
 
 ## The anti-hallucination contract
 
@@ -89,7 +95,49 @@ windows and use the same adaptive watcher, so long work remains unattended
 without turning silence into closure. Explicit terminal events move the raw,
 hashed transcript to an archive. When a confirmed finding targets an
 authoritative layer, the fold invokes that layer's owning `update-*` skill; it
-does not create a second writer. See ADR-0003.
+does not create a second writer. See ADR-0003. A review may also pin
+uncommitted files by content fingerprint, a reviewer whose pin moved posts a
+`BASELINE: STALE` review instead of findings, and a reviewer that cannot write
+the file (a browser chat model) can be relayed by the requester under a
+`RELAYED:` marker with its verbatim output hashed. See ADR-0006.
+
+### Keeping temporal layers short
+
+The work plan, open questions and backlog grow without bound if nothing trims
+them. Each owning `update-*` skill can compact its own layer under one shared
+rule (`skills/update-context/references/compaction.md`): entries are kept,
+compressed only when the dropped detail exists elsewhere, or moved verbatim to
+`archive/<stem>-history.md` with a one-line pointer left behind. Nothing is
+deleted, the skill pauses for confirmation first, and `archive/` is history,
+never current state. Authoritative layers and the work tracker are never
+compacted.
+
+Read-only helpers back the update skills: `update-work-tracker/scripts/tracker_path.py`
+computes the week and day folder for a date, and
+`update-decisions/scripts/adr_index.py` checks the ADR index against each ADR's
+Status line.
+
+## From plan to pull request
+
+A change moves through three authoring skills, each gated by the one before:
+`writing-implementation-plans` drafts a plan that leaves an implementer no
+design choices and runs `plan-review` until a full pass has no BLOCK;
+`implementing-a-plan` refuses a plan without that closed review, builds one step
+per commit and stops on the first deviation; `preparing-code-reviews` shapes the
+branch into one pull request and runs `code-review`, and pushes only after the
+user's go. A design call that comes up along the way is never settled inside
+a plan: it goes to the owner, or, when the owner is away and the call is cheap
+to undo, to `deciding-calls-by-debate`, which records it for the owner to
+review.
+
+## The agents
+
+`agents/` ships the roles that run this loop: a **manager** the owner talks to,
+which briefs **architect** and **implementer** worker sessions and keeps the
+owner's decisions batched, and read-only subagents (**review-specialist**,
+**cold-reader**, **cold-reader-deep**, **artifact-verifier**) that the review
+skills dispatch. Workers follow one contract (`agents/shared/worker-contract.md`)
+and never decide design calls. See `docs/agents.md` and ADR-0005.
 
 ## Why this is portable
 

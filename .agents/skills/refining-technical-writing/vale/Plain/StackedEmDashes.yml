@@ -1,0 +1,8 @@
+# general-rules.md "Plain statements": one aside takes two em dashes, so a third dash in the same
+# sentence means asides are stacked.
+extends: occurrence
+message: "Three or more em dashes in a sentence mean stacked asides (general-rules.md, Plain statements). Break the sentence up."
+level: warning
+scope: sentence
+max: 2
+token: '—'
