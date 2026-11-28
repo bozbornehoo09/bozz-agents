@@ -1,7 +1,7 @@
 {
   "name": "bozz-agents",
   "description": "Context-management, review, planning/build, writing and cross-agent review skills, plus manager/worker agents. Keeps project knowledge coherent, stress-tests plans and diffs with parallel reviewers, carries a change from plan to pull request, and coordinates independent reviews with verified finding folds.",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "author": {
     "name": "Ben Osborne"
   },

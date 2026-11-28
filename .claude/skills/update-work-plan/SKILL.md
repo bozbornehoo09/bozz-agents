@@ -46,7 +46,9 @@ discovery instead):
 > <timestamp> that affects the forward plan. Check: `git log
 > --since=<ts>` + `git status`; new or status-changed files in
 > docs/decisions/; the most recent work_tracker/ entries; file mtimes
-> under the source tree. Report a tight bullet list of (a) plan items
+> under the source tree. Read the plan through its headings and open
+> items (context-up's scripts/load_context.py prints them) and grep the
+> rest; never read it whole. Report a tight bullet list of (a) plan items
 > that appear DONE or IN PROGRESS, (b) new work not in any plan, with
 > file paths. Under 300 words."
 

@@ -44,5 +44,10 @@
         ]
       }
     ]
+  },
+  "env": {
+    "BOZZ_CTXCAP_WORKER_K": "350",
+    "BOZZ_CTXCAP_MANAGER_K": "150",
+    "BOZZ_CTXCAP_BARE": "0"
   }
 }

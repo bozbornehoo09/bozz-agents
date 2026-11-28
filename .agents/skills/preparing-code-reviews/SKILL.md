@@ -34,6 +34,9 @@ Bundled files:
 - `scripts/review-loop.sh` — one review → challenge → defense loop over the
   branch, driven by `code-review`'s briefs (tests:
   `scripts/test_review_loop.py`).
+- `scripts/loop_usage.py` — the loop's usage record: each session attempt's
+  answer, the totals in `usage.json`, the model-unavailable check (tests:
+  `scripts/test_loop_usage.py`).
 
 **Inputs.** The branch (default: the current one). The spec it implements —
 the plan, else the issue or design doc, else the user's request. From
@@ -163,12 +166,19 @@ REGISTER="<overrides register, if the project has one>" \
   if the host supports that. Exit 2 means an input is missing or wrong — fix
   it. Exit 1 means a session failed twice — stop and ask. Neither counts
   toward the three loops.
-- The default reviewer is `claude -p` limited to read-only tools. Another
-  host's non-interactive agent goes in `REVIEW_CMD` (for example
-  `REVIEW_CMD="codex exec --sandbox read-only"`). If `code-review` has no real
+- The default reviewer is `claude -p` limited to read-only tools; a session
+  whose model is unavailable gets its one retry on `REVIEW_FALLBACK_MODEL`
+  (default `opus`). Another host's non-interactive agent goes in
+  `REVIEW_CMD` (for example `REVIEW_CMD="codex exec --sandbox read-only"`). If `code-review` has no real
   briefs yet (only `_brief-template.md`), the script exits 2: add briefs (see
   `../code-review/SKILL.md`), or run `code-review` once yourself and write
   `Pre-flight review: one pass, no specialist briefs`.
+- Usage: every session attempt, failed ones and retries included, stays in
+  the loop folder beside its output; `usage.json` totals them, and the loop's
+  last stdout line is `USAGE: ...` (tokens per model and the CLI's cost
+  estimate — not a bill; a `REVIEW_CMD` reviewer's attempts count as having
+  no telemetry). The loop has no spend cap; a capped review would only be
+  rerun. Copy each loop's `USAGE` line into the report.
 - Precedent checkouts: the local directories on `PRECEDENTS.md`'s
   `Checkouts:` line, if they still exist (re-clone a public one at the
   recorded commit if not); with `Checkouts: none` or no record, pass none —
@@ -293,6 +303,7 @@ Base: <base> (from <origin/HEAD | gh | project rules | user>)
 History: <squash: 1 commit <sha> | series: <n> commits>; undo point <sha>
 Checks: "<summary line>" (<command>) …; pre-existing failures: <file:line or none>
 Review loop: <n> loop(s); "<final COUNTS line>" "<Verdict: line>" (<3-final.md path>);
+  usage: <each loop's USAGE line>;
   folded after the final loop (unreviewed): <finding → file:line, or none>;
   declined: <finding → reason, or none>; dropped (quote not found): <n>
   | Fast path: <tests met>; single pass: <COUNTS line | own read>; fixed: <n>

@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+"""A fake `claude` CLI for the manager-script tests; it never talks to a model.
+
+State lives in the JSON file $STUB_STATE: {"agents": [ {id, sessionId, name,
+kind, status, state, startedAt, cwd, ...}, ... ]}. As in the real agent view,
+an interactive entry (kind "interactive") may carry no id; only background
+ones are stopped or respawned by id. Every call is appended, one line of
+arguments each, to $STUB_STATE.log.
+
+  agents --json [--all]  print the list; without --all, sessions whose status
+                         is null (stopped or retired) are left out
+  --bg ... --name N ...  add session N, idle, then act as $STUB_LAUNCH says:
+                           claim     (default) claim CURRENT-MANAGER as N by
+                                     running $STUB_HANDOFF claim $STUB_ROOT $STUB_PREFIX
+                           silent    never claim
+                           die       end at once (status null, state "done")
+                           untrusted print a trust error and add nothing
+  stop <id>              set its status to null and its state to "done"
+  respawn <id>           set its status to idle; with STUB_RESPAWN=fail, exit 1
+                         and change nothing
+"""
+import json
+import os
+import subprocess
+import sys
+import time
+import uuid
+from pathlib import Path
+
+state_path = Path(os.environ["STUB_STATE"])
+data = json.loads(state_path.read_text()) if state_path.exists() else {"agents": []}
+argv = sys.argv[1:]
+with open(f"{state_path}.log", "a", encoding="utf-8") as log:
+    log.write(json.dumps(argv) + "\n")
+
+
+def save() -> None:
+    state_path.write_text(json.dumps(data))
+
+
+def by_id(agent_id):
+    return next((a for a in data["agents"] if a.get("id") == agent_id), None)
+
+
+def option(name):
+    return argv[argv.index(name) + 1] if name in argv else None
+
+
+if argv[:1] == ["agents"]:
+    shown = data["agents"] if "--all" in argv else [a for a in data["agents"] if a.get("status")]
+    print(json.dumps(shown))
+elif "--bg" in argv:
+    how = os.environ.get("STUB_LAUNCH", "claim")
+    if how == "untrusted":
+        print(f"Workspace not trusted: open {os.getcwd()} in claude once and accept the prompt.")
+        sys.exit(0)
+    session_id = str(uuid.uuid4())
+    agent = {"id": session_id[:8], "sessionId": session_id, "name": option("--name"),
+             "kind": "background", "status": "idle", "state": "working", "startedAt": int(time.time() * 1000), "cwd": os.getcwd(),
+             "agent": option("--agent"), "settings": option("--settings"),
+             "effort": option("--effort"), "prompt": argv[-1]}
+    if how == "die":
+        agent["status"], agent["state"] = None, "done"
+    data["agents"].append(agent)
+    save()
+    if how == "claim":
+        env = dict(os.environ, CLAUDE_CODE_SESSION_ID=session_id)
+        subprocess.run(["zsh", os.environ["STUB_HANDOFF"], "claim", os.environ["STUB_ROOT"],
+                        os.environ["STUB_PREFIX"]], env=env, capture_output=True, check=False)
+elif argv[:1] == ["stop"]:
+    agent = by_id(argv[1])
+    if agent:
+        agent["status"] = None
+        agent["state"] = "done"
+        save()
+elif argv[:1] == ["respawn"]:
+    if os.environ.get("STUB_RESPAWN") == "fail":
+        sys.exit(1)
+    agent = by_id(argv[1])
+    if agent:
+        agent["status"] = "idle"
+        save()
+else:
+    print("stub claude: unsupported arguments: " + " ".join(argv), file=sys.stderr)
+    sys.exit(2)

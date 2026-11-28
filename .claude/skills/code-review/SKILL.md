@@ -90,9 +90,9 @@ on which paths the diff touches. `docs/customizing.md` covers writing them.
    End with: COUNTS: BLOCK <n> FIX <n> SUGGEST <n>
    ```
    If a brief's corpus will not fit in one specialist's context, run that
-   brief as several parts, each over one group of files. A part that would
-   need a file held by another part reports the finding as "out of scope —
-   cannot evaluate" rather than guessing.
+   brief as several parts, each over one group of files, then settle the
+   pairs they could not judge with one pair call, as
+   `../skill-review/references/review-completeness.md` section 2 says.
 3. **Check every BLOCK.** Open each cited line and compare the quote
    byte-for-byte — both ends of a cross-reference, and for an `OV-<n>` the
    Rule at its register line. A BLOCK that does not match is dropped.
@@ -106,7 +106,9 @@ on which paths the diff touches. `docs/customizing.md` covers writing them.
    position in the diff.
 6. **Verdict** on one line: REVISE if any BLOCK; READY-WITH-FIXES if no BLOCK
    and at least one FIX; READY otherwise. SUGGEST findings never change the
-   verdict. A lens that failed counts as a BLOCK (the review is incomplete).
+   verdict. A lens that failed, or came back without its `COUNTS:` line or
+   unable to do a required read or check, makes it REVISE
+   (`../skill-review/references/review-completeness.md` section 1).
 
 ## Anti-hallucination contract (binding on every specialist)
 
@@ -147,7 +149,7 @@ the mistake. Such a finding quotes the plan line and the code, citing each.
 # Code Review: <commit message or "uncommitted changes">
 
 Scope: <n> files (+<adds>/-<dels>)
-Specialists run: <returned, split parts named>; failed: <lens | none>; skipped: <lens — reason, e.g. "overrides — no register" | none>
+Specialists run: <returned; split parts and pair call named>; failed: <lens that failed or came back unfinished | none>; skipped: <lens — reason, e.g. "overrides — no register" | none>
 Checked: <n> BLOCK quotes re-read; <n> others sampled; <n> dropped
 
 ## BLOCK

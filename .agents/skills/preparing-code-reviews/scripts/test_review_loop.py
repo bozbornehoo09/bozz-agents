@@ -2,7 +2,8 @@
 
 Covered: the per-brief lens sessions (concurrent, then concatenated), the
 challenge and defense stages, how briefs are discovered, the single retry of a
-failed session, and the exit statuses 1 and 2.
+failed session (on the fallback model when the model was unavailable), the
+usage record of every attempt, and the exit statuses 1 and 2.
 
 Run it in isolated mode, as a file (isolated mode leaves the working directory
 off sys.path, so `-m unittest` would not find it):
@@ -10,8 +11,11 @@ off sys.path, so `-m unittest` would not find it):
     python3 -I skills/preparing-code-reviews/scripts/test_review_loop.py
 
 No real reviewer is ever called: a fake `claude` placed first on PATH answers
-every session and logs the prompt and argv it was given.
+every session and logs the prompt and argv it was given. Given
+`--output-format json` it answers in the shape of Claude Code's JSON result
+($0.50 and fixed token counts per answered session); otherwise in plain text.
 """
+import json
 import os
 import shutil
 import subprocess
@@ -25,16 +29,34 @@ LOOP_SCRIPT = Path(__file__).resolve().parent / "review-loop.sh"
 #   FAIL_LENS / FAIL_TIMES  that lens exits 1 on its first FAIL_TIMES attempts
 #   EMPTY_LENS              that lens answers once without a COUNTS line
 #   SLOW_LENS               that lens sleeps a second before answering
+#   CRASH_LENS              that lens dies once, printing nothing at all
+#   GONE_LENS / GONE_VIA    without --model, that lens fails because its model
+#                           is unavailable, said in the JSON `errors` list
+#                           (GONE_VIA=errors, the default) or on stderr
 FAKE_REVIEWER = r"""#!/usr/bin/env bash
 prompt="${@: -1}"
 log="$CALLS/$(date +%s)-$$-$RANDOM"
 printf '%s' "$prompt" > "$log.txt"
 printf '%s\n' "$@" > "$log.args"
+json=; model=; prev=
+for a in "$@"; do
+  [ "$prev" = --output-format ] && [ "$a" = json ] && json=1
+  [ "$prev" = --model ] && model=$a
+  prev=$a
+done
+answer() {
 if [[ "$prompt" == "TASK: lens review ["* ]]; then
   lens=${prompt#TASK: lens review [}; lens=${lens%%]*}
   echo "start $lens" >> "$CALLS/timeline"
   [ "${SLOW_LENS:-}" = "$lens" ] && sleep 1
   echo "end $lens" >> "$CALLS/timeline"
+  if [ "${CRASH_LENS:-}" = "$lens" ] && [ ! -e "$CALLS/crash-$lens" ]; then
+    touch "$CALLS/crash-$lens"; exit 3
+  fi
+  if [ "${GONE_LENS:-}" = "$lens" ] && [ -z "$model" ]; then
+    if [ "${GONE_VIA:-errors}" = stderr ]; then echo "Error: model fable-x is unavailable" >&2; exit 3; fi
+    exit 2
+  fi
   if [ "${FAIL_LENS:-}" = "$lens" ]; then
     tries=$(ls "$CALLS" | grep -c "^fail-$lens-")
     if [ "$tries" -lt "${FAIL_TIMES:-1}" ]; then
@@ -50,6 +72,22 @@ elif [[ "$prompt" == "TASK: challenge."* ]]; then
 else
   printf 'COUNTS: BLOCK 0 FIX 1 SUGGEST 0\nVerdict: READY-WITH-FIXES\n'
 fi
+}
+text=$(answer); rc=$?
+[ "$rc" -eq 3 ] && exit 1   # died before any result
+if [ -z "$json" ]; then [ -n "$text" ] && printf '%s\n' "$text"; exit "$rc"; fi
+python3 -I -c 'import json, sys
+text, rc = sys.argv[1], int(sys.argv[2])
+ok = rc == 0
+out = {"type": "result", "subtype": "success" if ok else "error_during_execution", "is_error": not ok,
+       "num_turns": 4 if ok else 1, "duration_ms": 25, "session_id": "s-%s" % sys.argv[3],
+       "total_cost_usd": 0.5 if ok else 0.05,
+       "modelUsage": {"claude-test-model": {"inputTokens": 10 if ok else 1, "cacheReadInputTokens": 100,
+                      "cacheCreationInputTokens": 20, "outputTokens": 5, "costUSD": 0.5 if ok else 0.05}}}
+if ok: out["result"] = text
+if rc == 2: out["errors"] = ["The selected model is not available for this account"]
+print(json.dumps(out))' "$text" "$rc" "$$-$RANDOM"
+exit "$rc"
 """
 
 
@@ -66,6 +104,7 @@ class ReviewLoopScriptTest(unittest.TestCase):
         script_dir.mkdir(parents=True)
         self.script = script_dir / "review-loop.sh"
         shutil.copy(LOOP_SCRIPT, self.script)
+        shutil.copy(LOOP_SCRIPT.parent / "loop_usage.py", script_dir / "loop_usage.py")
 
         self.cr_refs = skills / "code-review" / "references"
         self.cr_refs.mkdir(parents=True)
@@ -99,7 +138,8 @@ class ReviewLoopScriptTest(unittest.TestCase):
         self.loop_dir = self.root / "loop-1"
 
         env = dict(os.environ)
-        for var in ("REVIEW_CMD", "REVIEW_BRIEFS", "REGISTER", "DECLINED", "CODE_REVIEW_DIR"):
+        for var in ("REVIEW_CMD", "REVIEW_BRIEFS", "REGISTER", "DECLINED", "CODE_REVIEW_DIR",
+                    "REVIEW_FALLBACK_MODEL"):
             env.pop(var, None)
         env.update(PATH=f"{bin_dir}:{env['PATH']}", CALLS=str(self.calls),
                    REVIEW_RETRY_PAUSE="0", DECISIONS=str(self.adr))
@@ -124,6 +164,18 @@ class ReviewLoopScriptTest(unittest.TestCase):
 
     def first_argv(self):
         return sorted(self.calls.glob("*.args"))[0].read_text().split("\n")
+
+    def usage(self):
+        return json.loads((self.loop_dir / "usage.json").read_text())
+
+    def models_tried(self, lens):
+        """The --model value of each session of <lens>, in order (None: no --model)."""
+        tried = []
+        for args in sorted(self.calls.glob("*.args"), key=os.path.getmtime):
+            argv = args.read_text().split("\n")
+            if any(a.startswith(f"TASK: lens review [{lens}]") for a in argv):
+                tried.append(argv[argv.index("--model") + 1] if "--model" in argv else None)
+        return tried
 
     # the happy path ------------------------------------------------------
     def test_runs_each_lens_then_challenge_then_defense(self):
@@ -239,7 +291,97 @@ class ReviewLoopScriptTest(unittest.TestCase):
         self.assertEqual(len(beta_starts), 2)
         self.assertGreater(beta_starts[1], timeline.index("end alpha"))
 
+    # usage record --------------------------------------------------------
+    def tries(self, report):
+        """(attempt number, row) pairs that usage.json holds for one report."""
+        return [(row["attempt"], row) for row in self.usage()["attempts"] if row["report"] == report]
+
+    def fresh(self):
+        shutil.rmtree(self.loop_dir, ignore_errors=True)
+        for leftover in list(self.calls.iterdir()):
+            leftover.unlink()
+
+    def test_each_attempt_is_kept_and_totalled(self):
+        result = self.loop()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("--output-format", self.first_argv())
+        recorded = [(row["report"], row["attempt"]) for row in self.usage()["attempts"]]
+        expected = [(f"1-review-{lens}.md", 1) for lens in ("alpha", "beta")]
+        expected += [("2-challenge.md", 1), ("3-final.md", 1)]
+        self.assertEqual(recorded, expected)
+        totals = self.usage()["totals"]
+        counts = {k: totals[k] for k in ("attempt_count", "session_count", "retries", "cost_estimate_usd")}
+        self.assertEqual(counts, {"attempt_count": 4, "session_count": 4, "retries": 0, "cost_estimate_usd": 2.0})
+        self.assertEqual(totals["tokens_by_model"], {"claude-test-model": {
+            "input": 40, "cache_read": 400, "cache_write": 80, "output": 20}})
+        last = result.stdout.strip().splitlines()[-1]
+        self.assertTrue(last.startswith("USAGE: attempts 4, sessions 4, retried 0, no telemetry 0; "
+                                        "estimated $2.00;"), last)
+        self.assertIn("Verdict: READY-WITH-FIXES", result.stdout)
+        self.assertTrue((self.loop_dir / "1-review-alpha.md.1.out").exists())
+        self.assertIn("alpha-1", (self.loop_dir / "1-review-alpha.md").read_text())
+
+    def test_a_failed_attempt_counts_its_spend(self):
+        result = self.loop({"FAIL_LENS": "beta"})
+        self.assertEqual(result.returncode, 0, result.stderr)
+        subtypes = [(n, row["subtype"]) for n, row in self.tries("1-review-beta.md")]
+        self.assertEqual(subtypes, [(1, "error_during_execution"), (2, "success")])
+        self.assertAlmostEqual(self.usage()["totals"]["cost_estimate_usd"], 2.05)
+        self.assertIn("USAGE: attempts 5, sessions 4, retried 1", result.stdout)
+
+    def test_a_crashed_attempt_is_kept_without_telemetry(self):
+        result = self.loop({"CRASH_LENS": "alpha"})
+        self.assertEqual(result.returncode, 0, result.stderr)
+        kinds = [(n, row["telemetry"]) for n, row in self.tries("1-review-alpha.md")]
+        self.assertEqual(kinds, [(1, "missing"), (2, "present")])
+        self.assertIn("USAGE: attempts 5, sessions 4, retried 1, no telemetry 1; estimated $2.00",
+                      result.stdout)
+
+    def test_unavailable_model_retries_on_the_fallback_model(self):
+        for where in ("errors", "stderr"):
+            with self.subTest(where=where):
+                self.fresh()
+                result = self.loop({"GONE_LENS": "alpha", "GONE_VIA": where})
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(self.models_tried("alpha"), [None, "opus"])
+                self.assertEqual(self.models_tried("beta"), [None])
+
+    def test_fallback_model_is_configurable(self):
+        result = self.loop({"GONE_LENS": "alpha", "REVIEW_FALLBACK_MODEL": "sonnet"})
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.models_tried("alpha"), [None, "sonnet"])
+
+    def test_other_failures_retry_on_the_same_model(self):
+        self.loop({"FAIL_LENS": "beta"})
+        self.assertEqual(self.models_tried("beta"), [None, None])
+
+    def test_a_failed_loop_still_writes_its_usage(self):
+        result = self.loop({"FAIL_LENS": "beta", "FAIL_TIMES": "2"})
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(len(self.tries("1-review-beta.md")), 2)
+        self.assertIn("USAGE: attempts 3, sessions 2, retried 1", result.stdout)
+
+    def test_another_reviewer_is_recorded_without_telemetry(self):
+        other = self.bin_dir / "another-agent"
+        other.write_text(FAKE_REVIEWER)
+        other.chmod(0o755)
+        result = self.loop({"REVIEW_CMD": f"{other} exec", "GONE_LENS": "alpha"})
+        self.assertEqual(result.returncode, 1)  # no fallback model outside the default reviewer
+        self.assertEqual(self.models_tried("alpha"), [None, None])
+        self.fresh()
+        result = self.loop({"REVIEW_CMD": f"{other} exec"})
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotIn("--output-format", self.first_argv())
+        self.assertIn("USAGE: attempts 4, sessions 4, retried 0, no telemetry 4; estimated $0.00",
+                      result.stdout)
+        self.assertIn("alpha-1", (self.loop_dir / "1-review-alpha.md").read_text())
+
     # input errors (exit 2, no session started) ---------------------------
+    def test_absent_usage_script(self):
+        (self.script.parent / "loop_usage.py").unlink()
+        self.assert_input_error(self.loop(), "not found:")
+        self.assertFalse((self.loop_dir / "usage.json").exists())
+
     def assert_input_error(self, result, message):
         self.assertEqual(result.returncode, 2)
         self.assertIn(message, result.stderr)

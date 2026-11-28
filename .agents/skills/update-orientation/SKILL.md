@@ -43,6 +43,8 @@ Below, "the orientation" means the **canonical** source resolved here.
 
 ## Scope
 
+Read the layer through `context-up/scripts/load_context.py`, headings and grep, never whole (`update-context` "Reading the layers").
+
 In scope:
 - The canonical orientation source (and, via regeneration, its per-tool
   copies).

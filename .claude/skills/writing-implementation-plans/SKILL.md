@@ -150,9 +150,12 @@ Out of scope:
      `## Plan Changes` row, which `plan-review` honours). Raise it through
      step 3. Never park it in a separate file.
 
-   Only a full pass can end this loop. When the first full pass has no BLOCK,
-   move straight to closure (`references/closure.md`); its FIXes are triaged
-   there rather than folded here. If one BLOCK survives two rounds of folding,
+   Only a full pass can end this loop, and only a finished one: a pass with
+   a failed or unfinished lens is `REVISE` and never counts as a pass with no
+   BLOCK (`../skill-review/references/review-completeness.md` section 1).
+   When the first full pass has no BLOCK, move straight to closure
+   (`references/closure.md`); its FIXes are triaged there rather than folded
+   here. If one BLOCK survives two rounds of folding,
    or comes back after its step-3 answer, stop and report the blocked output.
 
 6. **Commit for the implementer.** Check every quoted design line against its

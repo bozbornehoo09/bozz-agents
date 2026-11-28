@@ -104,18 +104,20 @@ inventory 10.
    AND a section:line (or file:line) citation. Cross-reference findings
    require both sides. An empty report is correct when no findings exist.
    Cite ADRs and rules by file path. Use the output format in the brief.
+   End with the line 'COUNTS: BLOCK <n> FIX <n> SUGGEST <n>', an empty
+   report too.
    ```
    Hand-off plans add: "A FIX or SUGGEST that can safely wait until build time
    may carry an `Implementer check:` line (SKILL.md, Implementer checks)."
    `closure` mode adds its sentence from Modes.
 
    When one brief's corpus will not fit a single specialist's context, split
-   it by file group. Each part reads only its own files and answers "out of
-   scope — cannot evaluate" for any finding whose other half lives in another
-   part. Dispatches that fail on rate limits are re-sent with less
-   parallelism; any other failure gets one retry. A lens that still has not
-   reported goes on the report's `failed:` field and forces `REVISE` — a
-   missing report is never read as a clean one.
+   it by file group and finish it with a pair call
+   (`../skill-review/references/review-completeness.md` section 2).
+   Dispatches that fail on rate limits are re-sent with less parallelism; any
+   other failure gets one retry. A lens that still has not reported, or came
+   back unfinished, goes on the report's `failed:` field and forces `REVISE`
+   (section 1 there) — a missing report is never read as a clean one.
 4. **Verify BLOCK findings.** Re-read the cited line for every BLOCK finding
    (plan, design, rule, or code at its commit); confirm the quote matches
    byte-for-byte. Drop any with hallucinated quotes. Before keeping a BLOCK
@@ -134,7 +136,9 @@ inventory 10.
    list and every `Skipped:` line into its header. In `sweep` mode, print the
    ten tables first and the gaps after them as findings.
 7. **Verdict, one line.** REVISE if any BLOCK; READY-WITH-FIXES if no BLOCK
-   and at least one FIX; READY otherwise. A failed lens counts as a BLOCK.
+   and at least one FIX; READY otherwise. An unfinished lens (step 3), or a
+   `sweep` table marked `unverified`, makes it REVISE, and that pass never
+   counts as one with no BLOCK.
 
 ## Implementer checks
 
@@ -199,7 +203,7 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
 Plan: <path @ commit | inline — restated and confirmed>
 Mode: <full | sweep | closure on <diff range>>
 Scope: <inferred packages>
-Specialists run: <every lens dispatched>; failed: <none | lens names>
+Specialists run: <every lens dispatched; split parts and pair call named>; failed: <none | lens names, failed or unfinished>
 Project briefs: <names | none found — generic lenses only>
 Checked: <n> BLOCK quotes re-read · <n> findings spot-checked · <n> dropped
 mechanism count: design N / plan N

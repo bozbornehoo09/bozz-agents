@@ -8,6 +8,10 @@
 # Usage: copy to your project root as `context-manifest.yaml` and edit. Every
 # path is relative to the project root. When no manifest is present, the
 # skills fall back to these same defaults.
+#
+# The bundled scripts (context-up's load_context.py, update-context's
+# work_check.py) read only `project.name`, `project.orientation` and each
+# layer's `id` and `path`, with a small YAML reader: keep one key per line.
 
 project:
   name: "your-project"
@@ -25,6 +29,8 @@ project:
 layers:
   - id: decisions
     title: "WHY — Architecture Decision Records (immutable, superseded not edited)"
+    # Also holds README.md (the index) and IN-FORCE.md (the hand-kept map of
+    # the decisions in force, which context-up loads instead of the ADRs).
     path: docs/decisions/
     skill: update-decisions
     review: docs-review
@@ -83,6 +89,8 @@ layers:
 
   - id: work-tracker
     title: "WHEN — activity log (not authoritative — no review hook)"
+    # Work folders for agent sessions live under <path>/work/ (see the
+    # worker contract); update-context's work_check.py checks them.
     path: work_tracker/
     skill: update-work-tracker
     review: null

@@ -17,6 +17,12 @@ Copy `config/context-manifest.example.yaml` to your project root as
   `path`, an owning `skill`, an optional `review`, and an `order`.
 - **Orientation.** List `CLAUDE.md`, `AGENTS.md`, or both, depending on which
   agents you run.
+- **Decisions in force.** `update-decisions/scripts/adr_index.py write`
+  regenerates the ADR index between `<!-- adr-index:begin -->` and
+  `<!-- adr-index:end -->` markers in your decisions README (a hand-kept index
+  without markers is left alone) and creates a DRAFT `IN-FORCE.md` map once;
+  edit that map by hand. `context-up` loads it instead of every ADR.
+  The helper scripts read only each layer's `id` and `path`.
 
 If you don't add a manifest, the skills fall back to the defaults in the example
 file.

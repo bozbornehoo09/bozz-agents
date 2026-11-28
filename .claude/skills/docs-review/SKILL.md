@@ -153,14 +153,13 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
    - **Size each dispatch first.** Estimate tokens as corpus bytes ÷ 4. If one
      specialist's corpus would exceed about a third of its context window,
      split that lens into parts (by layer, or by subject for cross-file
-     checks), each naming only its files; a part returns "out of scope —
-     cannot evaluate" for a finding whose other side sits in another part,
-     and the report's `Specialists run:` line names the parts.
+     checks), each naming only its files, and finish it with a pair call, as
+     `../skill-review/references/review-completeness.md` section 2 says.
    - **Failed dispatches.** On rate-limit or overload errors, re-dispatch the
      failed calls at half the parallelism, halving again while the errors
      persist (down to one at a time). Re-dispatch any other failure once. A
-     lens that still fails is named on the `Specialists run:` line as failed;
-     a review with a failed lens cannot return `READY`.
+     lens that still fails, or comes back unfinished, is handled as
+     `review-completeness.md` section 1 says.
    Each specialist gets:
    ```
    Review the project's authoritative docs against {brief_path}.
@@ -177,7 +176,8 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
    An empty report is correct when no findings exist.
    Respect departures a doc records as deliberate.
    Out-of-scope corpus is invisible; do not read or cite it.
-   Use the output format in the brief.
+   Use the output format in the brief. End with the line
+   'COUNTS: BLOCK <n> FIX <n> SUGGEST <n>', an empty report too.
    ```
 4. **Verify BLOCK findings.** Before reporting, the orchestrator re-reads the cited line for every quote a BLOCK finding carries (both sides of a cross-reference, plus any counter-quote) and confirms each matches the source byte-for-byte. A BLOCK with a hallucinated quote is dropped silently — do not report and do not retry. Exception: if the file's `git hash-object` no longer matches the read point, the file changed mid-run — list the finding under `Changed after the read point` instead of dropping it, and recommend a re-run.
 5. **Spot-check FIX/SUGGEST findings.** Verify at least 3 random findings per severity. Drop any whose quote does not match the source, with the same changed-file exception.
@@ -186,7 +186,7 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
    - Group by severity (BLOCK / FIX / SUGGEST).
    - Within severity, group by specialist dimension.
    - Deduplicate: if two specialists raise the same line for related reasons, merge into one finding tagged with both dimensions.
-7. **End with a one-line verdict.** REVISE if any BLOCK; READY-WITH-FIXES if no BLOCK and at least one FIX; READY otherwise. A SUGGEST-only result is `READY`.
+7. **End with a one-line verdict.** REVISE if any BLOCK; READY-WITH-FIXES if no BLOCK and at least one FIX; READY otherwise. A SUGGEST-only result is `READY`. An unfinished lens (failed, no `COUNTS:` line, or a required read or check not done) makes it `REVISE` (`review-completeness.md` section 1).
 
 ## Severity criteria
 
@@ -205,7 +205,7 @@ Corpus reviewed: <count> files
 Read point: <UTC time> (<N> file hashes)
 Changed after the read point: <finding headers, or none>
 Script checks: adr_index ran   (or `adr_index unavailable` / `adr_index failed: <error>`)
-Specialists run: internal-consistency, strategy-architecture-coherence, decisional-clarity, temporal-decay, layer-fidelity
+Specialists run: internal-consistency, strategy-architecture-coherence, decisional-clarity, temporal-decay, layer-fidelity; failed: none
 
 ## BLOCK
 - [internal-consistency] docs/decisions/0007-example-decision.md:42 ↔ rules/example_package.md:88

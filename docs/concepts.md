@@ -115,7 +115,19 @@ compacted.
 Read-only helpers back the update skills: `update-work-tracker/scripts/tracker_path.py`
 computes the week and day folder for a date, and
 `update-decisions/scripts/adr_index.py` checks the ADR index against each ADR's
-Status line.
+Status line, regenerates the index between its markers and seeds a hand-kept
+`IN-FORCE.md` map of the decisions in force (never overwriting one), and
+`update-context/scripts/work_check.py` checks, closes and hands off agent work
+folders (`update-context/references/work-folders.md`).
+
+### Bounded loading
+
+Sessions that hand off at a size cap (`docs/agents.md`) must start small, so
+`context-up` loads through one capped call, `context-up/scripts/load_context.py`,
+and every update skill reads layers through that load, headings and grep rather
+than whole files (`update-context` "Reading the layers"). Review skills that fan
+out never pass a review with a failed or unfinished lens
+(`skill-review/references/review-completeness.md`).
 
 ## From plan to pull request
 

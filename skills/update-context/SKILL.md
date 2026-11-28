@@ -41,6 +41,27 @@ the backlog parks longer-term tasks until they are scheduled. The
 orientation file summarizes the whole. The work tracker logs the
 session.
 
+## Reading the layers
+
+This is the one reading rule for a sweep; the narrow skills follow it when
+dispatched from here.
+
+- **Start from the bounded load.** `context-up`'s
+  `scripts/load_context.py --root .` prints the plan's live part, the
+  decisions in force, the newest tracker entries and each layer's size in
+  one capped call. Use it instead of opening the layers.
+- **Then headings and grep.** Reach anything else by
+  `grep -n '^#' <file>` (the headings) or `grep -n '<term>' <path>`, then
+  read only the matching lines or section. No layer file is read whole;
+  before editing, read the section being edited, not the file.
+- **Compaction is the one whole-file pass.** Only an approved compaction
+  (`references/compaction.md`) reads a layer whole, and only the layer it
+  compacts.
+- **A named scope bounds the run.** When the user names layers, a
+  package or a topic ("update-context for the decisions", "just the
+  retry work"), discovery, dispatch and review cover only that scope.
+  A run that names none covers every layer.
+
 ## Procedure
 
 ### Step 1 — Comprehensive discovery (one subagent call)
@@ -68,7 +89,11 @@ subagent or delegation facility with this brief:
 > Check: git log --since=<ts>, git status, and file mtimes under the
 > paths declared in context-manifest.yaml (decisions, strategy,
 > architecture, rules, the skills directory, docs, work_tracker) plus
-> the source tree, plus the most recent work_tracker/ entry. Also
+> the source tree. Read the layers only through the bounded load
+> (context-up's scripts/load_context.py) and grep on what git shows
+> changed — never a whole layer file. <If the user named a scope: Cover
+> only <scope>.> Run update-context's scripts/work_check.py check and
+> report its FIX lines verbatim. Also
 > list any active cross-review files under .agent-bridge/active/ with
 > their last status (read-only). Separately, flag a temporal layer
 > (work plan, open questions, backlog) whose live file has
@@ -95,6 +120,10 @@ narrow update skills that need to run. Print the dispatch plan in the
 format defined in `## Output format` and pause for confirmation. The
 user may add a domain the discovery missed, or remove one they don't
 want touched.
+
+If `work_check.py check` printed findings, add a `work folders:` line with
+their count; each is fixed on approval by the skill that owns the file, as
+`references/work-folders.md` "Fixing `check` findings" says.
 
 If discovery flagged consolidatable history, add a `compaction due` line
 naming the layer and signal. Compaction is never automatic: when the
@@ -165,6 +194,21 @@ been surfaced to the user.
 
 Surface the final summary defined in `## Output format`.
 
+### Step 6 — Work folders at handoff and close
+
+When the session belongs to a work folder (it was started from a
+`BRIEF.md`), finish with the work-folder commands in
+`references/work-folders.md`:
+
+- Before reporting `HANDOFF-READY`, run
+  `python3 -I <this skill's directory>/scripts/work_check.py handoff <id> --root .`
+  and repeat until it prints `OK`: each result is either cited by its home
+  or named in `HANDOFF.md`.
+- Closing a folder after `DONE` belongs to whoever the worker contract
+  makes responsible. That session runs `work_check.py close <id> --session
+  <name> --dry-run`, folds every `REFUSE` line, then runs it without
+  `--dry-run`; the script archives the folder in one commit.
+
 ## Output format
 
 **Dispatch plan** (print before executing; pause for confirmation):
@@ -177,6 +221,7 @@ Dispatch plan:
 - update-work-plan — <one-line reason>
 - update-work-tracker — always
 - (skipping: update-strategy, update-skills, update-open-questions, update-orientation — no changes detected)
+- work folders: 2 findings (dead-link docs/decisions/0004-retry.md:12; unresolved-cite work_tracker/work_plan.md:40)
 - compaction due: work plan — 31 Plan Changes rows, Phases 0–2 complete (run by update-work-plan if accepted)
 ```
 
@@ -185,6 +230,8 @@ Dispatch plan:
 - Which skills ran.
 - Which skills were skipped (and why).
 - Any compaction applied (layer, archive file) or declined.
+- Work-folder findings fixed or left open, and any `handoff` / `close`
+  result.
 - The final `docs-review` verdict.
 - Any deferred findings.
 
@@ -206,9 +253,9 @@ Dispatch plan:
 - Cross-reference always: ADR ↔ rule ↔ architecture ↔ tracker entry.
 - Preserve the trace of change: write "originally X; after learning Y, now Z"
   instead of silently overwriting a prior position.
-- Manual edits win. Read each file's current content first; keep the user's
-  formatting and deliberate departures from a template, and note the
-  divergence rather than reformatting it away.
+- Manual edits win. Read the current text of the section you are changing
+  first; keep the user's formatting and deliberate departures from a
+  template, and note the divergence rather than reformatting it away.
 
 ## Narrow alternatives (when not to use this orchestrator)
 
