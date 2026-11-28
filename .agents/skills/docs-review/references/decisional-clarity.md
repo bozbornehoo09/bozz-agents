@@ -47,7 +47,7 @@ Never read or cite: `docs/decisions/README.md`, `docs/strategy/research/**`, `do
 
 6. **Decision without consequences.** An ADR whose decision is so non-load-bearing that nothing in the codebase, architecture, or rules would change if the decision were reversed. Test: ask "if this ADR were reversed today, what files would need editing?" If the answer is "none," the ADR is decorative.
 
-7. **Implicit decisions.** A rule asserts a constraint that has the shape of an architectural decision (alternatives genuinely considered, binds future work) but cites no ADR. Flag as FIX with "needs ADR-NNNN" — not because every rule needs an ADR, but because *load-bearing* rules without ADR backing leave the decision unrecorded.
+7. **Implicit decisions.** A rule asserts a constraint that has the shape of an architectural decision (alternatives genuinely considered, binds future work) but cites no ADR. Flag as FIX with "needs ADR-NNNN" — not because every rule needs an ADR, but because *load-bearing* rules without ADR backing leave the decision unrecorded. (Rationale *prose* sitting outside an ADR, and missing ADR template sections, are `layer-fidelity.md`'s; you flag the unrecorded decision.)
 
 ## Anti-hallucination contract
 

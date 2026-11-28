@@ -68,13 +68,25 @@ subagent or delegation facility with this brief:
 > Check: git log --since=<ts>, git status, and file mtimes under the
 > paths declared in context-manifest.yaml (decisions, strategy,
 > architecture, rules, the skills directory, docs, work_tracker) plus
-> the source tree, plus the most recent work_tracker/ entry. Report a
-> tight bullet list mapping each finding to the skill(s) that should
-> handle it. Under 400 words."
+> the source tree, plus the most recent work_tracker/ entry. Also
+> list any active cross-review files under .agent-bridge/active/ with
+> their last status (read-only). Separately, flag a temporal layer
+> (work plan, open questions, backlog) whose live file has
+> consolidatable history — Plan Changes rows or completed phases past
+> the live horizon, stacked prior/superseded snapshots, old resolved
+> pointers, or entries over ~800 characters — naming the signal, not
+> the byte count. Report a tight bullet list mapping each finding to
+> the skill(s) that should handle it. Under 400 words."
 
 Timestamp anchor: prefer the timestamp of the most recent
 `work_tracker/` entry. If none, fall back to the start of the current
-week.
+week. Take "today" and every day count from the system clock
+(`date +%Y-%m-%d`), never from reasoning about the calendar.
+
+Cross-review files and archives under `.agent-bridge/` are append-only
+evidence owned by the cross-review helper. Discovery may summarize an
+open review's state for the tracker entry; no update skill edits,
+reformats, moves, or deletes them.
 
 ### Step 2 — Categorize and confirm the dispatch plan
 
@@ -83,6 +95,14 @@ narrow update skills that need to run. Print the dispatch plan in the
 format defined in `## Output format` and pause for confirmation. The
 user may add a domain the discovery missed, or remove one they don't
 want touched.
+
+If discovery flagged consolidatable history, add a `compaction due` line
+naming the layer and signal. Compaction is never automatic: when the
+user accepts it, the layer's own update skill runs the procedure in
+`references/compaction.md` after its normal reconcile step (it prints
+its own plan and pauses again before writing). Prefer proposing it at a
+semantic boundary — a phase just closed, a release shipped — rather
+than on slow growth.
 
 ### Step 3 — Invoke narrow update skills in dependency order
 
@@ -124,9 +144,9 @@ disjoint corpuses and have no dependency on each other's output:
 
 Both reviews are standalone skills — they are not exclusive to the
 narrow update skills that call them. The orchestrator invokes them
-directly here. Each review internally fans out to 4 specialists in
-parallel, so a sweep that runs both reviews has up to 8 specialists
-running concurrently.
+directly here. Each review internally fans out its own specialists in
+parallel, so a sweep that runs both reviews runs both specialist sets
+concurrently.
 
 Read each report and either:
 - **READY** → that review's domain is clean.
@@ -157,12 +177,14 @@ Dispatch plan:
 - update-work-plan — <one-line reason>
 - update-work-tracker — always
 - (skipping: update-strategy, update-skills, update-open-questions, update-orientation — no changes detected)
+- compaction due: work plan — 31 Plan Changes rows, Phases 0–2 complete (run by update-work-plan if accepted)
 ```
 
 **Final summary** (print after all skills complete):
 
 - Which skills ran.
 - Which skills were skipped (and why).
+- Any compaction applied (layer, archive file) or declined.
 - The final `docs-review` verdict.
 - Any deferred findings.
 
@@ -172,6 +194,8 @@ Dispatch plan:
   skill.
 - Reuse confirmation already given for that exact dispatch plan; do not ask
   again between narrow skills unless one surfaces a new decision or scope.
+- Accepting a `compaction due` line approves only running the procedure; the
+  owning skill still pauses on its compaction plan before moving anything.
 
 ## Style across all layers
 
@@ -180,6 +204,11 @@ Dispatch plan:
 - Be honest. Half-formed decisions are Proposed, not Accepted.
   Negative consequences belong in ADRs alongside positives.
 - Cross-reference always: ADR ↔ rule ↔ architecture ↔ tracker entry.
+- Preserve the trace of change: write "originally X; after learning Y, now Z"
+  instead of silently overwriting a prior position.
+- Manual edits win. Read each file's current content first; keep the user's
+  formatting and deliberate departures from a template, and note the
+  divergence rather than reformatting it away.
 
 ## Narrow alternatives (when not to use this orchestrator)
 

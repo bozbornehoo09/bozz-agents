@@ -15,9 +15,9 @@ Never read or cite anything outside each skill's `SKILL.md` and its `references/
 
 ## Check for (in order of importance)
 
-1. **Broken brief references.** A `SKILL.md` references a brief by path; the brief file does not exist under that skill's `references/`. **BLOCK** — the skill cannot run.
+1. **Broken brief references.** A `SKILL.md` references a brief by path; the brief file does not exist at that path — under that skill's `references/`, or, for a sibling-skill dispatch (`../<skill>/references/<brief>.md`), under the sibling's `references/`. **BLOCK** — the skill cannot run.
 
-2. **Orphan briefs.** A brief in a skill's `references/` is not referenced by its `SKILL.md`. The orchestrator surfaces these in the skill-brief map. **FIX** — either reference it or delete it; orphan briefs are dead weight.
+2. **Orphan briefs.** A brief in a skill's `references/` is referenced by no `SKILL.md` — neither its own nor a sibling that dispatches it by relative path. The orchestrator surfaces these in the skill-brief map. **FIX** — either reference it or delete it; orphan briefs are dead weight.
 
 3. **Missing or malformed YAML frontmatter in `SKILL.md`.** Every `SKILL.md` must open with:
    ```
@@ -26,7 +26,7 @@ Never read or cite anything outside each skill's `SKILL.md` and its `references/
    description: <one-line description>
    ---
    ```
-   Flag missing frontmatter, missing `name` or `description`, leading-slash on the name (should be `docs-review`, not `/docs-review`), or multi-line descriptions.
+   Flag missing frontmatter, missing `name` or `description`, leading-slash on the name (should be `docs-review`, not `/docs-review`), a `name` that is not lowercase-kebab, is longer than 64 characters, or does not match the skill's directory name, or multi-line descriptions.
 
 4. **Missing required sections in `SKILL.md`.** Skills fall into two families with different required shapes. Classify first, then check.
 
@@ -45,7 +45,7 @@ Never read or cite anything outside each skill's `SKILL.md` and its `references/
    - `## Pause-for-confirmation rules` and `## Style` for skills that write files (read-only loaders are exempt from these two)
    - `## Output format` whenever the skill emits a structured report
 
-   **How to classify:** a skill that spawns specialist reviewers is review-family; a skill that runs single-agent is authoring-family.
+   **How to classify:** a skill that spawns specialist reviewers from a Specialists table of briefs is review-family. Every other skill is authoring-family — including one that spawns subagents in a step without a Specialists table (a debate panel, a drafting or editing helper). For that kind, check the authoring shape and require its spawned agents to work under a stated anti-hallucination contract; do not require Specialists / Orchestration sections.
 
    *(The presence/quality of an anti-hallucination contract section is owned by `anti-hallucination-quality.md` — do not flag it here.)*
 

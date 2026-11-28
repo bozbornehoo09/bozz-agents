@@ -1,93 +1,160 @@
 ---
 name: code-review
-description: Review uncommitted changes or a specific commit/range against the project's architectural ADRs and per-package rules. Use after implementing a phase of a plan, before committing, or on a PR diff. Fans out to specialist reviewers in parallel and reports findings ranked by severity.
+description: Review uncommitted changes or a specific commit/range for defects and against the project's ADRs, rules, and standing owner overrides. Use after implementing a phase of a plan, before committing, or on a PR diff. Fans out built-in lenses (correctness and tests, precedents and reuse, decisions and scope, comments, owner overrides) plus any project architecture briefs in parallel, and reports findings ranked by severity.
 ---
 
 # Code Review
 
-> **Skeleton skill.** This ships the generic orchestration, anti-hallucination contract, and verdict logic, plus **one template brief** in `references/`. It does **not** know your architecture. Add one specialist brief per architectural concern (e.g. `architecture.md`, `security.md`, `performance.md`) to `references/`, then update the Specialists table below. For how to add briefs for your architecture, see `docs/customizing.md`.
-
-Review actual code against the project's architecture. What counts as a violation is defined entirely by the specialist briefs in `references/`, each citing your ADRs and rules.
+Read a change looking for what is wrong with it. The review runs two kinds of
+specialist side by side: five **built-in lenses** that ship here and apply to
+any codebase, and the **project briefs** you write for your own architecture.
+The report is a ranked list of findings, not a narrative, and this skill
+changes no code.
 
 ## Inputs
 
-One of:
+The review target is one of:
 - Uncommitted working-tree changes — default. Resolve via `git diff HEAD` and `git status`.
 - A commit SHA or range — `git diff <sha>` or `git diff <base>..<head>`.
-- A PR — `gh pr diff <num>`.
+- A PR — `gh pr diff <num>`, with its description.
 
-If the diff is large (>500 lines), ask the user whether to chunk by file group or proceed whole.
+The user may also pass the plan or spec the change implements and local paths
+to comparable codebases to treat as precedent.
+
+When nothing resolves to a diff or a list of changed files, ask the user what
+to review instead of guessing. For a diff over ~500 lines, ask whether to
+review it whole or in file groups.
+
+## Corpus
+
+Paths come from the layers in `context-manifest.yaml` at the project root, or
+the shipped defaults when there is no manifest.
+
+- The code: the diff, each changed file in full, the tests that exercise it,
+  and as much nearby code (callers, callees) as judging behavior takes. Docs
+  tell a reviewer what the code must satisfy; they never replace reading it.
+- The change description, and the plan or spec when one is given.
+- Decisions (`id: decisions`, default `docs/decisions/`): the index plus every
+  Accepted ADR.
+- Rules (`id: rules`), for any project brief that cites them.
+- The project's overrides register, located as `references/register.md`
+  defines; that file also gives its entry format.
+- Comparable codebases, and only those the user names.
 
 ## Specialists
 
-Each brief is a self-contained reviewer instruction file in `references/`, covering exactly one lens. Declare your briefs and run-conditions here. Replace this table with your own:
+One brief in `references/` per lens; each runs as a separate read-only
+reviewer.
+
+**Built-in lenses** run on every review:
+
+| Brief | Lens | What it hunts |
+|---|---|---|
+| `lens-correctness.md` | Correctness, simplicity and tests | Bugs and regressions; callers a changed contract breaks; code or tests that could be removed; description claims the code contradicts; guards with no test, or that no input can reach; tests asserting something other than our logic. |
+| `lens-precedents.md` | Precedents and reuse | Whether each new construct already exists in this repository (or a named comparable codebase), and the verdict: REUSE, COPY, or OK. |
+| `lens-decisions.md` | Decisions and scope | Code or text an Accepted ADR rules out or a newer ADR has overtaken; architectural choices with no ADR; code serving a later phase. |
+| `lens-comments.md` | Comments | Each added or edited comment against rules C1–C10 and their severities in `../refining-technical-writing/references/code-comments.md` (true, says why, explains its numbers, self-contained with no document or ticket ids, consistent terms, present where a reader would be lost). |
+| `lens-overrides.md` | Owner overrides | Each live register entry, applied as a hard rule. Skipped when the project keeps no register. |
+
+**Project briefs** are yours. Copy `_brief-template.md` under a descriptive
+name (`architecture.md`, `security.md`, ...) and add a row below saying when
+it runs. Two or three briefs that always run is a good ceiling; gate the rest
+on which paths the diff touches. `docs/customizing.md` covers writing them.
 
 | Brief | When to run |
 |---|---|
 | `_brief-template.md` | Template only — copy it to create real briefs; do not run as-is |
 | _(your `architecture.md`)_ | Always |
-| _(your `security.md`)_ | Always |
 | _(your domain brief)_ | When the diff touches that domain's paths |
-
-Convention: keep 2–3 "always" briefs and gate the rest on changed-file paths.
 
 ## Orchestration
 
-1. Resolve the diff. Capture `git diff` output and the list of changed files.
-2. Spawn independent specialists in parallel using the host agent's subagent or
-   delegation facility — one specialist per applicable brief in a single fan-out:
+1. **Resolve.** Collect the diff, the changed-file list, and the corpus, and
+   record whether the project has an overrides register.
+2. **Dispatch.** In one parallel fan-out, through whatever subagent or
+   delegation facility the host provides, start a read-only specialist for
+   each applicable brief: all built-in lenses (the overrides lens only when a
+   register exists) and every project brief whose condition matches. On a
+   rate limit or capacity error, retry the failed calls at half the
+   concurrency, down to one at a time; retry any other failure once, then
+   record that lens as failed. Every dispatch gets:
    ```
-   Review this diff against {brief_path}.
+   Review this change against {brief_path}.
    Changed files: {file_list}
    Diff: {diff_content}
+   Corpus paths: {the paths this brief's corpus names}
    Anti-hallucination contract: every finding requires a verbatim quote
    AND a file:line citation. Cross-reference findings require both sides.
    An empty report is correct when no findings exist.
-   Cite ADRs and rules by file path. Use the output format in the brief.
+   Use the output format in the brief. Number findings <lens>-<n>.
+   End with: COUNTS: BLOCK <n> FIX <n> SUGGEST <n>
    ```
-3. **Verify BLOCK findings.** Re-read the cited line for every BLOCK finding; confirm the quote matches byte-for-byte. Drop any with hallucinated quotes.
-4. **Spot-check FIX/SUGGEST findings.** Verify at least 3 random findings per severity. Drop mismatches.
-5. Deduplicate: if two specialists flag the same line for related reasons, merge into one finding tagged with both dimensions.
-6. Rank by severity, then by file order.
-7. End with a one-line verdict: `READY` (no BLOCKs), `REVISE` (BLOCKs present), or `READY-WITH-FIXES` (only FIX/SUGGEST).
+   If a brief's corpus will not fit in one specialist's context, run that
+   brief as several parts, each over one group of files. A part that would
+   need a file held by another part reports the finding as "out of scope —
+   cannot evaluate" rather than guessing.
+3. **Check every BLOCK.** Open each cited line and compare the quote
+   byte-for-byte — both ends of a cross-reference, and for an `OV-<n>` the
+   Rule at its register line. A BLOCK that does not match is dropped.
+4. **Sample the rest.** Check at least three FIX and three SUGGEST findings
+   from each lens the same way; for a claimed missing test, search the test
+   files the finding lists. Drop any that do not hold.
+5. **Merge and rank.** Where lenses flag the same file:line, keep one finding
+   carrying all their ids, any `OV-<n>`, and the higher severity. Remove an
+   `OV-<n>` tag that did not come from the overrides lens. Remove a cleared
+   check whose file:line now carries a finding. Order by severity, then by
+   position in the diff.
+6. **Verdict** on one line: REVISE if any BLOCK; READY-WITH-FIXES if no BLOCK
+   and at least one FIX; READY otherwise. SUGGEST findings never change the
+   verdict. A lens that failed counts as a BLOCK (the review is incomplete).
 
 ## Anti-hallucination contract (binding on every specialist)
 
 These rules are non-negotiable. The orchestrator **drops** any finding that violates them.
 
-1. **Every finding MUST include a verbatim quote** of the offending diff line. Format: `> "exact text from the diff"`. Paraphrases are invalid.
-2. **Every finding MUST cite `file:line`** — the file path and line number in the diff. No line number → finding invalid.
-3. **Cross-reference findings require quotes from BOTH sides.** A finding of the form "this code violates rule X" must include the verbatim diff line AND the verbatim rule clause being violated, with file:line for both.
-4. **"Missing element" findings quote the surrounding context** where the element should appear, so the absence is verifiable. Do not assert an absence without it.
-5. **An empty report is the correct output when no findings exist.** Specialists must not invent findings to justify the call. "No findings in this dimension" is a complete, valid report.
-6. **Out-of-scope corpus is invisible.** Each brief declares what it does NOT review (other specialists own those dimensions). Specialists must not flag concerns outside their declared lens.
+1. **Every finding MUST include a verbatim quote** of the offending code or text. Format: `> "exact text"`. Paraphrases are invalid.
+2. **Every finding MUST cite `file:line`.** No line number → finding invalid.
+3. **Cross-reference findings require quotes from BOTH sides** — the code AND the ADR clause, rule, register entry, or precedent — with `file:line` for each.
+4. **"Missing element" findings quote the surrounding context** where the element should appear, so the absence is verifiable.
+5. **`OV-<n>` belongs to the overrides lens.** No other lens tags a register entry; that lens quotes the entry's Rule at its register line.
+6. **Unconfirmed suspicions say so.** Prefix them `Hypothesis:` and name the evidence that would settle them. A convention the corpus does not show is not a convention.
+7. **An empty report is the correct output when no findings exist.** Do not pad the report.
+8. **Out-of-scope corpus is invisible.** Each brief declares what it does NOT review; specialists stay in their lens.
 
 ## Do not flag (negative scope)
 
-- Style, formatting, naming preferences that don't violate a Hard Rule.
-- Comments, docstring content, log message phrasing.
-- Test failures or flakes (those are CI's job, not a code reviewer).
-- Anything outside the diff being reviewed (broader codebase context is read for understanding, not flagged unless the diff *causes* a violation there).
+- Cosmetic choices — layout, formatting, names — that change no behavior and
+  break no rule, register entry, or established precedent. (A comment's
+  content is not cosmetic: it belongs to the comments lens.)
+- Problems that predate the diff and that the diff does not touch or worsen.
+- Scope the plan records as deliberate, unless a newer ADR or a register entry
+  contradicts the plan (raise that as a `PLAN` finding).
+- "More tests" with no specific behavior left uncovered.
+- Generated output, unless its source changed and it was not regenerated.
 
 ## Severity criteria
 
-- **BLOCK** — violates a CRITICAL OVERRIDE / hard rule in a rule file, or contradicts an Accepted ADR. Do not merge.
-- **FIX** — violates a rule but is mechanically fixable, or introduces a clear regression risk.
-- **SUGGEST** — improvement that doesn't violate a rule (cleanup, naming, future-proofing). Optional.
+- **BLOCK** — merging is unsafe: wrong behavior, lost data, a security hole, or an outage-grade operational failure; or the change breaks a CRITICAL OVERRIDE / hard rule in a rule file or contradicts an Accepted ADR.
+- **FIX** — a real defect, regression, avoidable complexity, or rule breach to correct before merge. Any finding tagged `OV-<n>` is FIX or higher.
+- **SUGGEST** — worth considering; nothing is broken without it.
+
+**PLAN** tag: the code faithfully follows its plan, but the plan itself is
+the mistake. Such a finding quotes the plan line and the code, citing each.
 
 ## Output template
 
 ```
 # Code Review: <commit message or "uncommitted changes">
 
-Files: <count> changed (<+adds>/<-dels>)
-Specialists run: <your brief names>
+Scope: <n> files (+<adds>/-<dels>)
+Specialists run: <returned, split parts named>; failed: <lens | none>; skipped: <lens — reason, e.g. "overrides — no register" | none>
+Checked: <n> BLOCK quotes re-read; <n> others sampled; <n> dropped
 
 ## BLOCK
-- <path>:<line> [<dimension>]
+- <id> [<lens>] [OV-<n>] [PLAN] <path>:<line>
   > "<verbatim offending line>"
-  <why it violates the rule>
-  → <rule/ADR file> "<verbatim rule clause>"
+  <what goes wrong, or which rule it breaks>
+  → <ADR, rule, register entry, or precedent> "<verbatim clause>"
 
 ## FIX
 - ...
@@ -95,12 +162,17 @@ Specialists run: <your brief names>
 ## SUGGEST
 - ...
 
+## Cleared checks
+- <a significant check that passed; each OK precedent with both cites>
+
 Verdict: REVISE
 ```
 
 ## What this skill is NOT
 
 - Not a linter or formatter — assume those run separately.
-- Not a test runner — flag missing tests but do not execute the suite.
-- Not a substitute for human review on enterprise-bound code. In a personal project the fan-out is enough; on shared/critical code, a human still reads the diff.
-- Not a generic SOLID/DRY checker — every check must trace to a brief in `references/` that you wrote for your architecture.
+- Not the test suite — a specialist may run a small, safe probe, but running the suite belongs to CI.
+- Not `plan-review` — this judges code that exists; `plan-review` judges a plan before code (and borrows `lens-overrides.md` for it).
+- Not `docs-review` — docs only constrain the code here.
+- Not a substitute for human review on shared or critical code. In a personal project the fan-out is enough; elsewhere a human still reads the diff.
+- Not a generic SOLID/DRY checker — every check traces to a brief in `references/`.

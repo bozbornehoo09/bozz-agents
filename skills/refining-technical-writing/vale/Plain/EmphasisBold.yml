@@ -1,0 +1,10 @@
+# general-rules.md "Plain statements": bold inside running text is decoration, except on a term
+# at the point where it is defined. A span has to start and end on a visible, non-backtick
+# character, so `src/**` style globs and stray asterisks do not count.
+extends: existence
+message: "Bold in running text (general-rules.md \"Plain statements\"): keep it only on a term where it is defined."
+scope: raw
+nonword: true
+level: suggestion
+tokens:
+  - '\*\*(?:[^\s*`]|[^\s*`][^*\n]*[^\s*`])\*\*'

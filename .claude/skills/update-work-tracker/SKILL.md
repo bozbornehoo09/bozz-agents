@@ -24,14 +24,28 @@ Out of scope:
 
 ## Steps
 
-### 1. Determine today's date and day-of-week
+### 1. Determine today's date and the target paths
 
-From your environment context.
+Never compute weekdays, week numbers, or week boundaries by reasoning
+about the calendar. Run the read-only helper from this skill's directory
+and use its output verbatim:
+
+```bash
+python3 scripts/tracker_path.py --root <work-tracker-path>   # today
+python3 scripts/tracker_path.py --root <work-tracker-path> --date YYYY-MM-DD
+```
+
+It prints the week folder, day folder, entry path, whether each exists,
+and `existing_*_folder` when a folder already covers the same dates under
+a different spelling. Reuse an existing folder and report the mismatch —
+never rename it or create a duplicate. With no shell, take the date from
+the environment context and apply the convention below carefully.
 
 ### 2. Find the correct weekly folder
 
-Convention: `week_<isoweek>_<startMM-DD>_<endMM-DD>` (Sun→Sat),
-e.g. `week_17_4-19_4-25`.
+Convention: `week_<NN>_<M-D>_<M-D>` (Sun→Sat), e.g. `week_27_6-28_7-4`,
+where `NN` is the ISO week number of the Monday inside the week. A week
+may span two months or two years; never split it at the edge.
 
 If this week's folder does not exist, PAUSE and confirm before creating it.
 When creating, also write a 1–2 line `README.md` summarizing the week's
@@ -39,8 +53,8 @@ intended focus.
 
 ### 3. Find or create today's daily folder
 
-Inside the week folder: `<dayofweek>_<MM-DD>/` (e.g. `tuesday_4-21/`).
-The daily entry lives at `<dayofweek>_<MM-DD>/entry.md`.
+Inside the week folder: `<dayofweek>_<M>-<DD>/` (e.g. `thursday_7-02/`).
+The daily entry lives at `<dayofweek>_<M>-<DD>/entry.md`.
 
 If the entry already exists, PAUSE and ask whether to append a timestamped
 section, replace it, or cancel.
@@ -76,6 +90,15 @@ Sections (omit any with no content):
 - **Up next** — a pointer to the work plan's "Next up"
   (`work_tracker/work_plan.md`), noting only what changed this session.
   The plan owns the forward view — do not restate the queue here.
+- **Reviews** — cross-review threads opened, folded, or closed this
+  session: review ID, round, outcome, one line each. Read state with
+  `review_bridge.py status`; the transcript stays the evidence — never
+  copy it here or edit it.
+
+Capture the why and how of investigations in one line each (what was
+tried, what the evidence showed), not just the what. When an earlier
+position changed, write "originally X; after Y, now Z" rather than
+dropping X. Deep rationale still belongs in an ADR.
 
 ## Pause-for-confirmation rules
 
@@ -89,3 +112,5 @@ Sections (omit any with no content):
 - Bullet points, not prose. Terse. One line per item where possible.
 - Cross-reference ADRs by number; cross-reference rules by file path.
 - Do not edit prior daily entries, only the current one.
+- Never edit, reformat, or move files under `.agent-bridge/`; they are
+  append-only review evidence.

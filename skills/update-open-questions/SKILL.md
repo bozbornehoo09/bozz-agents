@@ -87,9 +87,20 @@ mutation to existing-but-not-resolved questions that is routine.
 
 ### 6. Update the header
 
-- Bump the `Last updated` date to today.
+- Bump the `Last updated` date to today (from the system clock,
+  `date +%Y-%m-%d`).
 - If the document has shifted in scope or audience, update the Status
   line.
+
+### 7. Compaction (only when flagged or requested)
+
+When `update-context` reports `compaction due` for this file and the user
+accepted it, or the user asks, run
+`../update-context/references/compaction.md`. The only routine candidates
+are old `→ Resolved by ADR-NNNN` pointer stubs (RESOLVED-POINTER) — the ADR
+is their durable record — and MEGA-ENTRY tightening inside a deep dive.
+Open questions themselves are always KEEP: compaction never resolves,
+merges, or re-ranks one.
 
 ## Pause-for-confirmation rules
 
@@ -103,6 +114,7 @@ mutation to existing-but-not-resolved questions that is routine.
 - For additive deep-dive content within an existing question (new
   research finding, new option considered), surface the diff and
   proceed unless ambiguous.
+- PAUSE on the compaction plan before archiving any pointer stub.
 
 ## Style
 
@@ -113,7 +125,8 @@ mutation to existing-but-not-resolved questions that is routine.
 - Cite research memos by path; do not restate their content (the memo
   is the authoritative source).
 - Resolved questions become one-line pointers, not deletions —
-  deletion loses audit trail.
+  deletion loses audit trail. Old pointers may later move verbatim to
+  `archive/open_questions-history.md` through step 7, never deleted.
 
 ## Review hook
 

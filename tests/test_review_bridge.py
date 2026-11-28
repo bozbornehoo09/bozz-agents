@@ -650,6 +650,69 @@ class ReviewBridgeTests(unittest.TestCase):
             self.assertEqual(payload["last_event"]["status"], "CLOSED")
             self.assertIn(payload["result"], {"changed", "terminal", "archived"})
 
+    def test_fingerprint_pins_content_and_detects_moved_bytes(self):
+        with tempfile.TemporaryDirectory() as temp:
+            repo = Path(temp)
+            (repo / "docs").mkdir()
+            (repo / "docs/a.md").write_text("alpha\n")
+            (repo / "docs/b.md").write_text("beta\n")
+            (repo / "docs/.hidden").write_text("ignored\n")
+            (repo / "plan.md").write_text("plan\n")
+            first = json.loads(run_helper("fingerprint", "--repo-root", str(repo), "docs", "plan.md").stdout)
+            self.assertTrue(first["identity"].startswith("files-sha256:"))
+            self.assertEqual([item["path"] for item in first["files"]], ["docs/a.md", "docs/b.md", "plan.md"])
+            # Order of arguments does not change the identity.
+            again = json.loads(run_helper("fingerprint", "--repo-root", str(repo), "plan.md", "docs").stdout)
+            self.assertEqual(again["identity"], first["identity"])
+            # The reviewer launcher shares the command and accepts a match.
+            match = subprocess.run(
+                [sys.executable, str(REVIEWER_HELPER), "fingerprint", "--repo-root", str(repo),
+                 "--expect", first["identity"], "docs", "plan.md"],
+                text=True, capture_output=True,
+            )
+            self.assertEqual(match.returncode, 0, match.stderr)
+            self.assertTrue(json.loads(match.stdout)["match"])
+            # Changing one byte moves the identity and --expect exits 4.
+            (repo / "docs/b.md").write_text("beta!\n")
+            moved = run_helper(
+                "fingerprint", "--repo-root", str(repo), "--expect", first["identity"], "docs", "plan.md",
+                check=False,
+            )
+            self.assertEqual(moved.returncode, 4)
+            self.assertFalse(json.loads(moved.stdout)["match"])
+            # A fingerprint identity is accepted as a pinned revision.
+            body = repo / "request.md"
+            body.write_text("Review the docs set.\n")
+            init = run_helper(
+                "init", "--root", str(repo / ".agent-bridge"), "--kind", "DOCS", "--subject", "docs set",
+                "--review-skill", "docs-review", "--requester", "agent-a", "--reviewer", "agent-b",
+                "--base", "none", "--head", first["identity"], "--body-file", str(body),
+                "--expected-by", future(),
+            )
+            self.assertEqual(json.loads(init.stdout)["last_event"]["revision"], first["identity"])
+
+    def test_fingerprint_rejects_escaping_missing_and_absolute_paths(self):
+        with tempfile.TemporaryDirectory() as temp:
+            repo = Path(temp) / "repo"
+            repo.mkdir()
+            (Path(temp) / "outside.md").write_text("x\n")
+            for path in ("../outside.md", "missing.md", str(Path(temp) / "outside.md")):
+                with self.subTest(path=path):
+                    result = run_helper("fingerprint", "--repo-root", str(repo), path, check=False)
+                    self.assertEqual(result.returncode, 2)
+                    self.assertIn("fingerprint path", result.stderr)
+
+    def test_role_skills_pin_stale_baseline_and_out_of_band_relay(self):
+        protocol = (ROOT / "skills/cross-review-requester/references/protocol.md").read_text()
+        reviewer = (ROOT / "skills/cross-reviewer/SKILL.md").read_text()
+        fold = (ROOT / "skills/fold-review-findings/SKILL.md").read_text()
+        relay = (ROOT / "skills/cross-review-requester/references/out-of-band-reviewer.md").read_text()
+        for text in (protocol, reviewer, fold):
+            self.assertIn("BASELINE: STALE", text)
+        self.assertIn("fingerprint", reviewer)
+        self.assertIn("`$fold-review-findings`", relay)
+        self.assertIn("verbatim", relay)
+
 
 if __name__ == "__main__":
     unittest.main()

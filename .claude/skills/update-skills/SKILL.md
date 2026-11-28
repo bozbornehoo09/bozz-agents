@@ -89,11 +89,10 @@ NOT durable (do not add):
 
 ### 4. Cross-reference verification
 
-Each `SKILL.md` references its specialist briefs by path. Verify:
-- Every brief listed in a `SKILL.md` actually exists under that skill's
-  `references/`.
-- Every brief in a skill's `references/` is referenced by its
-  `SKILL.md`. Orphaned briefs are dead weight — surface for deletion.
+Broken brief references and orphan briefs are checked by `skill-review`
+(its Orchestration step 2 builds the skill-brief map; `structural-integrity`
+reports it), which closes this skill — do not re-derive them here. Verify the
+things that review cannot see from the skills alone:
 - Corpus globs in `SKILL.md` and the briefs it invokes are consistent.
   If `SKILL.md` scopes `docs/strategy/*.md` but a brief lists individual
   files, fix the brief.

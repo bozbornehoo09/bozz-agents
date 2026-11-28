@@ -1,0 +1,220 @@
+{
+  "family": "destructive",
+  "description": "Commands no agent session runs without a human at the keyboard: recursive deletes of broad targets, disk formatting, history-destroying git, privilege escalation and cloud or cluster deletes. Plain `git push` is not here: it goes to the host's ask flow, and the worker contract makes it an owner-go step.",
+  "rules": [
+    {
+      "id": "rm-recursive-broad",
+      "reason": "Recursive delete of the filesystem root, a top-level system folder, the home folder, the current or parent folder, or a bare glob.",
+      "pattern": "(?:^|[\\s;&|(`'\"\\\\/])rm\\s+(?=(?:-[\\w-]*\\s+)*(?:-[a-zA-Z]*[rR][a-zA-Z]*|--recursive)(?:\\s|$))(?:-[\\w-]*\\s+)*(?:[^\\s;&|]+\\s+)*(?:/(?:bin|boot|dev|etc|home|lib|lib64|opt|proc|root|run|sbin|srv|sys|tmp|usr|var|Users|System|Library|Applications|Volumes)?/?|~/?|\\$HOME/?|\\.{1,2}/?|\\*)(?=$|[\\s;&|)'\"])",
+      "examples": [
+        "rm -rf /",
+        "rm -rf / --no-preserve-root",
+        "rm -fr /etc/",
+        "rm -Rf ~",
+        "rm -rf ~/",
+        "rm -rf .",
+        "rm -rf ..",
+        "rm --recursive --force /usr",
+        "rm -r -f $HOME",
+        "rm -rf *",
+        "rm -rf build /",
+        "sudo rm -rf /var",
+        "bash -c 'rm -rf /'",
+        "/bin/rm -rf ~"
+      ]
+    },
+    {
+      "id": "mkfs",
+      "reason": "Formats a filesystem.",
+      "pattern": "(?:^|[\\s;&|(`'\"\\\\/])mkfs(?:\\.\\w+)?(?:\\s|$)",
+      "examples": [
+        "mkfs.ext4 /dev/sda1",
+        "mkfs -t xfs /dev/nvme1n1"
+      ]
+    },
+    {
+      "id": "dd-to-device",
+      "reason": "Raw write to a block device.",
+      "pattern": "(?:^|[\\s;&|(`'\"\\\\/])dd\\s+[^;&|\\n]*\\bof=/dev/",
+      "examples": [
+        "dd if=/dev/zero of=/dev/sda",
+        "dd bs=1M if=image.iso of=/dev/disk4"
+      ]
+    },
+    {
+      "id": "git-push-force",
+      "reason": "Force push rewrites shared history; use --force-with-lease after the owner's go.",
+      "pattern": "(?:^|[\\s;&|(`'\"\\\\/])git(?:\\s+(?:-C|-c|--git-dir|--work-tree|--namespace)\\s+(?:\"[^\"]*\"|'[^']*'|[^\\s;&|])+|\\s+--?[A-Za-z][\\w-]*(?:=(?:\"[^\"]*\"|'[^']*'|[^\\s;&|])+)?)*\\s+push\\b(?=[^;&|\\n]*(?:\\s--force(?![\\w-])|\\s-[a-zA-Z]*f[a-zA-Z]*(?=$|[\\s;&|)'\"])|\\s\\+[^\\s;&|]))",
+      "examples": [
+        "git push --force",
+        "git push -f origin main",
+        "git -C /repo push -fu origin fix/retry",
+        "git push origin +main",
+        "env git push --force origin main",
+        "bash -c 'cd /repo && git push -f'"
+      ]
+    },
+    {
+      "id": "git-push-delete",
+      "reason": "Deletes a remote branch or tag.",
+      "pattern": "(?:^|[\\s;&|(`'\"\\\\/])git(?:\\s+(?:-C|-c|--git-dir|--work-tree|--namespace)\\s+(?:\"[^\"]*\"|'[^']*'|[^\\s;&|])+|\\s+--?[A-Za-z][\\w-]*(?:=(?:\"[^\"]*\"|'[^']*'|[^\\s;&|])+)?)*\\s+push\\b(?=[^;&|\\n]*\\s(?:--delete\\b|-d(?=\\s|$)|:[^\\s;&|]))",
+      "examples": [
+        "git push origin --delete main",
+        "git push -d origin release-2",
+        "git push origin :release-2"
+      ]
+    },
+    {
+      "id": "git-reset-hard",
+      "reason": "Discards commits and working-tree changes.",
+      "pattern": "(?:^|[\\s;&|(`'\"\\\\/])git(?:\\s+(?:-C|-c|--git-dir|--work-tree|--namespace)\\s+(?:\"[^\"]*\"|'[^']*'|[^\\s;&|])+|\\s+--?[A-Za-z][\\w-]*(?:=(?:\"[^\"]*\"|'[^']*'|[^\\s;&|])+)?)*\\s+reset\\b(?=[^;&|\\n]*\\s--hard\\b)",
+      "examples": [
+        "git reset --hard",
+        "git reset --hard HEAD~1",
+        "git reset -q --hard origin/main",
+        "git -C /repo reset --hard"
+      ]
+    },
+    {
+      "id": "git-clean-force",
+      "reason": "Deletes untracked files (a dry run with -n is fine).",
+      "pattern": "(?:^|[\\s;&|(`'\"\\\\/])git(?:\\s+(?:-C|-c|--git-dir|--work-tree|--namespace)\\s+(?:\"[^\"]*\"|'[^']*'|[^\\s;&|])+|\\s+--?[A-Za-z][\\w-]*(?:=(?:\"[^\"]*\"|'[^']*'|[^\\s;&|])+)?)*\\s+clean\\b(?=[^;&|\\n]*\\s(?:-[a-zA-Z]*f|--force\\b))(?![^;&|\\n]*\\s(?:-[a-zA-Z]*n|--dry-run\\b))",
+      "examples": [
+        "git clean -fd",
+        "git clean -xdf",
+        "git -C /repo clean -f",
+        "git clean --force -d"
+      ]
+    },
+    {
+      "id": "git-discard-all",
+      "reason": "Throws away every uncommitted change in the checkout.",
+      "pattern": "(?:^|[\\s;&|(`'\"\\\\/])git(?:\\s+(?:-C|-c|--git-dir|--work-tree|--namespace)\\s+(?:\"[^\"]*\"|'[^']*'|[^\\s;&|])+|\\s+--?[A-Za-z][\\w-]*(?:=(?:\"[^\"]*\"|'[^']*'|[^\\s;&|])+)?)*\\s+(?:checkout|restore)\\s+(?:--\\s+)?\\.(?=$|[\\s;&|)])",
+      "examples": [
+        "git checkout .",
+        "git checkout -- .",
+        "git restore ."
+      ]
+    },
+    {
+      "id": "git-branch-force-delete",
+      "reason": "Deletes a branch even if it is not merged.",
+      "pattern": "(?:^|[\\s;&|(`'\"\\\\/])git(?:\\s+(?:-C|-c|--git-dir|--work-tree|--namespace)\\s+(?:\"[^\"]*\"|'[^']*'|[^\\s;&|])+|\\s+--?[A-Za-z][\\w-]*(?:=(?:\"[^\"]*\"|'[^']*'|[^\\s;&|])+)?)*\\s+branch\\s+(?:[^\\s;&|]+\\s+)*(?:-D|--delete\\s+--force|--force\\s+--delete)(?=\\s|$)",
+      "examples": [
+        "git branch -D feature/retry",
+        "git branch --delete --force old"
+      ]
+    },
+    {
+      "id": "git-stash-drop",
+      "reason": "Deletes stashed work.",
+      "pattern": "(?:^|[\\s;&|(`'\"\\\\/])git(?:\\s+(?:-C|-c|--git-dir|--work-tree|--namespace)\\s+(?:\"[^\"]*\"|'[^']*'|[^\\s;&|])+|\\s+--?[A-Za-z][\\w-]*(?:=(?:\"[^\"]*\"|'[^']*'|[^\\s;&|])+)?)*\\s+stash\\s+(?:drop|clear)\\b",
+      "examples": [
+        "git stash drop",
+        "git stash clear"
+      ]
+    },
+    {
+      "id": "sudo",
+      "reason": "Privilege escalation.",
+      "pattern": "(?:^|[\\s;&|(`'\"\\\\/])sudo\\s",
+      "examples": [
+        "sudo ls",
+        "sudo -u root id"
+      ]
+    },
+    {
+      "id": "aws-mutation",
+      "reason": "A cloud write or delete through the AWS CLI; reads (list, describe, get) are fine.",
+      "pattern": "(?:^|[\\s;&|(`'\"\\\\/])aws\\s+[^;&|\\n]*\\s(?:delete|remove|terminate|put|create|update|invoke|deregister|detach|purge|modify|rm|rb)(?:[-\\w]*)(?=\\s|$)|(?:^|[\\s;&|(`'\"\\\\/])aws\\s+[^;&|\\n]*\\s--delete\\b",
+      "examples": [
+        "aws s3api delete-object --bucket orders-export --key k",
+        "aws ec2 terminate-instances --instance-ids i-0abc",
+        "aws lambda invoke --function-name webhook-dispatcher out.json",
+        "aws dynamodb put-item --table-name orders --item {}",
+        "aws s3 rm s3://orders-export/k",
+        "aws s3 sync . s3://orders-export --delete"
+      ]
+    },
+    {
+      "id": "gcloud-delete",
+      "reason": "A delete through the Google Cloud CLIs.",
+      "pattern": "(?:^|[\\s;&|(`'\"\\\\/])(?:gcloud|gsutil)\\s+[^;&|\\n]*\\s(?:delete|rm|rb)(?=\\s|$)",
+      "examples": [
+        "gcloud compute instances delete vm-1",
+        "gcloud storage rm -r gs://orders-export",
+        "gsutil -m rm -r gs://orders-export"
+      ]
+    },
+    {
+      "id": "az-delete",
+      "reason": "A delete through the Azure CLI.",
+      "pattern": "(?:^|[\\s;&|(`'\"\\\\/])az\\s+[^;&|\\n]*\\s(?:delete|purge)(?=\\s|$)",
+      "examples": [
+        "az group delete --name rg-orders",
+        "az keyvault purge --name kv-orders"
+      ]
+    },
+    {
+      "id": "kubectl-delete",
+      "reason": "Deletes cluster resources or drains a node.",
+      "pattern": "(?:^|[\\s;&|(`'\"\\\\/])kubectl\\s+[^;&|\\n]*\\b(?:delete|drain)(?=\\s|$)",
+      "examples": [
+        "kubectl delete pod orders-7f9",
+        "kubectl -n prod delete deployment webhook-dispatcher",
+        "kubectl drain node-3"
+      ]
+    },
+    {
+      "id": "terraform-destroy",
+      "reason": "Destroys infrastructure, or applies without a reviewed plan.",
+      "pattern": "(?:^|[\\s;&|(`'\"\\\\/])(?:terraform|tofu)\\s+[^;&|\\n]*(?:\\bdestroy\\b|\\bapply\\b[^;&|\\n]*-auto-approve\\b|\\s-destroy\\b)",
+      "examples": [
+        "terraform destroy",
+        "terraform apply -auto-approve",
+        "tofu destroy -target=module.queue",
+        "terraform plan -destroy"
+      ]
+    }
+  ],
+  "safe": [
+    "rm -rf build",
+    "rm -rf ./build",
+    "rm -f /tmp/x.txt",
+    "rm -rf /tmp/scratch-1",
+    "rm -rf /tmp/a /tmp/b",
+    "rm file",
+    "rm -rf *.log",
+    "git status",
+    "git -C /repo log --oneline -5",
+    "git commit -m \"Retry on throttling\"",
+    "git commit --amend --no-edit",
+    "git push -u origin fix/retry",
+    "git push --force-with-lease origin fix/retry",
+    "git push --follow-tags",
+    "git -C /repo push origin HEAD",
+    "git stash push -m wip",
+    "git stash list",
+    "git log --grep push",
+    "git checkout -b fix/retry",
+    "git restore --staged src/app.py",
+    "git reset --soft HEAD~1",
+    "git reset HEAD src/app.py",
+    "git clean -n -d",
+    "git clean -nfd",
+    "git clean -i",
+    "git branch -d merged-branch",
+    "dd if=/dev/zero of=./disk.img bs=1M count=1",
+    "aws s3 ls s3://orders-export/deleted-items/",
+    "aws sts get-caller-identity",
+    "aws logs describe-log-groups",
+    "gcloud compute instances list",
+    "az group list",
+    "kubectl get pods -n prod",
+    "terraform plan",
+    "terraform apply",
+    "ls -la ~",
+    "cat /etc/hosts",
+    "python3 -m unittest discover -s tests"
+  ]
+}

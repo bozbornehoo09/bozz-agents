@@ -1,0 +1,55 @@
+{
+  "family": "readonly",
+  "extends": "destructive",
+  "description": "Use for sessions that only review. Inherits all of destructive, then also blocks git commands that change refs or write under .git/, and any command mentioning a credential or secret location.",
+  "rules": [
+    {
+      "id": "git-ref-moving",
+      "reason": "Changes a git ref or writes under .git/. Review sessions may read history but not alter it.",
+      "pattern": "(?:^|[\\s;&|(`'\"\\\\/])git(?:\\s+(?:-C|-c|--git-dir|--work-tree|--namespace)\\s+(?:\"[^\"]*\"|'[^']*'|[^\\s;&|])+|\\s+--?[A-Za-z][\\w-]*(?:=(?:\"[^\"]*\"|'[^']*'|[^\\s;&|])+)?)*\\s+(?:am|apply|checkout|cherry-pick|clean|commit|fetch|gc|merge|notes|prune|pull|push|rebase|reset|restore|revert|stash|switch|tag|update-ref|worktree|branch\\s+(?:[^\\s;&|]+\\s+)*(?:-[dDmMcCf]|--delete|--move|--copy|--force))(?=$|[\\s;&|)])",
+      "examples": [
+        "git commit -m x",
+        "git -C /repo commit -am y",
+        "git fetch",
+        "git pull --rebase",
+        "git checkout main",
+        "git switch -c x",
+        "git stash",
+        "git tag v1",
+        "git worktree add /tmp/x",
+        "git branch -D x",
+        "git push",
+        "git merge feature"
+      ]
+    },
+    {
+      "id": "credential-path",
+      "reason": "Mentions a location that holds credentials or secrets.",
+      "pattern": "(?:\\.ssh|\\.aws|\\.gnupg|\\.azure|\\.kube|\\.config/gcloud)(?=$|[/\\s'\"])|\\.netrc\\b|\\.git-credentials\\b|\\.npmrc\\b|\\.pypirc\\b|\\.docker/config\\.json|\\.pem\\b|\\bid_(?:rsa|ed25519|ecdsa)\\b",
+      "examples": [
+        "cat ~/.aws/credentials",
+        "cat ~/.ssh/id_rsa",
+        "cat ~/.netrc",
+        "ls ~/.gnupg",
+        "head ~/.git-credentials",
+        "cat deploy-key.pem",
+        "cat ~/.kube/config"
+      ]
+    }
+  ],
+  "safe": [
+    "git log --oneline",
+    "git -C /repo diff main..HEAD",
+    "git -C /repo show HEAD:agents/manager.md",
+    "git blame src/app.py",
+    "git branch -vv",
+    "git status --short",
+    "git rev-parse HEAD",
+    "git log --grep=commit",
+    "git merge-base main HEAD",
+    "grep -rn retry src/",
+    "ls -la",
+    "wc -w docs/design.md",
+    "gh pr view 42 --json body"
+  ]
+}

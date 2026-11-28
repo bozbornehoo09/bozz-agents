@@ -11,6 +11,10 @@ PRINCIPLES:
   reordered, or dropped, add a dated row to "Plan Changes" with the why.
 - Completed work leaves a pointer, not a narrative: cross-reference the
   work_tracker entry or ADR where it landed.
+- Aged history (old Plan Changes rows, finished phases) may move verbatim to
+  archive/work_plan-history.md through update-work-plan's compaction step —
+  never deleted. Default live horizon: newest 15 Plan Changes rows; the
+  current and previous phase.
 - This document is not authoritative — rationale lives in ADRs, constraints
   live in rules. Before a build phase starts, stress-test the plan with
   `plan-review`.

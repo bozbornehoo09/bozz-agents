@@ -59,6 +59,10 @@ decide:
 - NO if it's a code style choice, one-off bug fix, or derivation from an
   existing ADR
 
+Threshold test: if the decision fits in one line with obvious rationale,
+it is a bullet in the tracker entry (`Decided X (no ADR — minor)`). If a
+reader would ask "why not Y instead?", it is an ADR.
+
 ### 4. Draft each ADR using this template
 
 ```
@@ -101,14 +105,29 @@ never reused. Sequential — do NOT group by topic.
 ### 6. Update the index
 
 After writing/updating ADRs, update `docs/decisions/README.md` with one line
-per ADR: `- [ADR-NNNN](NNNN-slug.md) — Title — Status`.
+per ADR: `- [ADR-NNNN](NNNN-slug.md) — Title — Status` (a project that keeps
+the index as a `| ADR | Title | Status |` table keeps its table form).
+
+Then run the read-only checker from this skill's directory and resolve every
+line it prints (the ADR body is truth; fix the index, not the body):
+
+```bash
+python3 scripts/adr_index.py check --dir <decisions-path>
+python3 scripts/adr_index.py lines --dir <decisions-path>   # canonical list lines
+```
+
+It reports `status-mismatch`, `missing-from-index`, `index-orphan`,
+`missing-status`, `bad-status`, `duplicate-number`, and
+`broken-supersedence`. Take the ADR `Date` from the system clock
+(`date +%Y-%m-%d`).
 
 ### 7. Handle supersedence
 
 If a new ADR supersedes an existing one:
 - Set the old ADR's Status to "Superseded by ADR-NNNN"
 - Do NOT change anything else in the old ADR (immutability)
-- Cross-link both ways
+- Cross-link both ways (`**Supersedes:** ADR-MMMM` on the new one); the
+  step 6 checker's `broken-supersedence` class verifies the pair
 
 ### 8. Run docs-review
 

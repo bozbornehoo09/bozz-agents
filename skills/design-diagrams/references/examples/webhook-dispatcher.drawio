@@ -1,0 +1,109 @@
+<mxfile host="drawio" type="device">
+  <diagram id="wd_page" name="webhook-dispatcher">
+    <mxGraphModel grid="1" gridSize="10" guides="1" connect="1" arrows="1" page="1" pageWidth="1200" pageHeight="600" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Heading and key -->
+        <mxCell id="wd_heading" value="webhook-dispatcher: delivery path" style="text;whiteSpace=wrap;fontStyle=1;fontSize=16;verticalAlign=middle;html=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="20" y="10" width="460" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_key_new" value="" style="fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="20" y="50" width="16" height="16" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_key_new_txt" value="Net-new" style="text;whiteSpace=wrap;fontSize=11;verticalAlign=middle;html=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="42" y="48" width="70" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_key_same" value="" style="fillColor=#ffffff;strokeColor=#999999;" vertex="1" parent="1">
+          <mxGeometry x="120" y="50" width="16" height="16" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_key_same_txt" value="Existing, unchanged" style="text;whiteSpace=wrap;fontSize=11;verticalAlign=middle;html=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="142" y="48" width="125" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_key_ext" value="" style="fillColor=#eeeeee;strokeColor=#999999;" vertex="1" parent="1">
+          <mxGeometry x="280" y="50" width="16" height="16" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_key_ext_txt" value="Third party" style="text;whiteSpace=wrap;fontSize=11;verticalAlign=middle;html=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="302" y="48" width="80" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_key_open" value="" style="fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="395" y="50" width="16" height="16" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_key_open_txt" value="OPEN" style="text;whiteSpace=wrap;fontSize=11;verticalAlign=middle;html=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="417" y="48" width="50" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_key_async_txt" value="- - ▶ asynchronous" style="text;whiteSpace=wrap;fontSize=11;verticalAlign=middle;html=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="480" y="48" width="130" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- Bands, one per tier -->
+        <mxCell id="wd_band_src" value="PRODUCERS" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f7f8fa;strokeColor=#d0d5dd;fontColor=#667085;fontSize=11;fontStyle=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="20" y="80" width="1160" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_band_core" value="DISPATCH" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f7f8fa;strokeColor=#d0d5dd;fontColor=#667085;fontSize=11;fontStyle=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="20" y="220" width="1160" height="190" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_band_dst" value="RECEIVERS" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f7f8fa;strokeColor=#d0d5dd;fontColor=#667085;fontSize=11;fontStyle=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="20" y="420" width="1160" height="150" as="geometry"/>
+        </mxCell>
+
+        <!-- Producers -->
+        <mxCell id="wd_orders" value="&lt;b&gt;orders-service&lt;/b&gt;&lt;br&gt;emits order events" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontSize=11;spacing=6;fillColor=#ffffff;strokeColor=#999999;" vertex="1" parent="1">
+          <mxGeometry x="60" y="120" width="170" height="56" as="geometry"/>
+        </mxCell>
+
+        <!-- Dispatch: a card per service, icon on top of the card -->
+        <mxCell id="wd_card_ingest" value="" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="60" y="260" width="170" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_ingest" value="&lt;b&gt;Ingest API&lt;/b&gt;&lt;br&gt;validates, stamps id" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;html=1;outlineConnect=0;strokeColor=#ffffff;fillColor=#D05C17;gradientColor=#F78E04;gradientDirection=north;verticalLabelPosition=bottom;verticalAlign=top;align=center;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="121" y="274" width="48" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_card_queue" value="" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="320" y="260" width="170" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_queue" value="&lt;b&gt;deliveries&lt;/b&gt;&lt;br&gt;one message per target" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sqs;html=1;outlineConnect=0;strokeColor=#ffffff;fillColor=#BC1356;gradientColor=#F34482;gradientDirection=north;verticalLabelPosition=bottom;verticalAlign=top;align=center;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="381" y="274" width="48" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_card_worker" value="" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="580" y="260" width="170" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_worker" value="&lt;b&gt;Sender&lt;/b&gt;&lt;br&gt;signs and posts" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;html=1;outlineConnect=0;strokeColor=#ffffff;fillColor=#D05C17;gradientColor=#F78E04;gradientDirection=north;verticalLabelPosition=bottom;verticalAlign=top;align=center;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="641" y="274" width="48" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_card_table" value="" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="840" y="260" width="170" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_table" value="&lt;b&gt;attempts&lt;/b&gt;&lt;br&gt;status per delivery" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.dynamodb;html=1;outlineConnect=0;strokeColor=#ffffff;fillColor=#3334B9;gradientColor=#4D72F3;gradientDirection=north;verticalLabelPosition=bottom;verticalAlign=top;align=center;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="901" y="274" width="48" height="48" as="geometry"/>
+        </mxCell>
+
+        <!-- Receivers -->
+        <mxCell id="wd_partner" value="&lt;b&gt;Subscriber endpoint&lt;/b&gt;&lt;br&gt;customer-hosted HTTPS" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontSize=11;spacing=6;fillColor=#eeeeee;strokeColor=#999999;" vertex="1" parent="1">
+          <mxGeometry x="580" y="470" width="170" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_open_retry" value="&lt;b&gt;OPEN&lt;/b&gt;&lt;br&gt;retry budget per endpoint" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontSize=11;spacing=6;fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="840" y="470" width="170" height="56" as="geometry"/>
+        </mxCell>
+
+        <!-- Edges: attached to cards, ports set explicitly -->
+        <mxCell id="wd_e_publish" value="POST /v1/events" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#344054;fontColor=#344054;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="wd_orders" target="wd_card_ingest">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_e_enqueue" value="enqueue" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#344054;fontColor=#344054;fontSize=10;labelBackgroundColor=#ffffff;dashed=1;exitX=1;exitY=0.25;entryX=0;entryY=0.25;" edge="1" parent="1" source="wd_card_ingest" target="wd_card_queue">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_e_consume" value="consume" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#344054;fontColor=#344054;fontSize=10;labelBackgroundColor=#ffffff;dashed=1;exitX=1;exitY=0.25;entryX=0;entryY=0.25;" edge="1" parent="1" source="wd_card_queue" target="wd_card_worker">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_e_record" value="records outcome" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#344054;fontColor=#344054;fontSize=10;labelBackgroundColor=#ffffff;exitX=1;exitY=0.25;entryX=0;entryY=0.25;" edge="1" parent="1" source="wd_card_worker" target="wd_card_table">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="wd_e_deliver" value="signed POST" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#344054;fontColor=#344054;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="wd_card_worker" target="wd_partner">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

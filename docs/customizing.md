@@ -28,17 +28,18 @@ universal properties (internal consistency, decisional clarity, temporal decay,
 structural integrity, anti-hallucination quality, scope, cross-skill
 consistency). Leave them.
 
-`plan-review` and `code-review` ship as **skeletons**. They contain the generic
-machinery (parallel fan-out, anti-hallucination contract, verdict aggregation)
-and a single template brief:
+`plan-review` and `code-review` ship **built-in generic lenses** that always
+run (plan hygiene, simplicity, testing discipline, production safety; and
+correctness, comments, decisions, precedents, overrides). Those check a plan or
+diff against your own ADRs, rules and overrides register — they do not know your
+architecture. For architecture-specific checks, start from the template brief:
 
 ```
 skills/plan-review/references/_brief-template.md
 skills/code-review/references/_brief-template.md
 ```
 
-They do **not** know your architecture — out of the box they have no real
-specialist briefs, so they have nothing to flag against. You supply that:
+To add what only your architecture can check:
 
 1. **Copy `_brief-template.md`** to one real brief per architectural concern —
    e.g. `architecture.md`, `security.md`, `performance.md`. One brief = one lens.
@@ -51,6 +52,27 @@ specialist briefs, so they have nothing to flag against. You supply that:
 3. **Update the Specialists table** in each `SKILL.md` to list your briefs and
    their run-conditions.
 4. **Update `reviews:` in the manifest** to match.
+
+### Optional: an overrides register
+
+If the same correction keeps coming up in review ("never call the payments API
+from a request handler"), record it once in an overrides register and both review
+skills enforce it. Its location, entry format and how entries are added are
+defined in one place: `skills/code-review/references/register.md`. By default it
+is `docs/overrides.md`, or declare a manifest layer `id: overrides`.
+
+### Optional manifest layers used by the newer skills
+
+- `id: implementation-plans` — where `writing-implementation-plans` puts plans
+  (default `work_tracker/implementation-plans/`).
+- `id: debates` — where `deciding-calls-by-debate` saves debates (default
+  `work_tracker/debates/`).
+- `id: design-docs` — where the design-doc skills read and write docs; its
+  optional `audience` and `conventions` keys point at the project's audience
+  model and conventions file.
+
+Declare any of these with `skill: null` and `review: null`; the skills fall back
+to the defaults when they are absent.
 
 For a full, real instantiation to copy from, see
 [`prism-case-study.md`](prism-case-study.md) — the Prism project's six design

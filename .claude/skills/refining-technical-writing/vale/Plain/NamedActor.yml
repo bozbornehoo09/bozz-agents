@@ -1,0 +1,17 @@
+# general-rules.md "No names": a role or a team written in as the one who acts, decides or waives.
+# Only shapes a regular expression can tell apart from a system name are matched. A bare personal
+# name ("<name> will ship it") is left to the reading pass; TODO(<name>) and @author in code
+# comments are extract_comments.py's job. "@<handle>" is allowed because it addresses a chat
+# reader. "PM" counts only right after "the", so a clock time such as "2 PM" never matches.
+extends: existence
+message: "'%s' hands the work to someone (general-rules.md \"No names\"). Describe the step and what it needs; keep a name only where the text routes work to a person."
+nonword: true
+ignorecase: false
+level: warning
+tokens:
+  # <actor> <commitment verb>: "infra team to", "the on-call will", "owner must"
+  - '\b(?:[Tt]eam|[Oo]wner|[Oo]n-?call|[Tt]he\s+(?:PM|lead|manager))\s+(?:will|must|should|to|needs\s+to|is\s+going\s+to)\b'
+  # waiting on, or requiring, a role: "pending: on-call", "needs the owner"
+  - '\b(?:pending:\s*|needs\s+(?:the\s+)?)(?:on-?call|owner)\b'
+  # an exemption granted by somebody
+  - '\b[Ww]aived\s+by\b'

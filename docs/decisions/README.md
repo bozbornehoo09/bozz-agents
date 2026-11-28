@@ -15,3 +15,6 @@ recorded below as they land.
 | [ADR-0001](0001-bozz-agents-maintains-own-context.md) | bozz-agents maintains its own context | Accepted |
 | [ADR-0002](0002-host-neutral-skills-generated-trees.md) | Host-neutral skills, generated per-host trees, packaging by manifest | Accepted |
 | [ADR-0003](0003-file-scoped-cross-agent-review-lifecycle.md) | File-scoped cross-agent review lifecycle with independent finding adjudication | Accepted |
+| [ADR-0004](0004-built-in-lenses-and-plan-build-family.md) | Built-in generic review lenses and a plan → build → PR authoring family | Accepted |
+| [ADR-0005](0005-shipped-manager-worker-agents.md) | Ship manager/worker agent definitions alongside the skills | Accepted |
+| [ADR-0006](0006-cross-review-content-pins-and-relayed-reviewers.md) | Cross-review content pins, stale-baseline reviews and relayed reviewers (extends ADR-0003) | Accepted |

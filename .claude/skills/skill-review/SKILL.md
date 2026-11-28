@@ -32,6 +32,8 @@ Skills follow the [Agent Skills](https://agentskills.io/specification) open stan
 - `<skills-dir>/*/scripts/**`, `<skills-dir>/*/assets/**` — executable code and static assets; not markdown contracts.
 - Rule files, ADRs, strategy, architecture, orientation (`docs/**`, `.claude/rules/**`, `CLAUDE.md`, `AGENTS.md`) — `docs-review` reviews these.
 
+**Measurement input.** The orchestrator also runs this skill's bundled `scripts/measure_skills.py` (standard-library Python 3) and hands its output to every specialist. The script is not reviewed; its table and limit lines are evidence that `structural-integrity` and `scope-focus` may cite.
+
 If the user points at a file not covered, stop and ask. Do not guess scope.
 
 ## Specialists
@@ -54,8 +56,9 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
 3. **Cross-reference findings require quotes from BOTH sides** with both file:line citations.
 4. **"Missing" findings require quoting the surrounding context** where the missing element should appear, so the user can verify the absence.
 5. **An empty report is the correct output when no findings exist.** Do not invent findings.
-6. **Out-of-scope corpus is invisible.** Specialists do not read or cite anything outside the skills directory's `SKILL.md` and `references/*.md` files.
+6. **Out-of-scope corpus is invisible.** Specialists do not read or cite anything outside the skills directory's `SKILL.md` and `references/*.md` files. The one exception is the measurement output the orchestrator hands them.
 7. **Specialists must read every in-scope file before producing findings.** No grep-and-go.
+8. **Findings built on the measurement output** — size, shared passages, description overlap, branch sections — cite the measured file as `<file>:1` and copy, exactly, the table row or the `OVER` / `PAGE` / `CANDIDATE` line they rest on.
 
 ## Do not flag (negative scope)
 
@@ -67,11 +70,11 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
 
 ## Orchestration
 
-1. **Verify corpus.** List every `<skills-dir>/*/SKILL.md` and every `<skills-dir>/*/references/*.md`. If the directory is empty or missing, stop and ask.
+1. **Verify corpus and measure.** List every `<skills-dir>/*/SKILL.md` and every `<skills-dir>/*/references/*.md`. If the directory is empty or missing, stop and ask. Then run `python3 -I <this skill's directory>/scripts/measure_skills.py <skills-dir>` (add `--skill <name>` per skill under review on a targeted pass; it still compares against every skill) and keep its output for every specialist. If Python is unavailable, say so in the report and continue without it.
 2. **Build the skill-brief map.** For each `SKILL.md`, extract referenced brief paths. Compute:
-   - Briefs referenced by their owning SKILL.md → live.
-   - Briefs present in a skill's `references/` but not referenced by its SKILL.md → orphans (`structural-integrity` finding, FIX severity).
-   - Briefs referenced by a SKILL.md but not present under that skill's `references/` → broken references (`structural-integrity` finding, BLOCK severity).
+   - Briefs referenced by their owning SKILL.md, or by a sibling SKILL.md through `../<skill>/references/<brief>.md` → live.
+   - Briefs present in a skill's `references/` but referenced by no SKILL.md → orphans (`structural-integrity` finding, FIX severity).
+   - Briefs referenced by a SKILL.md but not present at the referenced path (that skill's `references/`, or the sibling's for a relative-path dispatch) → broken references (`structural-integrity` finding, BLOCK severity).
 3. **Spawn all four specialists in parallel** using the host agent's subagent
    or delegation facility. Use one parallel fan-out. Each specialist gets:
    ```
@@ -80,6 +83,8 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
    {full file list}
    Skill-brief map (built by orchestrator):
    {map of skill → referenced briefs, plus orphan list and broken-ref list}
+   Measurement output (scripts/measure_skills.py):
+   {its tables and OVER / PAGE / CANDIDATE lines}
    Anti-hallucination contract: every finding requires a verbatim quote
    AND a file:line citation. Cross-reference findings require both sides.
    "Missing" findings require quoting the surrounding context where the
@@ -88,19 +93,19 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
    Out-of-scope corpus is invisible; do not read or cite it.
    Use the output format in the brief.
    ```
-4. **Verify BLOCK findings.** Re-read the cited line for every BLOCK finding; confirm the quote matches byte-for-byte. Drop any with hallucinated quotes.
+4. **Verify BLOCK findings.** For each BLOCK, re-read what it cites — the file line, or for a finding built on measurements, the output kept in step 1 — and confirm the quote matches byte-for-byte. Drop any with hallucinated quotes.
 5. **Spot-check FIX/SUGGEST findings.** Verify at least 3 random findings per severity. Drop mismatches.
 6. **Aggregate.**
    - Add orchestrator-detected findings (orphan briefs, broken references) to `structural-integrity` group.
    - Group by severity (BLOCK / FIX / SUGGEST).
    - Within severity, group by specialist dimension.
    - Deduplicate cross-specialist findings on the same line.
-7. **End with a one-line verdict.** `READY` (no BLOCKs), `REVISE` (BLOCKs present), or `READY-WITH-FIXES` (only FIX/SUGGEST).
+7. **End with a one-line verdict.** REVISE if any BLOCK; READY-WITH-FIXES if no BLOCK and at least one FIX; READY otherwise.
 
 ## Severity criteria
 
 - **BLOCK** — A skill that, if run, would produce broken or misleading output. References a non-existent brief; has invalid required frontmatter (missing `name`/`description`, or `name` that won't validate); has no anti-hallucination contract; specialists with overlapping scopes that produce contradictory findings; severity vocabulary that breaks aggregation.
-- **FIX** — Quality issue that is mechanically resolvable. Orphan brief, bloated section, missing concrete example, inconsistent severity label, missing required structural anchor.
+- **FIX** — Quality issue that is mechanically resolvable. Orphan brief, bloated section, a measured limit crossed (`OVER` or `PAGE`), missing concrete example, inconsistent severity label, missing required structural anchor.
 - **SUGGEST** — Improvement that doesn't violate a convention. Better example, clearer phrasing, tighter scope language.
 
 ## Output template

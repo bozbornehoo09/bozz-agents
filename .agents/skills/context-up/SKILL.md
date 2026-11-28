@@ -12,6 +12,16 @@ everything defeats the layering and burns the context window.
 
 Read-only: this skill never modifies files.
 
+## Scope
+
+Covers: resolving the layer map, loading the temporal core (latest
+work-tracker entry, work plan's next-up and blocked items), and expanding
+into the specific layer docs the session's task needs.
+
+Does not cover: editing any layer (the `update-*` skills do that), reviewing
+docs for consistency (`docs-review`), or re-reading the auto-loaded
+orientation file.
+
 ## Procedure
 
 ### Step 1 — Resolve the layer map
@@ -42,6 +52,17 @@ Read, in full — these are small by convention:
    statuses ONLY. Note any **Proposed** ADRs awaiting sign-off; read a
    Proposed ADR in full only if signing off looks like this session's
    work.
+4. Open cross-reviews, if `.agent-bridge/active/` exists — file names
+   only, plus each one's last event from the cross-review helper's
+   read-only `review_bridge.py status --file <path>`. Do not read the
+   transcripts; an open review is a pending item, not context to load.
+
+**Freshness check.** Compare today's date (from the system clock,
+`date +%Y-%m-%d` — never reasoned) with the latest tracker entry's date
+and the work plan's "As of" date. If either is more than 7 days old,
+report it as possibly stale and verify current state (git log, the
+files themselves) before relying on it. Do not edit anything to fix it;
+`update-context` owns that.
 
 Do NOT read individual Accepted ADRs, the architecture design, strategy
 docs, rules, or research at this stage.
@@ -77,7 +98,10 @@ Print a tight summary (≤10 lines):
 - **Project + phase:** one line.
 - **Last session:** 1–2 lines from the latest tracker entry.
 - **Next up:** the plan's top unchecked item (or the user's stated task).
-- **Blockers / pending:** open blockers, Proposed ADRs awaiting sign-off.
+- **Blockers / pending:** open blockers, Proposed ADRs awaiting sign-off,
+  open cross-reviews (ID + state + whose turn).
+- **Freshness:** only when the check fired — e.g. "tracker last entry
+  2026-07-19 (12 days) — may be stale; verified against git log."
 - **Loaded:** the files/sections actually read.
 - **Skipped (by design):** the layers deliberately not loaded, e.g.
   "architecture §§1–8, strategy, research — say the word to pull any in."
@@ -99,3 +123,6 @@ Then: "Context loaded. Ready to continue."
   weeks, or the longer-term backlog (`work_tracker/backlog.md`) unless
   the task is specifically about them — the backlog is a parking lot,
   not part of resuming.
+- **History is not current state.** Files under any `archive/` folder
+  (compacted layer history, archived cross-review transcripts) never
+  enter the load; cite them only when the task is about that history.

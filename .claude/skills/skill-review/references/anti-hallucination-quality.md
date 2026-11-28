@@ -20,8 +20,8 @@ A complete anti-hallucination contract has **all five** of these guards. Missing
 1. **Verbatim quote requirement.** Every specialist finding must include a verbatim quote from the source, formatted as a markdown blockquote. Paraphrases are explicitly invalid.
 2. **File:line citation requirement.** Every finding must cite a specific file and line number. No line number → finding invalid.
 3. **Cross-reference symmetry.** Findings of the form "A contradicts B" must include verbatim quotes and line numbers from BOTH sides.
-4. **Empty-report validity.** When present, the guard must explicitly state that inventing findings is prohibited — not merely encourage accuracy or say "try to avoid."
-5. **Negative scope ("do not flag" list).** When present, the enumeration must be specific and binding — concrete out-of-scope concerns named, not vague categories that leave room for drift.
+4. **Empty-report validity.** The contract must state that an empty report is correct and that inventing findings is prohibited — not merely encourage accuracy or say "try to avoid."
+5. **Negative scope ("do not flag" list).** The contract must name concrete out-of-scope concerns in binding terms, not vague categories that leave room for drift.
 
 ## Check for (in order of importance)
 

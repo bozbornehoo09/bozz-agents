@@ -23,6 +23,14 @@ Require:
 If the review event is clean, verify the event targets the current pinned head
 and return `NO_FINDINGS_CONFIRMED`; do not invent work.
 
+If the review's first body line is `BASELINE: STALE`, adjudicate nothing:
+confirm the mismatch (re-run the pin check), return `NO_CHANGES` with
+`Stale baseline — re-pin and re-request`, and never let it support `CLOSE`.
+
+A relayed out-of-band review (first body line `RELAYED:`) is folded exactly
+like any other; the relay's verbatim quote of the reviewer's output is the
+finding text.
+
 ## Workflow
 
 1. **Freeze the evidence.** Capture the reviewed revision, complete diff, file
@@ -32,7 +40,11 @@ and return `NO_FINDINGS_CONFIRMED`; do not invent work.
    finding, pinned artifact, and authoritative sources—but not the
    implementer’s planned response, desired conclusion, or proposed fix.
    Explicitly prohibit recursive delegation and bind the verifier to the
-   anti-hallucination contract below.
+   anti-hallucination contract below. Before delegating, do the cheap
+   mechanical check yourself: open each cited `file:line` in the pinned bytes.
+   A quote that appears nowhere in the cited file is `REJECTED` with the line's
+   actual text (or the fact that the line or file does not exist) as the
+   counter-evidence; still record it in the report.
 3. **Adjudicate.** Re-read the verifier’s citations yourself. Classify every
    finding:
    - `CONFIRMED` — reproduced or directly proven against exact sources;
@@ -45,6 +57,15 @@ and return `NO_FINDINGS_CONFIRMED`; do not invent work.
    an authoritative content layer with a declared owning `update-*` skill,
    invoke that owner to make the edit; adjudication does not bypass the
    project's single-writer contract.
+   - **Sibling instances.** For a confirmed defect, search the reviewed scope
+     yourself for other instances of the same problem and fix every hit in
+     this fold; name the search and its hits in the report. Never fix one
+     instance of a demonstrated multi-file problem.
+   - **Recorded decisions win.** Before applying a fix, check it against the
+     Accepted ADRs and other recorded decisions it touches. A fix that would
+     reverse or reinterpret one is not foldable here: return `BLOCKED` naming
+     the decision and the question for the user (a new ADR goes through
+     `update-decisions`).
 5. **Verify the fold.** Run focused reproductions first, then proportionate
    tests/static checks. Confirm each original finding is resolved in the new
    diff and that rejected/deferred items were not silently changed.
@@ -84,6 +105,9 @@ Resulting revision: <sha or unchanged>
   Destination: <durable path/id>
   Trigger: <when it returns>
 
+Sibling search: <command/pattern and hits, per confirmed finding>
+Re-adjudicate next round: <REJECTED BLOCK/FIX ids, or none>
+
 Fold outcome: FOLDED | NO_CHANGES | BLOCKED
 ```
 
@@ -96,8 +120,9 @@ Never guess merely to keep the review loop moving.
 ## Pause-for-confirmation rules
 
 Pause before editing when the reviewed revision moved, evidence conflicts, the
-fix would broaden authorized scope, safe verification is unavailable, or a
-deferral is not explicitly permitted by gate policy. Return a `BLOCKED` fold
+fix would broaden authorized scope or change a recorded decision, safe
+verification is unavailable, or a deferral is not explicitly permitted by gate
+policy. Return a `BLOCKED` fold
 report that names the missing decision or evidence; do not change bridge state
 or invent a disposition.
 

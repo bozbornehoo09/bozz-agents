@@ -1,0 +1,7 @@
+# general-rules.md "Sentence length": more than 30 words makes a sentence a split candidate.
+extends: occurrence
+message: "More than 30 words in one sentence (general-rules.md, Sentence length). Split it only if every clause is kept."
+level: suggestion
+scope: sentence
+max: 30
+token: '\b(\w+)\b'
