@@ -80,7 +80,9 @@ bozz-agents/
 │   ├── cross-reviewer/          # independent review + adaptive polling
 │   └── fold-review-findings/    # impartial adjudication before edits
 ├── agents/                  # manager/worker agent definitions (Claude Code)
-│   └── shared/              #   worker contract, owner rules, shell deny lists
+│   └── shared/              #   worker contract, owner rules, shell deny lists,
+│                            #   reference/ (rules read on trigger), scripts/
+├── hooks/                   # size-cap hook (self-gated; ADR-0007)
 ├── config/
 │   └── context-manifest.example.yaml   # the one file you customize
 ├── docs/                    # concepts.md, customizing.md, agents.md, decisions/

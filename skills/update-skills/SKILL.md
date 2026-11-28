@@ -31,6 +31,8 @@ resolved here.
 
 ## Scope
 
+Read the layer through `context-up/scripts/load_context.py`, headings and grep, never whole (`update-context` "Reading the layers").
+
 In scope:
 - `<the skills directory>/*/SKILL.md` — skill definitions (YAML
   frontmatter + body).

@@ -18,6 +18,8 @@ lands, its corresponding open question is resolved) and **upstream of**
 
 ## Scope
 
+Read the layer through `context-up/scripts/load_context.py`, headings and grep, never whole (`update-context` "Reading the layers").
+
 In scope:
 - `docs/open_questions.md`
 

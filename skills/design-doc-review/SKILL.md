@@ -100,17 +100,18 @@ The orchestrator **drops** any finding that breaks these:
 5. **Fan out in one parallel batch** through the host's subagent or delegation facility:
    one subagent per lens that runs, plus one reader per seat the cold-read panel needs.
    Each lens subagent gets the doc's real path and the hash, its brief path(s), this
-   contract, and the doc's audience notes (or the fact that they are missing). Verify also
-   gets the claim list, plus the figure references when the doc has figures; give it a
-   fresh context, separate from whoever wrote the doc.
+   contract, the doc's audience notes (or the fact that they are missing), and the
+   instruction to end with the line `COUNTS: BLOCK <n> FIX <n> SUGGEST <n>`, an empty
+   report too. Verify also gets the claim list, plus the figure references when the doc
+   has figures; give it a fresh context, separate from whoever wrote the doc.
    - **Launch the cold readers yourself**, as direct children of this run, per
      `zero-context-gate.md`. Do not route them through a specialist: many hosts do not let
      a subagent start its own subagents. Each reader is cast from the doc's **Readers**
      row verbatim.
    - **Size each dispatch.** If a lens's files exceed about a third of a subagent's
      context window (bytes ÷ 4 ≈ tokens), split it into parts by file group, each part
-     naming its files and answering "out of scope — cannot evaluate" when the other side
-     of a finding lies in another part. List the parts on the `Specialists run:` line.
+     naming its files, and finish it with a pair call, as
+     `../skill-review/references/review-completeness.md` section 2 says.
    - **Failures.** On rate-limit or overload errors, re-send the failed calls at half the
      parallelism, halving again while the errors continue, down to one at a time; a call
      that still fails counts as failed. Order within the fan-out never changes the
@@ -123,11 +124,15 @@ The orchestrator **drops** any finding that breaks these:
    or paraphrased quote on either side, silently.
 7. **Spot-check FIX and SUGGEST**: at least three per severity. Drop mismatches.
 8. **Aggregate** by severity, then lens. Merge a line raised by two lenses into one
-   finding carrying both tags.
+   finding carrying both tags. Name any lens that failed or came back unfinished in the
+   `failed:` field of `Specialists run:`.
 9. **Verdict.**
    - REVISE if any BLOCK; READY-WITH-FIXES if no BLOCK and at least one FIX; READY
      otherwise.
    - A cold-read gate that FAILED or is INCOMPLETE counts as a BLOCK (see Severity).
+   - An unfinished lens (failed, no `COUNTS:` line, or a required read or check not
+     done) makes it REVISE (`review-completeness.md` section 1). Cold readers are judged
+     by the gate's own rules instead.
    - **STALE pre-empts a verdict.** Report it, discard the round, rerun; never map it to
      `REVISE`, which would judge a doc this round did not actually review.
    - A reader whose tool log shows it opened another file is **CONTAMINATED**, not STALE:
@@ -172,7 +177,7 @@ The block below shows the format only; the doc and findings are invented.
 # Design Doc Review: docs/design/webhook-delivery-hld.md
 
 Doc: docs/design/webhook-delivery-hld.md (HLD)
-Specialists run: tone (tone-rubric + structure-rubric), cold-read (2 readers), audience-and-length (audience-and-purpose + length-budget), verify (14 claims)
+Specialists run: tone (tone-rubric + structure-rubric), cold-read (2 readers), audience-and-length (audience-and-purpose + length-budget), verify (14 claims); failed: none
 Measured: body 2,910 words vs HLD ceiling 2,500 (over by 410); median sentence 13; 3.8% over 30 words
 Cold-read gate: PASS (readers: 2, personas: platform engineer, security reviewer)
 

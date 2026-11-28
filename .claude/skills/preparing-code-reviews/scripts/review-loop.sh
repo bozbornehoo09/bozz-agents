@@ -12,12 +12,21 @@
 #   defense    one session that keeps or concedes each finding, lists the
 #              survivors and ends with code-review's Verdict line (3-final.md)
 #
-# stderr of each session lands in <output>.err. On success the script prints
-# the COUNTS and Verdict lines of 3-final.md.
+# Every attempt of a session is kept beside its output as <output>.<n>.out
+# (the reviewer's stdout; for the default reviewer, the JSON result of
+# `claude -p --output-format json`) and <output>.<n>.err, failed attempts and
+# retries included; <output>.err collects all of them. When the loop ends,
+# for any reason after its inputs are validated, loop_usage.py totals the
+# attempts into <loop-dir>/usage.json (tokens per model, estimated cost,
+# turns) and prints one USAGE line, last. There is no spend or turn cap: a
+# capped review would only have to be run again. On success the USAGE line
+# follows the COUNTS and Verdict lines of 3-final.md.
 #
 # Retries: a session that exits non-zero, or whose output lacks its expected
 # closing line, gets exactly one more attempt after REVIEW_RETRY_PAUSE seconds
-# (default 30). Exit status: 0 the loop finished; 1 a session failed on its
+# (default 30). With the default reviewer, when the failed attempt reports
+# that its model is unavailable, the retry runs on REVIEW_FALLBACK_MODEL
+# (default: opus). Exit status: 0 the loop finished; 1 a session failed on its
 # retry; 2 an argument or input is missing or invalid.
 #
 # Optional environment:
@@ -25,7 +34,11 @@
 #                    passed as its final argument; its stdout is the result.
 #                    e.g. REVIEW_CMD="codex exec --sandbox read-only".
 #                    Default: `claude -p` with read-only tools, given access to
-#                    only the directories this loop needs.
+#                    only the directories this loop needs. Usage is recorded
+#                    only for the default; other commands' attempts are kept
+#                    and counted, marked as without telemetry.
+#   REVIEW_FALLBACK_MODEL  model for the retry of a default-reviewer session
+#                    whose model was unavailable (default: opus).
 #   REVIEW_BRIEFS    brief files to use, space-separated. Default: the
 #                    code-review skill's references/lens-*.md; if there are
 #                    none, every references/*.md except templates (_*.md) and
@@ -49,6 +62,8 @@ CR_DIR="${CODE_REVIEW_DIR:-$SELF_DIR/../../code-review}"
 [ -f "$CR_DIR/SKILL.md" ] || die 2 "not found: $CR_DIR/SKILL.md"
 CR_DIR="$(cd "$CR_DIR" && pwd)"
 CR_SKILL="$CR_DIR/SKILL.md"
+USAGE_PY="$SELF_DIR/loop_usage.py"
+[ -f "$USAGE_PY" ] || die 2 "not found: $USAGE_PY"
 
 BRIEFS=()
 if [ -n "${REVIEW_BRIEFS:-}" ]; then
@@ -85,8 +100,10 @@ git -C "$REPO" rev-parse --verify --quiet "$BASE^{commit}" >/dev/null || die 2 "
 mkdir -p "$LOOP_DIR"
 
 # --- reviewer command -----------------------------------------------------
+RAW=
 if [ -n "${REVIEW_CMD:-}" ]; then
   read -r -a REVIEWER <<< "$REVIEW_CMD"
+  RAW=--raw
 else
   ACCESS=()
   grant() { local d; for d in "$@"; do ACCESS+=(--add-dir "$d"); done; }
@@ -97,7 +114,7 @@ else
            ${DECLINED_FILES[@]+"${DECLINED_FILES[@]}"} ${DECISION_FILES[@]+"${DECISION_FILES[@]}"}; do
     grant "$(dirname "$f")"
   done
-  REVIEWER=(claude -p --permission-mode dontAsk
+  REVIEWER=(claude -p --output-format json --permission-mode dontAsk
             --allowedTools Read Grep Glob
               "Bash(git -C $REPO diff:*)" "Bash(git -C $REPO show:*)" "Bash(git -C $REPO log:*)"
             "${ACCESS[@]}" --no-session-persistence)
@@ -118,18 +135,28 @@ Rules. $CR_SKILL defines the evidence contract, the BLOCK/FIX/SUGGEST severities
 # --- running sessions -----------------------------------------------------
 lens_of() { local n; n=$(basename "$1" .md); echo "${n#lens-}"; }
 
-# attempt <prompt> <out> <expected-regex> <stderr-redirect-mode>
+# attempt <prompt> <out> <expected-regex> [<reviewer option>...]
+# One reviewer run, recorded as the next free <out>.<n>.out / <out>.<n>.err.
+# The options go before the prompt, which stays the final argument.
 attempt() {
-  if [ "$4" = append ]; then "${REVIEWER[@]}" "$1" > "$2" 2>> "$2.err"
-  else "${REVIEWER[@]}" "$1" > "$2" 2> "$2.err"; fi && grep -q -E "$3" "$2"
+  local prompt=$1 out=$2 want=$3 n=1 rc; shift 3
+  while [ -e "$out.$n.out" ]; do n=$((n+1)); done
+  "${REVIEWER[@]}" "$@" "$prompt" > "$out.$n.out" 2> "$out.$n.err"; rc=$?
+  cat "$out.$n.err" >> "$out.err"
+  python3 -I "$USAGE_PY" result $RAW "$out.$n.out" "$out" || return 1
+  [ "$rc" -eq 0 ] && grep -q -E "$want" "$out"
 }
 # retry: the single second attempt; a second failure ends the loop with 1.
 retry() {
+  local opts=()
+  if [ -z "$RAW" ] && python3 -I "$USAGE_PY" unavailable "$2"; then
+    opts=(--model "${REVIEW_FALLBACK_MODEL:-opus}")
+  fi
   sleep "${REVIEW_RETRY_PAUSE:-30}"
-  attempt "$1" "$2" "$3" append && return
+  attempt "$1" "$2" "$3" ${opts[@]+"${opts[@]}"} && return
   die 1 "reviewer session failed on retry or produced no result: $2 (details in $2.err)"
 }
-session() { attempt "$1" "$2" "$3" new || retry "$1" "$2" "$3"; }
+session() { attempt "$1" "$2" "$3" || retry "$1" "$2" "$3"; }
 
 lens_prompt() {
   local lens; lens=$(lens_of "$1")
@@ -140,15 +167,14 @@ Give each finding an id of the form $lens-<n>. No findings is an acceptable resu
 # Stage 1. All lenses start together. Retries wait until every first attempt
 # has exited and then go one by one, so a rate-limited host sees one session
 # at a time and nothing is still running when the script exits.
+trap 'python3 -I "$USAGE_PY" summary "$LOOP_DIR"' EXIT
 pids=(); retry_list=()
 for b in "${BRIEFS[@]}"; do
-  out="$LOOP_DIR/1-review-$(lens_of "$b").md"
-  "${REVIEWER[@]}" "$(lens_prompt "$b")" > "$out" 2> "$out.err" &
+  attempt "$(lens_prompt "$b")" "$LOOP_DIR/1-review-$(lens_of "$b").md" '^COUNTS:' &
   pids+=($!)
 done
 for i in "${!BRIEFS[@]}"; do
-  out="$LOOP_DIR/1-review-$(lens_of "${BRIEFS[$i]}").md"
-  wait "${pids[$i]}" && grep -q '^COUNTS:' "$out" || retry_list+=("${BRIEFS[$i]}")
+  wait "${pids[$i]}" || retry_list+=("${BRIEFS[$i]}")
 done
 for b in ${retry_list[@]+"${retry_list[@]}"}; do
   retry "$(lens_prompt "$b")" "$LOOP_DIR/1-review-$(lens_of "$b").md" '^COUNTS:'

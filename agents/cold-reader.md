@@ -1,8 +1,9 @@
 ---
 name: cold-reader
-description: Zero-context reader for the legibility gate, on the faster model tier. Reads a single document (given by path, or pasted inline as a fallback) as the persona the dispatcher names or the document's declared audience, and returns an explain-back, gaps quoted verbatim with line numbers, and a TOOL LOG of every path it opened. One read-only tool. Paired with cold-reader-deep (identical prompt, deeper tier) because each gate panel needs two different models. Dispatched by design-doc-review's cold-read lens and the design-doc-write/edit gate, not run on its own.
+description: Zero-context reader for the legibility gate, faster tier. Reads one document as the named persona and returns an explain-back, gaps quoted with line numbers, and a log of every path opened. Pairs with cold-reader-deep (same prompt, deeper tier): each panel needs two models. Dispatched by design-doc-review.
 tools: Read
 model: sonnet
+omitClaudeMd: true
 ---
 
 # Cold reader

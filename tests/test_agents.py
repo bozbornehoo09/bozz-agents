@@ -20,16 +20,22 @@ CODEX = ROOT / "codex" / "agents"
 BEHAVIORS = ROOT / "tests/data/agents/manager-behaviors.json"
 
 ROLES = {
-    # role: (model tier, tools frontmatter or None for "inherit")
-    "manager": ("opus", None),
-    "architect": ("opus", None),
-    "implementer": ("sonnet", None),
-    "review-specialist": ("opus", "Read, Glob, Grep, Bash"),
-    "cold-reader": ("sonnet", "Read"),
-    "cold-reader-deep": ("opus", "Read"),
-    "artifact-verifier": ("opus", "Read, Glob, Grep, Bash, WebFetch, WebSearch"),
+    # role: (model tier, the tools it lists, the subagent types it may dispatch)
+    "manager": ("opus", {"Read", "Write", "Edit", "Glob", "Grep", "Bash", "Skill", "ToolSearch", "SendMessage"},
+                {"general-purpose"}),
+    "architect": ("opus", {"Read", "Write", "Edit", "Glob", "Grep", "Bash", "Skill", "ToolSearch", "WebFetch",
+                           "WebSearch"},
+                  {"review-specialist", "cold-reader", "cold-reader-deep", "artifact-verifier", "general-purpose"}),
+    "implementer": ("sonnet", {"Read", "Write", "Edit", "Glob", "Grep", "Bash", "Skill", "ToolSearch", "WebFetch"},
+                    {"review-specialist", "artifact-verifier"}),
+    "review-specialist": ("opus", {"Read", "Glob", "Grep", "Bash"}, set()),
+    "cold-reader": ("sonnet", {"Read"}, set()),
+    "cold-reader-deep": ("opus", {"Read"}, set()),
+    "artifact-verifier": ("opus", {"Read", "Glob", "Grep", "Bash", "WebFetch", "WebSearch"}, set()),
 }
 SESSION_ROLES = {"manager", "architect", "implementer"}
+PLUGIN = "bozz-agents"
+MAX_DESCRIPTION_WORDS = 50
 WRITE_TOOLS = {"Write", "Edit", "NotebookEdit"}
 ALLOWED_MODELS = {"opus", "sonnet", "haiku"}
 
@@ -57,11 +63,27 @@ def frontmatter(path: Path) -> tuple[dict[str, str], str]:
     if not sep:
         raise AssertionError(f"{path.name}: frontmatter not closed")
     fields = {}
+    parent = None
     for line in head.splitlines():
         key, colon, value = line.partition(":")
-        if colon:
+        if not colon:
+            continue
+        if line.startswith(" ") and parent:
+            fields[f"{parent}.{key.strip()}"] = value.strip()
+        else:
+            parent = key.strip() if not value.strip() else None
             fields[key.strip()] = value.strip()
     return fields, body
+
+
+def tool_list(value: str) -> tuple[set[str], set[str]]:
+    """Split a tools line into plain tool names and the types inside Agent(...)."""
+    agent_types: set[str] = set()
+    match = re.search(r"Agent\(([^)]*)\)", value)
+    if match:
+        agent_types = {t.strip() for t in match.group(1).split(",") if t.strip()}
+        value = value[:match.start()] + value[match.end():]
+    return {t.strip() for t in value.split(",") if t.strip()}, agent_types
 
 
 def folded(path: Path) -> str:
@@ -74,15 +96,42 @@ class AgentDefinitionTests(unittest.TestCase):
         self.assertEqual(found, set(ROLES))
 
     def test_frontmatter_name_description_model_tools(self):
-        for role, (model, tools) in ROLES.items():
+        for role, (model, tools, dispatches) in ROLES.items():
             with self.subTest(role=role):
                 fields, body = frontmatter(AGENTS / f"{role}.md")
                 self.assertEqual(fields.get("name"), role)
-                self.assertGreater(len(fields.get("description", "")), 80)
+                description = fields.get("description", "")
+                self.assertGreater(len(description), 80)
+                self.assertLessEqual(len(description.split()), MAX_DESCRIPTION_WORDS,
+                                     "every description is re-sent in each agent listing")
                 self.assertIn(fields.get("model"), ALLOWED_MODELS)
                 self.assertEqual(fields.get("model"), model)
-                self.assertEqual(fields.get("tools"), tools)
+                plain, agent_types = tool_list(fields.get("tools", ""))
+                self.assertEqual(plain, tools)
+                self.assertNotIn("Agent", plain, "Agent is listed only with the types it may dispatch")
+                # each bozz-agents type appears plugin-scoped and bare (an install without the plugin)
+                want = {t for t in dispatches if t == "general-purpose"}
+                want |= {f"{PLUGIN}:{t}" for t in dispatches if t != "general-purpose"}
+                want |= {t for t in dispatches if t != "general-purpose"}
+                self.assertEqual(agent_types, want)
                 self.assertTrue(body.strip())
+
+    def test_read_only_reviewers_start_without_claude_md(self):
+        for role in set(ROLES) - SESSION_ROLES:
+            with self.subTest(role=role):
+                self.assertEqual(frontmatter(AGENTS / f"{role}.md")[0].get("omitClaudeMd"), "true")
+
+    def test_cache_lifetimes(self):
+        # managers idle between wakes, so they keep the one-hour cache; workers call
+        # without long gaps and stay on the default five minutes
+        self.assertEqual(frontmatter(AGENTS / "manager.md")[0].get("experimental.cacheTtl"), "1h")
+        for role in set(ROLES) - {"manager"}:
+            with self.subTest(role=role):
+                self.assertNotIn("experimental.cacheTtl", frontmatter(AGENTS / f"{role}.md")[0])
+        briefs = folded(SHARED / "reference/manager/briefs.md")
+        self.assertIn("claude --bg --effort high --name <session> --agent bozz-agents:architect", briefs)
+        handoff = (SHARED / "scripts/manager-handoff.zsh").read_text(encoding="utf-8")
+        self.assertIn('{"promptCacheTtl":"1h","idleCompaction":false}', handoff)
 
     def test_no_fable_model_anywhere(self):
         for path in list(AGENTS.rglob("*")) + list(CODEX.glob("*.toml")):
@@ -90,11 +139,13 @@ class AgentDefinitionTests(unittest.TestCase):
                 with self.subTest(path=path.name):
                     self.assertNotRegex(path.read_text(encoding="utf-8").lower(), r"model\s*[:=]\s*\"?fable")
 
-    def test_subagent_roles_cannot_write(self):
+    def test_subagent_roles_cannot_write_or_dispatch(self):
         for role in set(ROLES) - SESSION_ROLES:
             with self.subTest(role=role):
-                tools = {t.strip() for t in frontmatter(AGENTS / f"{role}.md")[0]["tools"].split(",")}
-                self.assertFalse(tools & WRITE_TOOLS)
+                plain, agent_types = tool_list(frontmatter(AGENTS / f"{role}.md")[0]["tools"])
+                self.assertFalse(plain & WRITE_TOOLS)
+                self.assertFalse(agent_types)
+                self.assertNotIn("Agent", plain)
 
     def test_cold_reader_pair_shares_one_prompt_on_two_tiers(self):
         fast, fast_body = frontmatter(AGENTS / "cold-reader.md")
@@ -117,23 +168,52 @@ class AgentDefinitionTests(unittest.TestCase):
                     self.assertIn(name, text)
         manager = (AGENTS / "manager.md").read_text(encoding="utf-8")
         for name in ("worker-contract.md", "owner-talk.md", "owner-override.md",
-                     "scripts/ctx.sh", "scripts/watch.zsh"):
+                     "scripts/ctx.sh", "scripts/watch.zsh", "scripts/manager-handoff.zsh"):
             self.assertIn(name, manager)
         self.assertIn("scripts/ctxpct.sh", (SHARED / "worker-contract.md").read_text(encoding="utf-8"))
+
+    def test_every_reference_trigger_names_an_existing_file(self):
+        # the prompts name reference files by bare name behind a trigger; each must exist
+        sources = {
+            "manager": [AGENTS / "manager.md"],
+            "worker": [SHARED / "worker-contract.md", AGENTS / "architect.md", AGENTS / "implementer.md"],
+        }
+        for folder, paths in sources.items():
+            have = {p.name for p in (SHARED / "reference" / folder).glob("*.md")}
+            named = set()
+            for path in paths:
+                named |= set(re.findall(r"`(?:[\w/]*reference/%s/)?([a-z-]+\.md)`" % folder, path.read_text()))
+            named -= {"owner-talk.md", "owner-override.md", "worker-contract.md", "architect.md",
+                      "work-folder.md"} if folder == "manager" else {"owner-talk.md", "owner-override.md",
+                                                                      "worker-contract.md"}
+            with self.subTest(folder=folder):
+                self.assertTrue(named, "no reference triggers found")
+                self.assertLessEqual(named, have, f"missing: {sorted(named - have)}")
+                self.assertEqual(have - named, set(), "a reference file no prompt points at")
+
+    def test_reference_files_open_with_their_trigger(self):
+        for path in (SHARED / "reference").rglob("*.md"):
+            with self.subTest(path=path.name):
+                self.assertTrue(path.read_text(encoding="utf-8").startswith("Read this "))
 
     def test_shared_files_exist(self):
         for rel in ("worker-contract.md", "owner-talk.md", "owner-override.md", "shell_deny.py",
                     "shell-deny/destructive.json", "shell-deny/readonly.json", "claude-settings.example.json",
-                    "build_codex_roles.py", "scripts/ctx.sh", "scripts/ctxpct.sh", "scripts/watch.zsh"):
+                    "build_codex_roles.py", "scripts/ctx.sh", "scripts/ctxpct.sh", "scripts/watch.zsh",
+                    "scripts/sessions.zsh", "scripts/ctxcap.sh", "scripts/manager-handoff.zsh"):
             with self.subTest(rel=rel):
                 self.assertTrue((SHARED / rel).is_file())
 
     def test_referenced_skills_exist(self):
         existing = {p.name for p in (ROOT / "skills").iterdir() if (p / "SKILL.md").is_file()}
-        checks = [(AGENTS / f"{r}.md", names) for r, names in REFERENCED_SKILLS.items()]
-        checks.append((SHARED / "worker-contract.md", SHARED_SKILLS))
-        for path, names in checks:
-            text = path.read_text(encoding="utf-8")
+        checks = [([AGENTS / f"{r}.md"] + sorted((SHARED / "reference/manager").glob("*.md"))
+                   if r == "manager" else [AGENTS / f"{r}.md"], names)
+                  for r, names in REFERENCED_SKILLS.items()]
+        checks.append(([SHARED / "worker-contract.md", SHARED / "owner-talk.md"]
+                       + sorted((SHARED / "reference/worker").glob("*.md")), SHARED_SKILLS))
+        for paths, names in checks:
+            path = paths[0]
+            text = "".join(p.read_text(encoding="utf-8") for p in paths)
             for name in names:
                 with self.subTest(file=path.name, skill=name):
                     self.assertIn(f"`{name}`", text)
@@ -155,7 +235,7 @@ class AgentDefinitionTests(unittest.TestCase):
         self.assertIn("shell_deny.py --family destructive", hook["hooks"][0]["command"])
 
     def test_helper_scripts_parse(self):
-        for name in ("ctx.sh", "ctxpct.sh", "watch.zsh"):
+        for name in ("ctx.sh", "ctxpct.sh", "watch.zsh", "sessions.zsh", "ctxcap.sh", "manager-handoff.zsh"):
             with self.subTest(script=name):
                 try:
                     result = subprocess.run(["zsh", "-n", str(SHARED / "scripts" / name)],

@@ -13,10 +13,10 @@ roles, and thin per-host plugin/marketplace manifests.
   end-of-session orchestrator; the ten narrow `update-<layer>` skills each own
   one content layer (decisions, strategy, architecture, rules, AI tooling,
   open questions, work plan, backlog, orientation, work tracker).
-- `skills/context-up/` — the **session-start** bookend: a read-only loader that
-  resolves the layer map, loads the temporal core (latest tracker entry, work
-  plan next-up), and expands by task intent under an anti-greed contract
-  (index-first, fetch-only-cited).
+- `skills/context-up/` — the **session-start** bookend: a read-only loader whose
+  load is one capped script call (`scripts/load_context.py`: work plan next-up,
+  decisions in force, latest tracker entries, repository state), then headings
+  and grep at need under an anti-greed contract (index-first, fetch-only-cited).
 - `skills/{docs,skill,plan,code,design-doc}-review/` — the **review** family.
   Each fans out its bundled specialist briefs; `plan-review` and `code-review`
   ship built-in generic lenses and also run consumer-supplied briefs made from
@@ -31,7 +31,11 @@ roles, and thin per-host plugin/marketplace manifests.
 - `agents/` — the **manager/worker agents** (manager, architect, implementer,
   review-specialist, cold-reader, cold-reader-deep, artifact-verifier) and their
   shared contract and shell deny lists in `agents/shared/` (ADR-0005; see
-  `docs/agents.md`). `codex/agents/*.toml` are generated from them.
+  `docs/agents.md`). `codex/agents/*.toml` are generated from them. Session
+  roles hand off at a size cap through the self-gated hook in `hooks/`
+  (`agents/shared/scripts/ctxcap.sh`); the manager hands off to its own
+  successor (`manager-handoff.zsh`); rules read only on a trigger live in
+  `agents/shared/reference/` (ADR-0007). Script tests: `tests/test_agents_scripts.py`.
 - `skills/{cross-review-requester,cross-reviewer,fold-review-findings}/` — the
   file-scoped **cross-agent review lifecycle**. The requester and reviewer both
   use ETA/grace-aware polling; every completed review passes through an

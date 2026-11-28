@@ -35,6 +35,8 @@ Below, "the rule files" always means the **canonical** ones resolved here.
 
 ## Scope
 
+Read the layer through `context-up/scripts/load_context.py`, headings and grep, never whole (`update-context` "Reading the layers").
+
 In scope:
 - the per-package rule files at the canonical location resolved above
 

@@ -19,7 +19,8 @@ These are the conventions the family has adopted. Divergence is a finding.
 
 - **Severity vocabulary:** `BLOCK` / `FIX` / `SUGGEST`. Three levels, in that case. Other vocabularies (`ERROR/WARN/INFO`, `HIGH/MEDIUM/LOW`, `🔴/🟡/🟢`) are non-canonical.
 - **Verdict labels:** `READY` / `REVISE` / `READY-WITH-FIXES`. Other labels (`PASS/FAIL`, `OK/NOT OK`) are non-canonical.
-- **Verdict mapping:** REVISE if any BLOCK; READY-WITH-FIXES if no BLOCK and at least one FIX; READY otherwise. A SUGGEST-only result is `READY`.
+- **Verdict mapping:** REVISE if any BLOCK; READY-WITH-FIXES if no BLOCK and at least one FIX; READY otherwise. A SUGGEST-only result is `READY`. This holds for a finished pass; an unfinished lens makes it REVISE whatever the findings.
+- **Fan-out completeness:** defined once, in `skill-review/references/review-completeness.md`. Every skill that fans out lenses asks each lens to end with `COUNTS: BLOCK <n> FIX <n> SUGGEST <n>`, names an unfinished lens in the `failed:` field and returns REVISE for it (section 1), and finishes a split lens with a pair call (section 2), pointing to that file rather than restating it.
 - **Specialist invocation:** independent specialists run in parallel through
   the host's subagent or delegation facility. Sequential invocation breaks the
   design; the facility's product-specific name is irrelevant.
@@ -46,7 +47,9 @@ These are the conventions the family has adopted. Divergence is a finding.
 
 6. **Anti-hallucination anchor divergence.** A skill or brief using a non-canonical heading for the contract section. The text may be fine; the anchor name is the convention. **FIX**.
 
-7. **Inconsistent description tone in frontmatter.** SKILL.md `description:` fields should be one-line, imperative, and explain when to invoke. A skill whose description is multi-line, narrative, or describes what the skill *is* rather than when to use it. **SUGGEST**.
+7. **Fan-out completeness divergence.** A skill that fans out lenses but whose lens prompt lacks the `COUNTS:` end line, whose verdict rule lets a failed or unfinished lens through, or whose split rule has no pair call and no pointer to `review-completeness.md`. Quote the skill's prompt, verdict or split line and the matching line of `review-completeness.md`. **BLOCK** if a failed or unfinished lens can still yield `READY` or `READY-WITH-FIXES`; **FIX** otherwise (including a restated copy of the rules in place of the pointer).
+
+8. **Inconsistent description tone in frontmatter.** SKILL.md `description:` fields should be one-line, imperative, and explain when to invoke. A skill whose description is multi-line, narrative, or describes what the skill *is* rather than when to use it. **SUGGEST**.
 
 **Do not flag:** a missing or divergent canonical closing line in a brief is a required-section failure owned by `structural-integrity.md` — do not flag it here.
 
@@ -66,7 +69,7 @@ Finding: <one sentence>
 Diverging quote: > "<verbatim source text>"
 Canonical example at <other-file:line>:
 > "<verbatim canonical convention>"
-Convention violated: <severity-vocab | verdict-labels | verdict-mapping | output-template | invocation-pattern | brief-location | anti-hallucination-anchor | description-tone>
+Convention violated: <severity-vocab | verdict-labels | verdict-mapping | output-template | invocation-pattern | brief-location | anti-hallucination-anchor | fan-out-completeness | description-tone>
 ```
 
 Empty report is a valid result. Do not invent findings to look thorough.

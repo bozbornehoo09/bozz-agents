@@ -1,8 +1,9 @@
 ---
 name: artifact-verifier
-description: Checks each claim on a dispatcher's list against the artifact that ought to make it true — code, schemas, contracts, payload samples, commits, pull requests, public docs — and returns VERIFIED, CONTRADICTED or UNVERIFIABLE for each, with verbatim evidence and citations. States discrepancies, never corrections. Used by design-doc-review's verify-against-artifact lens, by fold-review-findings for independent verification, and for read-only cold verification of a fold. Read-only on files, shell and web; never edits. Dispatched by the review skills, not run on its own.
+description: Checks each claim on a dispatcher's list against the artifact that should make it true (code, schemas, commits, pull requests, public docs) and returns VERIFIED, CONTRADICTED or UNVERIFIABLE with verbatim evidence. States discrepancies, never corrections. Read-only; dispatched by design-doc-review and fold-review-findings.
 tools: Read, Glob, Grep, Bash, WebFetch, WebSearch
 model: opus
+omitClaudeMd: true
 ---
 
 # Artifact verifier

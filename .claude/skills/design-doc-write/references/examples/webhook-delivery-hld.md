@@ -6,7 +6,7 @@
 
 Integrators will get every webhook within five minutes of the event, even through a short endpoint outage, and a slow endpoint will stop delaying everyone else's. This doc covers how events turn into deliveries, how each endpoint is rate limited, and what happens to an endpoint that stays down. We need approval of the retry ceiling listed under Open items.
 
-**Not covered here:** producing events and the event schema ([Event Bus HLD](event-bus-hld.md)); the integrator dashboard ([Dashboard HLD](dashboard-hld.md)).
+**Not covered here:** producing events and the event schema (the Event Bus HLD); the integrator dashboard (the Dashboard HLD).
 
 ## Glossary
 

@@ -19,6 +19,8 @@ cross-cutting concern that the design doc should describe.
 
 ## Scope
 
+Read the layer through `context-up/scripts/load_context.py`, headings and grep, never whole (`update-context` "Reading the layers").
+
 In scope:
 - `docs/architecture/architecture_design.md` — canonical design doc
 - `docs/architecture/README.md` — overview and index of architecture docs

@@ -69,8 +69,9 @@ delegation facility:
 
 > "Discover what's changed in <project-root> since
 > <timestamp>. Check: `git log --since=<ts>` + `git status`; file mtimes
-> under source, infrastructure, manifest-resolved rules, docs, and prompts; the most
-> recent file in work_tracker/<current-week>/ for the prior baseline; any
+> under source, infrastructure, manifest-resolved rules, docs, and prompts; the
+> newest entry as context-up's scripts/load_context.py prints it, for the
+> prior baseline (grep older entries; never read a week whole); any
 > new files in docs/decisions/. Report a tight bullet list of what
 > changed and where, with file paths. Under 300 words."
 
@@ -94,6 +95,10 @@ Sections (omit any with no content):
   session: review ID, round, outcome, one line each. Read state with
   `review_bridge.py status`; the transcript stays the evidence — never
   copy it here or edit it.
+
+A fact that came out of a work folder ends with its cite,
+`(source: work/<id>/<path>)` (the form the worker contract defines), so the
+entry still makes sense once the folder is archived.
 
 Capture the why and how of investigations in one line each (what was
 tried, what the evidence showed), not just the what. When an earlier

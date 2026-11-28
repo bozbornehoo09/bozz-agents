@@ -45,7 +45,9 @@ Four briefs. All four run on every invocation. Each lives in this skill's `refer
 | `structural-integrity.md` | Conventional structure | Missing or malformed YAML frontmatter (required `name`/`description`; `name` must be lowercase-kebab, ≤64 chars, and match the parent directory); missing required sections for the skill's family (review fan-out skills: Inputs/Corpus, Specialists, Orchestration, Output template, What this skill is NOT; single-agent authoring skills: Scope, Steps, Pause-for-confirmation rules, Style, Output format where a structured report is emitted; briefs: their equivalents); skill-references-brief integrity (every brief referenced by a SKILL.md exists under that skill's `references/`; every brief in a skill's `references/` is referenced by its SKILL.md — orphan briefs are dead weight). |
 | `anti-hallucination-quality.md` | Contract strength | Skill or brief that lacks an explicit anti-hallucination contract; contract present but missing key guards (verbatim-quote requirement, file:line citation, empty-report-is-correct, negative-scope "do not flag" list); contract guards that are aspirational ("specialists should be careful") rather than binding ("findings without a quote are dropped"). |
 | `scope-focus.md` | Single-purpose discipline | A skill doing more than one thing (review + author + transform); a brief whose "Check for" list spans multiple lenses that should be split; bloat (skill body over the spec's recommended ~500-line ceiling, or a brief well over family-norm length, without justification); overlap between briefs within a skill, or between skills. |
-| `cross-skill-consistency.md` | Family conventions | Severity vocabulary divergence (one skill uses BLOCK/FIX/SUGGEST, another uses ERROR/WARN/INFO); verdict label divergence (READY / REVISE / READY-WITH-FIXES vs. PASS / FAIL); output template structural divergence; aggregation pattern divergence. |
+| `cross-skill-consistency.md` | Family conventions | Severity vocabulary divergence (one skill uses BLOCK/FIX/SUGGEST, another uses ERROR/WARN/INFO); verdict label divergence (READY / REVISE / READY-WITH-FIXES vs. PASS / FAIL); output template structural divergence; aggregation pattern divergence; a fan-out skill not following `review-completeness.md`. |
+
+`references/review-completeness.md` is not a brief. It is the review family's one definition of what an unfinished lens and a split lens do; review skills point to it, and `cross-skill-consistency.md` checks that they follow it.
 
 ## Anti-hallucination contract (binding on every specialist)
 
@@ -76,7 +78,11 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
    - Briefs present in a skill's `references/` but referenced by no SKILL.md → orphans (`structural-integrity` finding, FIX severity).
    - Briefs referenced by a SKILL.md but not present at the referenced path (that skill's `references/`, or the sibling's for a relative-path dispatch) → broken references (`structural-integrity` finding, BLOCK severity).
 3. **Spawn all four specialists in parallel** using the host agent's subagent
-   or delegation facility. Use one parallel fan-out. Each specialist gets:
+   or delegation facility. Use one parallel fan-out. Retry a call that fails
+   on a rate limit at lower parallelism and any other failed call once. If a
+   lens's corpus will not fit one specialist's context, split it and finish
+   it with a pair call (`references/review-completeness.md` section 2). Each
+   specialist gets:
    ```
    Review the project's skills and specialist briefs against {brief_path}.
    Concrete corpus:
@@ -91,16 +97,18 @@ These rules are non-negotiable. The orchestrator **drops** any finding that viol
    missing element should appear.
    An empty report is correct when no findings exist.
    Out-of-scope corpus is invisible; do not read or cite it.
-   Use the output format in the brief.
+   Use the output format in the brief. End with the line
+   'COUNTS: BLOCK <n> FIX <n> SUGGEST <n>', an empty report too.
    ```
 4. **Verify BLOCK findings.** For each BLOCK, re-read what it cites — the file line, or for a finding built on measurements, the output kept in step 1 — and confirm the quote matches byte-for-byte. Drop any with hallucinated quotes.
 5. **Spot-check FIX/SUGGEST findings.** Verify at least 3 random findings per severity. Drop mismatches.
 6. **Aggregate.**
    - Add orchestrator-detected findings (orphan briefs, broken references) to `structural-integrity` group.
+   - Name any lens that failed or came back unfinished in the `failed:` field of `Specialists run:`.
    - Group by severity (BLOCK / FIX / SUGGEST).
    - Within severity, group by specialist dimension.
    - Deduplicate cross-specialist findings on the same line.
-7. **End with a one-line verdict.** REVISE if any BLOCK; READY-WITH-FIXES if no BLOCK and at least one FIX; READY otherwise.
+7. **End with a one-line verdict.** REVISE if any BLOCK; READY-WITH-FIXES if no BLOCK and at least one FIX; READY otherwise. An unfinished lens makes it REVISE (`references/review-completeness.md` section 1).
 
 ## Severity criteria
 
@@ -117,7 +125,7 @@ The block below illustrates the format only. `foo` and `wibble` are placeholder 
 
 Skills reviewed: <count>
 Briefs reviewed: <count>
-Specialists run: structural-integrity, anti-hallucination-quality, scope-focus, cross-skill-consistency
+Specialists run: structural-integrity, anti-hallucination-quality, scope-focus, cross-skill-consistency; failed: none
 
 ## BLOCK
 - [structural-integrity] skills/foo/SKILL.md:42

@@ -31,6 +31,8 @@ phase, it is promoted out.
 
 ## Steps
 
+Read the layer through `context-up/scripts/load_context.py`, headings and grep, never whole (`update-context` "Reading the layers").
+
 ### 1. Locate or create the backlog
 
 Default path: `work_tracker/backlog.md`. If none exists, PAUSE and

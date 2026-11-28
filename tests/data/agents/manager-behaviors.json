@@ -14,14 +14,14 @@
       "anchors": [
         {
           "file": "agents/manager.md",
-          "text": "You author nothing yourself"
+          "text": "Workers hold the pen and run their own reviews."
         },
         {
-          "file": "agents/manager.md",
+          "file": "agents/shared/reference/manager/briefs.md",
           "text": "write `BRIEF.md` there, 40 lines at most"
         },
         {
-          "file": "agents/manager.md",
+          "file": "agents/shared/reference/manager/briefs.md",
           "text": "Channel: <absolute work folder path>/channel/"
         }
       ]
@@ -37,11 +37,11 @@
       "anchors": [
         {
           "file": "agents/manager.md",
-          "text": "you never answer an ask, never offer a lean on one, and never carry an answer from one session into another"
+          "text": "you never answer one, offer a lean on one, or carry an answer from one session into another"
         },
         {
           "file": "agents/shared/worker-contract.md",
-          "text": "The manager never relays them."
+          "text": "the manager never relays them"
         }
       ]
     },
@@ -74,8 +74,8 @@
           "text": "You open, publish and merge no pull request"
         },
         {
-          "file": "agents/shared/worker-contract.md",
-          "text": "One go can cover a **batch**"
+          "file": "agents/shared/reference/worker/owner-steps.md",
+          "text": "One go can cover a batch."
         }
       ]
     },
@@ -90,7 +90,7 @@
       "anchors": [
         {
           "file": "agents/manager.md",
-          "text": "\"rewrite your STATUS\" is the one message a stale worker may get from you"
+          "text": "\"rewrite your STATUS\" is the one message it may get"
         }
       ]
     },
@@ -105,12 +105,12 @@
       "expected": "The manager stops the session through the watcher, then on stopped <id> rewrites BRIEF.md for orders-service-retry-api-2 (Read <handoff> first) and launches it, telling the owner which session is now live.",
       "anchors": [
         {
-          "file": "agents/manager.md",
-          "text": "rewrite `BRIEF.md` for the successor"
+          "file": "agents/shared/reference/manager/stopping.md",
+          "text": "Otherwise rewrite the brief, start the successor at once"
         },
         {
-          "file": "agents/manager.md",
-          "text": "Every stop goes through the watcher."
+          "file": "agents/shared/reference/manager/stopping.md",
+          "text": "Every stop goes through the watcher; never run `claude stop` yourself."
         }
       ]
     },
@@ -124,12 +124,12 @@
       "expected": "The successor starts only after the stop completes, so two sessions never fold one review.",
       "anchors": [
         {
-          "file": "agents/manager.md",
-          "text": "start the successor only after the stop completes"
+          "file": "agents/shared/reference/manager/stopping.md",
+          "text": "start the successor only on `stopped <id>`, so no review is ever folded by two sessions"
         },
         {
           "file": "agents/shared/worker-contract.md",
-          "text": "A requester holding an open cross-review never hands off on the fold"
+          "text": "a requester with an open cross-review first folds the reviews that have completed, and never hands off on the fold count"
         }
       ]
     },
@@ -143,11 +143,11 @@
       "expected": "No successor starts. The state line becomes RETIRED-BLOCKED with the handoff path and the item; a successor starts when the owner returns.",
       "anchors": [
         {
-          "file": "agents/manager.md",
+          "file": "agents/shared/reference/manager/stopping.md",
           "text": "RETIRED-BLOCKED: <handoff path>, <items>"
         },
         {
-          "file": "agents/shared/worker-contract.md",
+          "file": "agents/shared/reference/worker/unattended.md",
           "text": "Blocked: all remaining work waits on <items>"
         }
       ]
@@ -162,7 +162,7 @@
       "expected": "The manager asks the owner to set background isolation to none once and launches nothing until it is set.",
       "anchors": [
         {
-          "file": "agents/manager.md",
+          "file": "agents/shared/reference/manager/briefs.md",
           "text": "launch nothing until it is set"
         }
       ]
@@ -177,7 +177,7 @@
       "expected": "The manager sets Owner: away in every live brief, records the time, makes sure the watcher runs, and in the same turn messages the waiting worker to re-read its Owner line and continue.",
       "anchors": [
         {
-          "file": "agents/manager.md",
+          "file": "agents/shared/reference/manager/unattended.md",
           "text": "The owner is away: re-read your brief's Owner line and continue."
         }
       ]
@@ -192,8 +192,8 @@
       "expected": "The manager does not switch any brief to away; only the owner's words in the manager's own session do.",
       "anchors": [
         {
-          "file": "agents/manager.md",
-          "text": "only when the owner says *in this session* that they are leaving"
+          "file": "agents/shared/reference/manager/unattended.md",
+          "text": "It starts only when the owner says so *in this session*, never on word reported from a worker's session."
         }
       ]
     },
@@ -207,11 +207,11 @@
       "expected": "The manager sets Owner: present everywhere, starts successors for RETIRED-BLOCKED workstreams, and shows the morning report read from homes: worker lines, incidents, then What to prioritize with debate-decided and parked calls since the away time.",
       "anchors": [
         {
-          "file": "agents/manager.md",
+          "file": "agents/shared/reference/manager/unattended.md",
           "text": "morning report"
         },
         {
-          "file": "agents/manager.md",
+          "file": "agents/shared/reference/manager/unattended.md",
           "text": "Clear `Incidents` after it."
         }
       ]
@@ -227,7 +227,7 @@
       "expected": "Two implementation workstreams, one implementer per checkout, each brief carrying the build command and the plan path.",
       "anchors": [
         {
-          "file": "agents/manager.md",
+          "file": "agents/shared/reference/manager/briefs.md",
           "text": "one implementer per checkout, never two"
         }
       ]
@@ -242,7 +242,7 @@
       "expected": "The manager tells the owner before launching that the id-library plan has no real-system checks.",
       "anchors": [
         {
-          "file": "agents/manager.md",
+          "file": "agents/shared/reference/manager/briefs.md",
           "text": "if one does not, tell the owner before launching"
         }
       ]
@@ -258,11 +258,11 @@
       "expected": "The manager checks the commit is on the brief branch, runs the brief's build command, checks the Plan line says the plan closed with no BLOCK, and checks each step has evidence, pending or waived. A mismatch becomes an open owner item; it fixes nothing itself.",
       "anchors": [
         {
-          "file": "agents/manager.md",
+          "file": "agents/shared/reference/manager/stopping.md",
           "text": "the brief's build command passes"
         },
         {
-          "file": "agents/manager.md",
+          "file": "agents/shared/reference/manager/stopping.md",
           "text": "Never fix it yourself."
         }
       ]
@@ -277,12 +277,12 @@
       "expected": "The manager moves the folder to work/archive/ and commits it by explicit path, then starts the next workstream.",
       "anchors": [
         {
-          "file": "agents/manager.md",
+          "file": "agents/shared/reference/manager/stopping.md",
           "text": "`git mv` the folder to"
         },
         {
-          "file": "agents/manager.md",
-          "text": "Only a `DONE` closes a folder"
+          "file": "agents/shared/reference/manager/stopping.md",
+          "text": "`DONE` is the only state that closes one"
         }
       ]
     },
@@ -296,12 +296,12 @@
       "expected": "The manager writes channel/MSG-<n>.md (point first) and delivers it with SendMessage whose first line is 'Read your channel: <path>'.",
       "anchors": [
         {
-          "file": "agents/manager.md",
+          "file": "agents/shared/reference/manager/messaging.md",
           "text": "Read your channel: <MSG path>"
         },
         {
           "file": "agents/shared/worker-contract.md",
-          "text": "At the start and end of every turn, read every `MSG-*.md`"
+          "text": "In the first shell call of each turn, list your channel"
         }
       ]
     },
@@ -315,11 +315,11 @@
       "expected": "The manager never stops or resumes a worker to deliver a message; it marks the worker paste and gives the owner the item to type 'read your channel' in that session.",
       "anchors": [
         {
-          "file": "agents/manager.md",
+          "file": "agents/shared/reference/manager/messaging.md",
           "text": "Never stop and resume a worker to deliver a message"
         },
         {
-          "file": "agents/manager.md",
+          "file": "agents/shared/reference/manager/messaging.md",
           "text": "type \"read your channel\" — open <session>"
         }
       ]
@@ -334,11 +334,11 @@
       "expected": "This touches no owner decision, so the manager writes and commits DECISION-<n>.md in the folder of the worker that changes, with file:line evidence, messages both workers, adds an owner item marked 'decided by manager, owner to review', and tells the owner in one line.",
       "anchors": [
         {
-          "file": "agents/manager.md",
+          "file": "agents/shared/reference/manager/messaging.md",
           "text": "Calls between workers"
         },
         {
-          "file": "agents/manager.md",
+          "file": "agents/shared/reference/manager/messaging.md",
           "text": "decided by manager, owner to review"
         }
       ]
@@ -353,7 +353,7 @@
       "expected": "That is an owner call: the manager writes no DECISION and puts the ask under What to prioritize with the session to answer in.",
       "anchors": [
         {
-          "file": "agents/manager.md",
+          "file": "agents/shared/reference/manager/messaging.md",
           "text": "Never write a DECISION that states, implies or applies an owner decision or lean"
         }
       ]
@@ -364,16 +364,16 @@
       "roles": [
         "manager"
       ],
-      "input": "The watcher woke with 'ctx 4a1b2c3d 70%+' and 'ctx 9e8f7a6b 80%+'. Neither worker has a ctx-msg mark.",
-      "expected": "Each worker gets one context message for its step and its ctx-msg mark is set in the same turn, so a later wake does not resend it.",
+      "input": "The watcher woke with 'ctx 4a1b2c3d over 350k' and 'ctx 9e8f7a6b over 350k'. Neither worker has a ctx-msg mark.",
+      "expected": "Each worker gets one message to hand off by its contract's Handoff, and its ctx-msg mark is set in the same turn, so a later wake does not resend it; the mark clears when the line leaves the diff.",
       "anchors": [
         {
-          "file": "agents/manager.md",
-          "text": "Send each step once"
+          "file": "agents/shared/reference/manager/messaging.md",
+          "text": "send no second one while the mark stands"
         },
         {
           "file": "agents/shared/worker-contract.md",
-          "text": "At 80%, hand off now."
+          "text": "A manager message about your context means you are past the cap: hand off."
         }
       ]
     },
@@ -387,8 +387,8 @@
       "expected": "The manager clears the stopping mark, puts the id back in -i, re-arms, and acts on the worker's next fresh STATUS.",
       "anchors": [
         {
-          "file": "agents/manager.md",
-          "text": "the worker went back to work"
+          "file": "agents/shared/reference/manager/stopping.md",
+          "text": "means the worker went back to work"
         }
       ]
     },
@@ -403,7 +403,7 @@
       "anchors": [
         {
           "file": "agents/manager.md",
-          "text": "never delete a session"
+          "text": "Never delete a session"
         }
       ]
     },
@@ -447,7 +447,7 @@
       "expected": "The manager converts the time to UTC, records 'scheduled <UTC time>' on the state line, sets a background timer, and at the time starts a fresh worker for it.",
       "anchors": [
         {
-          "file": "agents/manager.md",
+          "file": "agents/shared/reference/manager/scheduled.md",
           "text": "scheduled <UTC time>"
         }
       ]
@@ -462,8 +462,8 @@
       "expected": "The manager starts nothing new, messages the WORKING worker to hand off with update-context and its closeout, waits for fresh HANDOFF-READY or DONE from both, stops both through the watcher, then writes and commits NEXT-SESSION-PROMPT.md with MANAGER-STATE.md.",
       "anchors": [
         {
-          "file": "agents/manager.md",
-          "text": "Build `NEXT-SESSION-PROMPT.md` out of the state file"
+          "file": "agents/shared/reference/manager/end-of-session.md",
+          "text": "Build it from the state file"
         }
       ]
     },
@@ -477,7 +477,7 @@
       "expected": "The manager reports the count of the other folders in one line, closes those whose STATUS says DONE, and gives each remaining one owner item, written once.",
       "anchors": [
         {
-          "file": "agents/manager.md",
+          "file": "agents/shared/reference/manager/session-start.md",
           "text": "report the count in one line"
         }
       ]
@@ -492,12 +492,12 @@
       "expected": "The manager shows the lead, a prerequisite graph, and one table per PR series headed by its purpose line, with INDEPENDENT / NEXT UP in Depends on, and never invents a grouping.",
       "anchors": [
         {
-          "file": "agents/manager.md",
-          "text": "Never invent a grouping."
+          "file": "agents/shared/reference/manager/dashboard.md",
+          "text": "Never invent a grouping"
         },
         {
-          "file": "agents/manager.md",
-          "text": "`INDEPENDENT` when every source was read"
+          "file": "agents/shared/reference/manager/dashboard.md",
+          "text": "`INDEPENDENT` when every source for it was read"
         }
       ]
     },
@@ -511,8 +511,8 @@
       "expected": "That row shows 'unread', never a guess.",
       "anchors": [
         {
-          "file": "agents/manager.md",
-          "text": "A read that failed shows `unread`, never a guess."
+          "file": "agents/shared/reference/manager/dashboard.md",
+          "text": "A read that failed shows `unread`, never a guess"
         }
       ]
     },
@@ -527,7 +527,7 @@
       "anchors": [
         {
           "file": "agents/manager.md",
-          "text": "it is not an ask of the owner"
+          "text": "it is never an ask of the owner"
         }
       ]
     },
@@ -541,8 +541,8 @@
       "expected": "The manager runs in paste mode: it prints each brief path and the command for the owner to start the worker in a new terminal, and every message is delivered by the worker reading its channel.",
       "anchors": [
         {
-          "file": "agents/manager.md",
-          "text": "you are in *paste mode*"
+          "file": "agents/shared/reference/manager/paste-mode.md",
+          "text": "Print the brief path and a command for the owner to run in a fresh terminal"
         }
       ]
     },
@@ -556,7 +556,7 @@
       "expected": "The step stops as a deviation and becomes an owner item; the implementer does not run a debate and carries on with what the deviation does not block.",
       "anchors": [
         {
-          "file": "agents/shared/worker-contract.md",
+          "file": "agents/shared/reference/worker/unattended.md",
           "text": "An implementer never debates"
         }
       ]
@@ -568,10 +568,10 @@
         "architect"
       ],
       "input": "An architect needs to edit a section another live worker's STATUS names in its Doing now line.",
-      "expected": "It reports WAITING-ON-MANAGER naming the other session, file and section, polls every 60 seconds, and ends its turn after 30 minutes; it never lists the block as an owner item.",
+      "expected": "It reports WAITING-ON-MANAGER naming the other session, file and section and ends its turn without polling; the manager's message that the block has cleared starts its next turn. It never lists the block as an owner item.",
       "anchors": [
         {
-          "file": "agents/shared/worker-contract.md",
+          "file": "agents/shared/reference/worker/sibling-edits.md",
           "text": "A block by a sibling is never an owner item"
         }
       ]
@@ -603,12 +603,270 @@
         "architect",
         "implementer"
       ],
-      "input": "A worker reports progress and has one open question it asked two messages ago.",
-      "expected": "The reply leads with the result, then progress, and ends with the open question restated in full.",
+      "input": "A worker reports progress and has one open question it asked in full two messages ago.",
+      "expected": "The reply leads with the result, then progress, and ends with the open question restated in one line (it was given in full the first time).",
       "anchors": [
         {
           "file": "agents/shared/owner-talk.md",
           "text": "Close each message with a single block of everything the owner has to act on"
+        },
+        {
+          "file": "agents/shared/owner-talk.md",
+          "text": "in every later message restate it in one line until it is answered"
+        }
+      ]
+    },
+    {
+      "id": "claim-first",
+      "category": "succession",
+      "roles": [
+        "manager"
+      ],
+      "input": "A new manager session starts while CURRENT-MANAGER names orders-manager-3, which the agent view lists as idle, and no handoff is running.",
+      "expected": "Its first act is manager-handoff.zsh claim; the claim exits 1, and the manager tells the owner to open orders-manager-3 and does nothing else.",
+      "anchors": [
+        {
+          "file": "agents/manager.md",
+          "text": "Exit 1 means another manager is live: tell the owner the line it prints and do nothing else."
+        }
+      ]
+    },
+    {
+      "id": "wake-guard",
+      "category": "succession",
+      "roles": [
+        "manager"
+      ],
+      "input": "The watcher wakes an old manager after it ran its handoff; manager-handoff.zsh current exits 1 and prints the successor's name. The owner asks it for a dashboard.",
+      "expected": "It acts on nothing and answers only with the printed line naming the successor to open.",
+      "anchors": [
+        {
+          "file": "agents/manager.md",
+          "text": "reply to anything the owner says with nothing but the line it printed"
+        }
+      ]
+    },
+    {
+      "id": "manager-cap-handoff",
+      "category": "context",
+      "roles": [
+        "manager"
+      ],
+      "input": "The size-cap hook says the manager is past its 150k cap; two workstreams are live.",
+      "expected": "It writes NEXT-SESSION-PROMPT.md and MANAGER-STATE.md, runs manager-handoff.zsh handoff in the background and ends the turn; on exit 1 it tells the owner once, re-arms and does not retry.",
+      "anchors": [
+        {
+          "file": "agents/manager.md",
+          "text": "On exit 1, say so to the owner once, re-arm the watcher and make no second attempt"
+        },
+        {
+          "file": "agents/shared/reference/manager/end-of-session.md",
+          "text": "At a size-cap handoff the live workers keep running"
+        }
+      ]
+    },
+    {
+      "id": "manager-cap-nothing-live",
+      "category": "context",
+      "roles": [
+        "manager"
+      ],
+      "input": "The manager reaches its cap with no workstream live or queued.",
+      "expected": "It ends the session by end-of-session.md instead of starting a successor that would have nothing to do.",
+      "anchors": [
+        {
+          "file": "agents/manager.md",
+          "text": "the cap with nothing live or queued, a successor would have no work, so close the session"
+        }
+      ]
+    },
+    {
+      "id": "worker-cap-handoff",
+      "category": "context",
+      "roles": [
+        "architect",
+        "implementer"
+      ],
+      "input": "An architect folding review pass 3 sees the hook's note: context 352k, past the 350k cap. One cross-review it requested has completed and one is still open.",
+      "expected": "It folds the completed review, runs update-context, writes HANDOFF.md with an Open reviews: line naming the open file, and reports HANDOFF-READY; it starts no new review pass.",
+      "anchors": [
+        {
+          "file": "agents/shared/worker-contract.md",
+          "text": "Your cap is 350k tokens."
+        },
+        {
+          "file": "agents/shared/reference/worker/closeout.md",
+          "text": "an `Open reviews:` line naming each open cross-review file"
+        }
+      ]
+    },
+    {
+      "id": "no-fold-count-handoff-when-measured",
+      "category": "context",
+      "roles": [
+        "architect"
+      ],
+      "input": "An architect at 180k context commits its fourth fold.",
+      "expected": "It does not hand off: while its size can be read, it hands off only at the cap.",
+      "anchors": [
+        {
+          "file": "agents/shared/worker-contract.md",
+          "text": "While your size can be read, never hand off on a draft or fold count"
+        }
+      ]
+    },
+    {
+      "id": "owner-wait-stop",
+      "category": "stopping",
+      "roles": [
+        "manager",
+        "architect"
+      ],
+      "input": "A worker's STATUS has read WAITING-ON-OWNER: retry limit for 35 minutes and its folder has a HANDOFF.md with Open reviews: none.",
+      "expected": "The manager stops it through the watcher and marks it owner-stop; when the owner says they will answer, it starts the successor from the handoff and tells the owner to answer there, never taking the answer itself.",
+      "anchors": [
+        {
+          "file": "agents/shared/reference/manager/stopping.md",
+          "text": "you never take the answer yourself"
+        },
+        {
+          "file": "agents/shared/worker-contract.md",
+          "text": "When you set `WAITING-ON-OWNER`, write `HANDOFF.md` in that turn"
+        }
+      ]
+    },
+    {
+      "id": "watcher-ignores-doing-now",
+      "category": "watcher",
+      "roles": [
+        "manager"
+      ],
+      "input": "A worker rewrites its Doing now: line three times in ten minutes without changing its STATUS line.",
+      "expected": "The watcher does not wake the manager; only actionable changes (STATUS lines, handoffs, unread MSGs, blocker state, size past the cap, session status) do.",
+      "anchors": [
+        {
+          "file": "agents/shared/scripts/watch.zsh",
+          "text": "the STATUS: line of every work/*/STATUS.md (not Doing now:, which changes"
+        }
+      ]
+    },
+    {
+      "id": "respawned-rearm",
+      "category": "watcher",
+      "roles": [
+        "manager"
+      ],
+      "input": "The watcher ends with '14:02Z respawned 5c6d7e8f'.",
+      "expected": "The manager tells that worker to re-arm any wait it had going (its background jobs died), then re-arms the watcher.",
+      "anchors": [
+        {
+          "file": "agents/shared/reference/manager/messaging.md",
+          "text": "Tell each affected worker to re-arm any wait it had going."
+        }
+      ]
+    },
+    {
+      "id": "workers-high-effort",
+      "category": "launch",
+      "roles": [
+        "manager"
+      ],
+      "input": "Launch the architect for the retry-doc workstream.",
+      "expected": "The launch line carries --effort high and no one-hour cache setting; the manager itself keeps the owner's effort.",
+      "anchors": [
+        {
+          "file": "agents/shared/reference/manager/briefs.md",
+          "text": "Workers run at high effort and on the default five-minute prompt cache"
+        }
+      ]
+    },
+    {
+      "id": "lean-labels",
+      "category": "owner-talk",
+      "roles": [
+        "manager",
+        "architect",
+        "implementer"
+      ],
+      "input": "A sonnet implementer is asked for its lean on whether to change a retry limit that the plan does not set.",
+      "expected": "It writes 'No lean (<session>, sonnet)' because the call is not a very simple one; any lean it does give carries its session and model.",
+      "anchors": [
+        {
+          "file": "agents/shared/owner-talk.md",
+          "text": "No lean (<session name>, sonnet)"
+        },
+        {
+          "file": "agents/shared/owner-talk.md",
+          "text": "Lean (<session name>, <model>): ..."
+        }
+      ]
+    },
+    {
+      "id": "dashboard-header-and-question-first",
+      "category": "dashboard",
+      "roles": [
+        "manager"
+      ],
+      "input": "The owner asks 'is the intake PR merged yet?' and wants the dashboard.",
+      "expected": "The answer comes first, then a header with the as-of time and each source's read time, then worker lines and every ask in full, deadlines first.",
+      "anchors": [
+        {
+          "file": "agents/manager.md",
+          "text": "When the owner asked a question, its answer."
+        },
+        {
+          "file": "agents/manager.md",
+          "text": "deadlines first, then by how many waiting steps the answer unblocks"
+        }
+      ]
+    },
+    {
+      "id": "full-dashboard-rereads",
+      "category": "dashboard",
+      "roles": [
+        "manager"
+      ],
+      "input": "The owner types 'full dashboard'.",
+      "expected": "Every source the dashboard uses is read again first; the current milestone's series and lanes come first, then the rest.",
+      "anchors": [
+        {
+          "file": "agents/shared/reference/manager/dashboard.md",
+          "text": "A **full dashboard** first re-reads every source"
+        },
+        {
+          "file": "agents/shared/reference/manager/dashboard.md",
+          "text": "The current milestone's series and lanes come first"
+        }
+      ]
+    },
+    {
+      "id": "refused-git-on-own-branch",
+      "category": "checkout",
+      "roles": [
+        "architect",
+        "implementer"
+      ],
+      "input": "Auto mode refuses `git reset --keep HEAD~1` on a candidate branch the worker created for this task.",
+      "expected": "It tags the current commit, then detaches, moves the branch with git branch -f and checks it out again, one command per call, recording the tag and commands; on a shared branch it reports WAITING-ON-OWNER instead.",
+      "anchors": [
+        {
+          "file": "agents/shared/reference/worker/checkout.md",
+          "text": "On a branch anyone else uses, report"
+        }
+      ]
+    },
+    {
+      "id": "specialist-searches-roots-first",
+      "category": "review",
+      "roles": [
+        "architect"
+      ],
+      "input": "A review-specialist's brief names the package src/orders/ as the root to search for callers of a function.",
+      "expected": "It searches that root first, then reads in full each file it cites.",
+      "anchors": [
+        {
+          "file": "agents/review-specialist.md",
+          "text": "search them first, then read in full each file or entry you cite"
         }
       ]
     }
